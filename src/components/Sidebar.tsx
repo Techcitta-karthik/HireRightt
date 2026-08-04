@@ -1,0 +1,252 @@
+import type { WizardStep } from '../data/wizard'
+import styles from './Sidebar.module.css'
+
+const WHY_ITEMS = [
+  'AI-Powered Matching',
+  'Verified by Top Employers Globally',
+  '100% Secure & Privacy-First',
+  'Helping talent grow, one connection at a time',
+]
+
+interface SidebarProps {
+  step?: WizardStep
+}
+
+export function Sidebar({ step = 1 }: SidebarProps) {
+  const showImpactSidebar = step === 2 || step === 3 || step === 4 || step === 5
+  const isPerformance = step === 3
+  const isAiOrDone = step === 4 || step === 5
+  const isDone = step === 5
+
+  return (
+    <aside className={styles.sidebar} aria-label="HRERIGHT introduction">
+      <div className={styles.glowA} aria-hidden="true" />
+      <div className={styles.glowB} aria-hidden="true" />
+      <div className={styles.glowC} aria-hidden="true" />
+      <div className={styles.wave} aria-hidden="true" />
+
+      <div className={styles.inner}>
+        <div className={styles.brand}>
+          <h1 className={styles.logo}>
+            HRERIGHT
+            <sup className={styles.ttt}>TTT</sup>
+          </h1>
+          <p className={styles.tagline}>
+            TALENT <span>TO</span> TALENT
+          </p>
+        </div>
+
+        {showImpactSidebar ? (
+          <>
+            <div className={styles.illusCard} aria-hidden="true">
+              <div
+                className={
+                  isDone
+                    ? styles.checkBadge
+                    : isPerformance
+                      ? styles.chartBadge
+                      : styles.codeBadge
+                }
+              >
+                {isDone ? (
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M5 13L9.5 17.5L19 7"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ) : isPerformance ? (
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M5 19V11M10 19V7M15 19V13M20 19H4"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                ) : (
+                  '</>'
+                )}
+              </div>
+              <div className={styles.armchairScene}>
+                <div className={styles.plant}>
+                  <span className={styles.leaf} />
+                  <span className={styles.pot} />
+                </div>
+                <div className={styles.chair}>
+                  <div className={styles.person}>
+                    <span className={styles.head} />
+                    <span className={styles.body} />
+                  </div>
+                  <div className={styles.laptop}>
+                    <span className={styles.screen} />
+                    <span className={styles.base} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.hero}>
+              <h2>
+                {isDone ? (
+                  <>
+                    You&apos;re All Set! Let&apos;s Find You the{' '}
+                    <em className={styles.accent}>Right</em> Opportunities.
+                  </>
+                ) : isPerformance ? (
+                  <>
+                    Showcase Your Impact, Unlock More{' '}
+                    <em className={styles.accent}>Opportunities</em>
+                  </>
+                ) : isAiOrDone ? (
+                  <>
+                    You&apos;re on the <em className={styles.accent}>Right</em>{' '}
+                    Path!
+                  </>
+                ) : (
+                  <>
+                    Build Your Profile, Unlock{' '}
+                    <em className={styles.accent}>Opportunities</em>
+                  </>
+                )}
+              </h2>
+              <p>
+                {isDone
+                  ? 'Your profile is complete and you are ready to explore opportunities that match your skills and goals.'
+                  : isPerformance
+                  ? 'Your achievements and performance highlight your value and help us match you with the right opportunities.'
+                  : isAiOrDone
+                    ? 'We’re excited to have you with us. Our AI interview will help you showcase your skills and connect you with the best opportunities.'
+                  : 'Your skills and experience help us match you with the right opportunities.'}
+              </p>
+            </div>
+
+            <div className={styles.safeCard}>
+              <div className={styles.safeIcon} aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 3L5 6.5V11.5C5 16 8.2 19.8 12 21C15.8 19.8 19 16 19 11.5V6.5L12 3Z"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9.5 12L11.2 13.7L14.8 10"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className={styles.safeTitle}>Your journey is in safe hands.</p>
+                <ul className={styles.safeList}>
+                  {WHY_ITEMS.map((item) => (
+                    <li key={item}>
+                      <span className={styles.check} aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                          <path
+                            d="M3.5 8.5L6.5 11.5L12.5 4.5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.hero}>
+              <h2>
+                Your Journey to the <em>Right</em> Opportunity Starts Here.
+              </h2>
+              <p>
+                Build a powerful profile that showcases who you are — and let AI
+                connect you with opportunities that truly fit.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureImage}>
+                <img
+                  src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=640&q=80"
+                  alt="Person celebrating at a mountain summit"
+                />
+                <div className={styles.featureOverlay} />
+              </div>
+              <p className={styles.featureCopy}>
+                One profile. Unlimited possibilities.
+                <br />
+                Built on trust. Powered by AI.
+              </p>
+            </div>
+
+            <div className={styles.why}>
+              <h3>Why HRERIGHT</h3>
+              <ul>
+                {WHY_ITEMS.map((item) => (
+                  <li key={item}>
+                    <span className={styles.check} aria-hidden="true">
+                      <svg viewBox="0 0 16 16" fill="none">
+                        <path
+                          d="M3.5 8.5L6.5 11.5L12.5 4.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
+
+        <div className={styles.help}>
+          <div className={styles.helpIcon} aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 14v-2a8 8 0 1 1 16 0v2"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+              <path
+                d="M4 14v3a2 2 0 0 0 2 2h1v-5H6a2 2 0 0 0-2 2Zm16 0v3a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 2Z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 19v1a2.5 2.5 0 0 0 2.5 2.5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+          <div>
+            <p className={styles.helpTitle}>Need help?</p>
+            <a href="mailto:care@hreright.com" className={styles.helpLink}>
+              care@hreright.com
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+  )
+}

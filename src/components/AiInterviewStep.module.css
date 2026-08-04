@@ -1,0 +1,387 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  animation: fade-up 0.35s var(--ease) both;
+}
+
+.banner {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 12px;
+  background: linear-gradient(135deg, #f0fdf4, #e0f2fe);
+  border-color: #bbf7d0;
+}
+
+.bannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.successIcon {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #22c55e, #16a34a);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 26px rgba(34, 197, 94, 0.3);
+}
+
+.successIcon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.bannerEyebrow {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.bannerText h3 {
+  margin-top: 2px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--gray-900);
+}
+
+.bannerText p:last-child {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  color: var(--gray-600);
+}
+
+.botWrap {
+  display: grid;
+  place-items: center;
+}
+
+.bot {
+  width: 92px;
+  height: 92px;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #ede9fe, #ddd6fe);
+  display: grid;
+  place-items: center;
+  color: var(--purple-700);
+}
+
+.bot svg {
+  width: 58px;
+  height: 58px;
+}
+
+.sectionTitle {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.subtitle {
+  margin-top: 4px;
+  font-size: 0.84rem;
+  color: var(--gray-500);
+}
+
+.detailsGrid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 14px;
+}
+
+.detailsList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.detailItem {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.detailIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--purple-50);
+  display: grid;
+  place-items: center;
+  color: var(--purple-600);
+}
+
+.detailIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.detailLabel {
+  font-size: 0.74rem;
+  color: var(--gray-500);
+}
+
+.detailValue {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.badge {
+  margin-left: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--purple-700);
+  background: var(--purple-100);
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.nextCard {
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  padding: 14px;
+}
+
+.nextCard h5 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.nextCard ul {
+  margin-top: 8px;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nextCard li {
+  font-size: 0.82rem;
+  color: var(--gray-700);
+}
+
+.detailActions {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.outlineBtn,
+.primaryBtn,
+.whatsappBtn {
+  height: 42px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.outlineBtn {
+  border: 1.5px solid var(--purple-600);
+  color: var(--purple-700);
+  background: var(--white);
+}
+
+.outlineBtn:hover {
+  transform: translateY(-1px);
+  background: var(--purple-50);
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #fb923c 0%, #ff6b6b 100%);
+  color: var(--white);
+}
+
+.primaryBtn:hover,
+.whatsappBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(251, 146, 60, 0.25);
+}
+
+.confirmGrid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.confirmCard {
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.confirmHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.confirmHead p {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.sent {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #15803d;
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.messageBox {
+  margin: 8px 0 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 10px;
+  background: #f8fafc;
+  min-height: 112px;
+}
+
+.messageBox p {
+  font-size: 0.78rem;
+  color: var(--gray-700);
+  line-height: 1.45;
+}
+
+.whatsappBtn {
+  width: 100%;
+  border: 1px solid #22c55e;
+  background: #22c55e;
+  color: #fff;
+}
+
+.reminders {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.reminderItem {
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+  text-align: left;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.reminderDot {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #d1d5db;
+  flex-shrink: 0;
+}
+
+.reminderItem p {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+.reminderItem span {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  color: var(--gray-500);
+}
+
+.reminderActive {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.reminderActive .reminderDot {
+  background: #22c55e;
+}
+
+.finalCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  background: linear-gradient(135deg, #fff7ed, #f5f3ff);
+}
+
+.finalIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: #f59e0b;
+  box-shadow: var(--shadow-sm);
+}
+
+.finalIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.finalCard h4 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+
+.finalCard h4 span {
+  color: var(--purple-700);
+}
+
+.finalCard p {
+  margin-top: 4px;
+  font-size: 0.84rem;
+  color: var(--gray-700);
+}
+
+.finalCard small {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.76rem;
+  color: var(--gray-500);
+}
+
+.status {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+@media (max-width: 980px) {
+  .banner,
+  .detailsGrid,
+  .confirmGrid,
+  .reminders {
+    grid-template-columns: 1fr;
+  }
+
+  .detailsList {
+    grid-template-columns: 1fr;
+  }
+}

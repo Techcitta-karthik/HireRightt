@@ -1,0 +1,419 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+  animation: fade-up 0.4s var(--ease) both;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sectionHead h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  letter-spacing: -0.01em;
+}
+
+.sectionHead p {
+  font-size: 0.82rem;
+  color: var(--gray-500);
+}
+
+.fieldLabel,
+.field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 8px;
+}
+
+.req {
+  color: var(--coral);
+}
+
+.textInput,
+.textarea {
+  width: 100%;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--gray-800);
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textInput {
+  height: 46px;
+  padding: 0 14px;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+  padding: 14px 14px 28px;
+  line-height: 1.55;
+}
+
+.textInput:hover,
+.textarea:hover {
+  border-color: var(--brand-300);
+}
+
+.textInput:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skillTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px 0 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.14), rgba(255, 107, 107, 0.12));
+  border: 1px solid rgba(251, 146, 60, 0.35);
+  color: var(--brand-700);
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: fade-up 0.2s var(--ease);
+}
+
+.tagRemove {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--brand-700);
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tagRemove:hover {
+  background: rgba(234, 88, 12, 0.15);
+  color: var(--brand-800);
+}
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.suggestLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+.suggestRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suggestChip {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-600);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.suggestChip:hover {
+  border-color: var(--orange);
+  color: var(--brand-700);
+  background: var(--brand-50);
+  transform: translateY(-1px);
+}
+
+.experienceList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.experienceCard {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  padding: 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #ffffff 0%, #fffaf5 100%);
+}
+
+.expIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(251, 146, 60, 0.16), rgba(255, 107, 107, 0.14));
+  color: var(--orange);
+  display: grid;
+  place-items: center;
+}
+
+.expIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.expBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.expTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.expIndex {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.removeExp {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--coral);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.removeExp:hover {
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.twoCol,
+.threeCol {
+  display: grid;
+  gap: 14px;
+}
+
+.twoCol {
+  grid-template-columns: 1fr 1fr;
+}
+
+.threeCol {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.field {
+  min-width: 0;
+}
+
+.dateWrap {
+  position: relative;
+}
+
+.dateHint {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  color: var(--gray-400);
+  pointer-events: none;
+}
+
+.checkRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--gray-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkRow input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkboxUi {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--gray-300);
+  background: var(--white);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.checkRow input:checked + .checkboxUi {
+  background: linear-gradient(135deg, #fb923c, #ff6b6b);
+  border-color: transparent;
+}
+
+.checkRow input:checked + .checkboxUi::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.textareaWrap {
+  position: relative;
+}
+
+.counter {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--gray-400);
+  pointer-events: none;
+}
+
+.addExp {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--orange);
+  padding: 8px 4px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.addExp span {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.addExp:hover {
+  color: var(--coral);
+  transform: translateX(2px);
+}
+
+.totalRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.totalSelect {
+  min-width: 0;
+}
+
+.motivate {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 1px solid var(--peach);
+}
+
+.motivateIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fb923c, #ff6b6b);
+  color: var(--white);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 18px rgba(251, 146, 60, 0.28);
+}
+
+.motivateIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.motivateTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 2px;
+}
+
+.motivate p:last-child {
+  font-size: 0.82rem;
+  color: var(--gray-600);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .threeCol,
+  .totalRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .twoCol,
+  .experienceCard {
+    grid-template-columns: 1fr;
+  }
+
+  .expIcon {
+    display: none;
+  }
+
+  .card {
+    padding: 18px 16px;
+  }
+
+  .sectionHead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,77 @@
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, #f7f1e9 0%, #f0e4d4 100%);
+  border: 1px solid var(--purple-100);
+  animation: fade-up 0.45s var(--ease) both;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.shield {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--purple-600);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.shield svg {
+  width: 18px;
+  height: 18px;
+}
+
+.left p {
+  font-size: 0.84rem;
+  color: var(--gray-700);
+  line-height: 1.45;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--green-600);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+@media (max-width: 800px) {
+  .banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .badges {
+    flex-wrap: wrap;
+  }
+}
