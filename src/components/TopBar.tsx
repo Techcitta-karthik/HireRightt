@@ -3,9 +3,10 @@ import styles from './TopBar.module.css'
 
 interface TopBarProps {
   userName?: string
+  onSignOut?: () => void
 }
 
-export function TopBar({ userName = 'Arjun' }: TopBarProps) {
+export function TopBar({ userName = 'Arjun', onSignOut }: TopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -78,7 +79,12 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
             <button type="button" role="menuitem">
               Account settings
             </button>
-            <button type="button" role="menuitem" className={styles.danger}>
+            <button
+              type="button"
+              role="menuitem"
+              className={styles.danger}
+              onClick={onSignOut}
+            >
               Sign out
             </button>
           </div>

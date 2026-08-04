@@ -202,10 +202,10 @@ export function HomePage() {
           </nav>
 
           <div className={styles.navActions}>
-            <button type="button" className={styles.loginBtn}>
+            <Link to="/login" className={styles.loginBtn}>
               Login
-            </button>
-            <Link to="/onboarding" className={styles.ctaBtn}>
+            </Link>
+            <Link to="/register" className={styles.ctaBtn}>
               Get Started Free <Icon name="arrow" />
             </Link>
           </div>
@@ -228,7 +228,7 @@ export function HomePage() {
               </p>
 
               <div className={styles.heroActions}>
-                <Link to="/onboarding" className={styles.primaryHeroBtn}>
+                <Link to="/register" className={styles.primaryHeroBtn}>
                   <Icon name="user" />
                   Create Your Profile
                 </Link>
@@ -364,13 +364,13 @@ export function HomePage() {
                 HRERIGHT.
               </p>
               <div className={styles.stripActions}>
-                <Link to="/onboarding" className={styles.primaryHeroBtn}>
+                <Link to="/register" className={styles.primaryHeroBtn}>
                   <Icon name="user" />
                   Create Your Profile — It&apos;s Free
                 </Link>
-                <a href="#login">
+                <Link to="/login">
                   Already have an account? <strong>Login</strong>
-                </a>
+                </Link>
               </div>
             </div>
           </section>
