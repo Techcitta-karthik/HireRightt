@@ -3,6 +3,7 @@ import styles from './ResumeUpload.module.css'
 
 interface ResumeUploadProps {
   file: File | null
+  uploadedName?: string
   onFileChange: (file: File | null) => void
 }
 
@@ -23,7 +24,11 @@ function isAccepted(file: File) {
   )
 }
 
-export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
+export function ResumeUpload({
+  file,
+  uploadedName,
+  onFileChange,
+}: ResumeUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
@@ -111,7 +116,7 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
         </div>
 
         <div
-          className={`${styles.dropzone} ${dragging ? styles.dragging : ''} ${file ? styles.hasFile : ''}`}
+          className={`${styles.dropzone} ${dragging ? styles.dragging : ''} ${file || uploadedName ? styles.hasFile : ''}`}
           onDragOver={(event) => {
             event.preventDefault()
             setDragging(true)
@@ -127,7 +132,7 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
             onChange={(event) => validateAndSet(event.target.files?.[0] ?? null)}
           />
 
-          {file ? (
+          {file || uploadedName ? (
             <div className={styles.fileInfo}>
               <div className={styles.fileIcon} aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none">
@@ -141,20 +146,26 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
                 </svg>
               </div>
               <div className={styles.fileMeta}>
-                <p className={styles.fileName}>{file.name}</p>
+                <p className={styles.fileName}>{file?.name ?? uploadedName}</p>
                 <p className={styles.fileSize}>
-                  {(file.size / 1024).toFixed(1)} KB · Ready to upload
+                  {file
+                    ? `${(file.size / 1024).toFixed(1)} KB · Ready to upload`
+                    : 'Uploaded and saved securely'}
                 </p>
               </div>
               <button
                 type="button"
                 className={styles.removeBtn}
                 onClick={() => {
-                  validateAndSet(null)
-                  if (inputRef.current) inputRef.current.value = ''
+                  if (file) {
+                    validateAndSet(null)
+                    if (inputRef.current) inputRef.current.value = ''
+                  } else {
+                    inputRef.current?.click()
+                  }
                 }}
               >
-                Remove
+                {file ? 'Remove' : 'Replace'}
               </button>
             </div>
           ) : (

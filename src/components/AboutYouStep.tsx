@@ -12,17 +12,23 @@ import styles from './StepPanels.module.css'
 
 interface AboutYouStepProps {
   data: ProfileFormData
+  uploadedResumeName?: string
   onChange: <K extends keyof ProfileFormData>(
     key: K,
     value: ProfileFormData[K],
   ) => void
 }
 
-export function AboutYouStep({ data, onChange }: AboutYouStepProps) {
+export function AboutYouStep({
+  data,
+  onChange,
+  uploadedResumeName,
+}: AboutYouStepProps) {
   return (
     <div className={styles.stack}>
       <ResumeUpload
         file={data.resumeFile}
+        uploadedName={uploadedResumeName}
         onFileChange={(file) => onChange('resumeFile', file)}
       />
 
