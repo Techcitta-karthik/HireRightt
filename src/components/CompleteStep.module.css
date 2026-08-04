@@ -93,6 +93,13 @@ h4 {
   background: #fff;
 }
 
+.nextLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
 .nextIcon {
   width: 32px;
   height: 32px;

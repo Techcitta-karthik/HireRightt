@@ -1,4 +1,6 @@
+import { motion } from 'framer-motion'
 import { STEPS, type WizardStep } from '../data/wizard'
+import { easeOut, staggerFast } from '../motion/variants'
 import styles from './Stepper.module.css'
 
 interface StepperProps {
@@ -9,7 +11,13 @@ interface StepperProps {
 
 export function Stepper({ current, onStepClick, completedThrough }: StepperProps) {
   return (
-    <nav className={styles.stepper} aria-label="Profile setup progress">
+    <motion.nav
+      className={styles.stepper}
+      aria-label="Profile setup progress"
+      variants={staggerFast}
+      initial="hidden"
+      animate="show"
+    >
       <ol className={styles.list}>
         {STEPS.map((step, index) => {
           const isActive = step.id === current
@@ -17,21 +25,40 @@ export function Stepper({ current, onStepClick, completedThrough }: StepperProps
           const isClickable = step.id <= Math.max(current, completedThrough + 1)
 
           return (
-            <li key={step.id} className={styles.item}>
+            <motion.li
+              key={step.id}
+              className={styles.item}
+              variants={{
+                hidden: { opacity: 0, y: 10 },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.35, ease: easeOut },
+                },
+              }}
+            >
               {index > 0 && (
                 <div
                   className={`${styles.connector} ${isDone || isActive ? styles.connectorActive : ''}`}
                   aria-hidden="true"
                 />
               )}
-              <button
+              <motion.button
                 type="button"
                 className={`${styles.step} ${isActive ? styles.active : ''} ${isDone && !isActive ? styles.done : ''}`}
                 onClick={() => isClickable && onStepClick(step.id)}
                 disabled={!isClickable}
                 aria-current={isActive ? 'step' : undefined}
+                whileHover={isClickable ? { y: -2, scale: 1.02 } : undefined}
+                whileTap={isClickable ? { scale: 0.97 } : undefined}
+                animate={isActive ? { scale: 1.02 } : { scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 28 }}
               >
-                <span className={styles.circle}>
+                <motion.span
+                  className={styles.circle}
+                  layout
+                  transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+                >
                   {isDone && !isActive ? (
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path
@@ -45,16 +72,16 @@ export function Stepper({ current, onStepClick, completedThrough }: StepperProps
                   ) : (
                     step.id
                   )}
-                </span>
+                </motion.span>
                 <span className={styles.copy}>
                   <span className={styles.label}>{step.label}</span>
                   <span className={styles.sublabel}>{step.sublabel}</span>
                 </span>
-              </button>
-            </li>
+              </motion.button>
+            </motion.li>
           )
         })}
       </ol>
-    </nav>
+    </motion.nav>
   )
 }

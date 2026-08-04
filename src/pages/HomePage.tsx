@@ -1,6 +1,15 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { SiteNav } from '../components/SiteNav'
 import styles from './HomePage.module.css'
+import {
+  easeOut,
+  fadeIn,
+  fadeUp,
+  scaleIn,
+  staggerContainer,
+} from '../motion/variants'
 
 const FEATURES = [
   {
@@ -171,223 +180,183 @@ function Icon({ name }: { name: string }) {
   return <>{map[name]}</>
 }
 
+const viewOnce = {
+  once: true,
+  amount: 0.25,
+} as const
+
 export function HomePage() {
   return (
     <div className={styles.page}>
+      <motion.div
+        className={styles.dashBackdrop}
+        aria-hidden="true"
+        initial={{ opacity: 0, scale: 0.96, y: 18 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.85, ease: easeOut, delay: 0.1 }}
+      >
+        <motion.img
+          src="/dashboard-bg.png?v=4"
+          alt=""
+          animate={{ y: [0, -10, 0] }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      </motion.div>
+
       <div className={styles.shell}>
-        <header className={styles.navbar}>
-          <div className={styles.brand}>
-            <h1>
-              HRERIGHT<sup>TTT</sup>
-            </h1>
-            <p>
-              TALENT <span>TO</span> TALENT
-            </p>
-          </div>
-
-          <nav className={styles.navLinks}>
-            <a href="#jobs">
-              For Job Seekers <span className={styles.chevron} />
-            </a>
-            <a href="#why">
-              Why HRERIGHT <span className={styles.chevron} />
-            </a>
-            <a href="#solutions">
-              Solutions <span className={styles.chevron} />
-            </a>
-            <a href="#resources">
-              Resources <span className={styles.chevron} />
-            </a>
-            <a href="#about">About Us</a>
-          </nav>
-
-          <div className={styles.navActions}>
-            <button type="button" className={styles.loginBtn}>
-              Login
-            </button>
-            <Link to="/onboarding" className={styles.ctaBtn}>
-              Get Started Free <Icon name="arrow" />
-            </Link>
-          </div>
-        </header>
+        <SiteNav />
 
         <main>
-          <section className={styles.hero}>
-            <div className={styles.heroLeft}>
-              <span className={styles.kicker}>AI-POWERED HIRING PLATFORM</span>
-              <h2>
-                Your Dream Job
-                <br />
-                Deserves the
-                <br />
-                <em>Right</em> Start.
-              </h2>
-              <p>
-                AI-powered matching, secure profiles, and faster opportunities
-                — all in one place.
-              </p>
+          <section className={styles.heroStage} aria-label="Hero">
+            <div className={styles.heroHitArea}>
+              <Link to="/onboarding" className={styles.srCta}>
+                Create Your Profile
+              </Link>
+              <Link to="/how-it-works" className={styles.srCtaSecondary}>
+                How It Works
+              </Link>
+            </div>
+          </section>
 
-              <div className={styles.heroActions}>
-                <Link to="/onboarding" className={styles.primaryHeroBtn}>
-                  <Icon name="user" />
-                  Create Your Profile
-                </Link>
-                <button type="button" className={styles.secondaryHeroBtn}>
-                  <Icon name="play" />
-                  How It Works
-                </button>
+          <div className={styles.contentPanel}>
+            <motion.section
+              className={styles.logos}
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={viewOnce}
+            >
+              <motion.p variants={fadeIn}>
+                Powering hiring for leading companies worldwide
+              </motion.p>
+              <div className={styles.logoRow}>
+                {COMPANIES.map((company) => (
+                  <motion.div
+                    key={company.name}
+                    className={styles.logoItem}
+                    variants={fadeUp}
+                    whileHover={{ y: -3, opacity: 1 }}
+                  >
+                    <img src={company.src} alt={`${company.name} logo`} />
+                  </motion.div>
+                ))}
               </div>
+            </motion.section>
 
-              <div className={styles.quickPoints}>
-                <span>
-                  <i className={styles.qIcon}>
-                    <Icon name="bolt" />
-                  </i>
-                  AI Matching
-                </span>
-                <span>
-                  <i className={styles.qIcon}>
-                    <Icon name="shield" />
-                  </i>
-                  Secure & Private
-                </span>
-                <span>
-                  <i className={styles.qIcon}>
-                    <Icon name="star" />
-                  </i>
-                  Trusted by Top Employers
-                </span>
+            <motion.section
+              id="why"
+              className={styles.featuresSection}
+              initial="hidden"
+              whileInView="show"
+              viewport={viewOnce}
+              variants={staggerContainer}
+            >
+              <motion.span className={styles.kicker} variants={fadeUp}>
+                WHY JOB SEEKERS CHOOSE HRERIGHT
+              </motion.span>
+              <motion.h3 variants={fadeUp}>
+                Everything you need to get hired,
+                <br />
+                faster and <em>smarter.</em>
+              </motion.h3>
+
+              <div className={styles.featureGrid}>
+                {FEATURES.map((feature) => (
+                  <motion.article
+                    key={feature.title}
+                    className={styles.featureCard}
+                    variants={fadeUp}
+                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  >
+                    <div className={styles.featureIcon}>
+                      <Icon name={feature.icon} />
+                    </div>
+                    <h4>{feature.title}</h4>
+                    <p>{feature.desc}</p>
+                  </motion.article>
+                ))}
               </div>
+            </motion.section>
 
-              <div className={styles.trustRow}>
+            <motion.section
+              className={styles.ctaStrip}
+              variants={scaleIn}
+              initial="hidden"
+              whileInView="show"
+              viewport={viewOnce}
+            >
+              <motion.div
+                className={styles.rocket}
+                aria-hidden="true"
+                animate={{ y: [0, -8, 0], rotate: [0, -2, 0] }}
+                transition={{
+                  duration: 3.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              >
+                <div className={styles.rocketBody} />
+                <div className={styles.rocketNose} />
+                <div className={styles.rocketWindow} />
+                <div className={styles.rocketFinLeft} />
+                <div className={styles.rocketFinRight} />
+                <div className={styles.rocketFlame} />
+                <div className={styles.cloudA} />
+                <div className={styles.cloudB} />
+              </motion.div>
+              <div className={styles.ctaCopy}>
+                <h3>
+                  Take the <em>Right</em> Step Today
+                </h3>
                 <p>
-                  Trusted by 1000+ employers and millions of job seekers
-                  worldwide.
+                  Join thousands of job seekers who are building their future
+                  with HRERIGHT.
                 </p>
-              </div>
-            </div>
-
-            <div className={styles.heroRight}>
-              <div className={styles.dashboardCard}>
-                <div className={styles.dashSidebar} aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <div className={styles.dashMain}>
-                  <div className={styles.dashTop}>
-                    <strong>HRERIGHT</strong>
-                    <span>Welcome back, Arjun!</span>
-                  </div>
-                  <div className={styles.dashGrid}>
-                    <article>
-                      <p>Profile Strength</p>
-                      <div className={styles.progress}>
-                        <strong>85%</strong>
-                      </div>
-                      <small>Very Strong</small>
-                    </article>
-                    <article>
-                      <p>Top Job Matches</p>
-                      <ul>
-                        <li>
-                          <span>Senior Frontend Developer</span>
-                          <b>98%</b>
-                        </li>
-                        <li>
-                          <span>Full Stack Engineer</span>
-                          <b>95%</b>
-                        </li>
-                        <li>
-                          <span>Software Engineer (AI/ML)</span>
-                          <b>92%</b>
-                        </li>
-                      </ul>
-                    </article>
-                  </div>
+                <div className={styles.stripActions}>
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Link to="/onboarding" className={styles.primaryHeroBtn}>
+                      <Icon name="user" />
+                      Create Your Profile — It&apos;s Free
+                    </Link>
+                  </motion.div>
+                  <Link to="/login">
+                    Already have an account? <strong>Login</strong>
+                  </Link>
                 </div>
               </div>
-            </div>
-          </section>
+            </motion.section>
 
-          <section className={styles.logos}>
-            <p>Powering hiring for leading companies worldwide</p>
-            <div className={styles.logoRow}>
-              {COMPANIES.map((company) => (
-                <div key={company.name} className={styles.logoItem}>
-                  <img src={company.src} alt={`${company.name} logo`} />
-                </div>
+            <motion.section
+              className={styles.stats}
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={viewOnce}
+            >
+              {STATS.map((stat) => (
+                <motion.article
+                  key={stat.label}
+                  variants={fadeUp}
+                  whileHover={{ y: -3 }}
+                >
+                  <div className={styles.statIcon}>
+                    <Icon name={stat.icon} />
+                  </div>
+                  <div>
+                    <strong>{stat.value}</strong>
+                    <span>{stat.label}</span>
+                  </div>
+                </motion.article>
               ))}
-            </div>
-          </section>
-
-          <section id="why" className={styles.featuresSection}>
-            <span className={styles.kicker}>WHY JOB SEEKERS CHOOSE HRERIGHT</span>
-            <h3>
-              Everything you need to get hired,
-              <br />
-              faster and <em>smarter.</em>
-            </h3>
-
-            <div className={styles.featureGrid}>
-              {FEATURES.map((feature) => (
-                <article key={feature.title} className={styles.featureCard}>
-                  <div className={styles.featureIcon}>
-                    <Icon name={feature.icon} />
-                  </div>
-                  <h4>{feature.title}</h4>
-                  <p>{feature.desc}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className={styles.ctaStrip}>
-            <div className={styles.rocket} aria-hidden="true">
-              <div className={styles.rocketBody} />
-              <div className={styles.rocketNose} />
-              <div className={styles.rocketWindow} />
-              <div className={styles.rocketFinLeft} />
-              <div className={styles.rocketFinRight} />
-              <div className={styles.rocketFlame} />
-              <div className={styles.cloudA} />
-              <div className={styles.cloudB} />
-            </div>
-            <div className={styles.ctaCopy}>
-              <h3>
-                Take the <em>Right</em> Step Today
-              </h3>
-              <p>
-                Join thousands of job seekers who are building their future with
-                HRERIGHT.
-              </p>
-              <div className={styles.stripActions}>
-                <Link to="/onboarding" className={styles.primaryHeroBtn}>
-                  <Icon name="user" />
-                  Create Your Profile — It&apos;s Free
-                </Link>
-                <a href="#login">
-                  Already have an account? <strong>Login</strong>
-                </a>
-              </div>
-            </div>
-          </section>
-
-          <section className={styles.stats}>
-            {STATS.map((stat) => (
-              <article key={stat.label}>
-                <div className={styles.statIcon}>
-                  <Icon name={stat.icon} />
-                </div>
-                <div>
-                  <strong>{stat.value}</strong>
-                  <span>{stat.label}</span>
-                </div>
-              </article>
-            ))}
-          </section>
+            </motion.section>
+          </div>
         </main>
       </div>
     </div>

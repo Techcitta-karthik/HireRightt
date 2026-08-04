@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { AboutYouStep } from '../components/AboutYouStep'
 import { AiInterviewStep } from '../components/AiInterviewStep'
 import { CompleteStep } from '../components/CompleteStep'
@@ -14,6 +16,8 @@ import {
   type ProfileFormData,
   type WizardStep,
 } from '../data/wizard'
+import { MotionButton } from '../motion/MotionButton'
+import { easeOut, fadeUp, stepPanel } from '../motion/variants'
 import styles from './ProfileWizard.module.css'
 
 const STEP_TITLES: Record<WizardStep, { title: string; subtitle: string }> = {
@@ -43,6 +47,7 @@ const STEP_TITLES: Record<WizardStep, { title: string; subtitle: string }> = {
 }
 
 export function ProfileWizard() {
+  const navigate = useNavigate()
   const [step, setStep] = useState<WizardStep>(1)
   const [completedThrough, setCompletedThrough] = useState(0)
   const [data, setData] = useState<ProfileFormData>(initialFormData)
@@ -87,6 +92,8 @@ export function ProfileWizard() {
     if (step < 5) {
       setStep((prev) => (prev + 1) as WizardStep)
       window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      navigate('/dashboard')
     }
   }
 
@@ -94,16 +101,27 @@ export function ProfileWizard() {
   const showAutoSaveFooter = step >= 2
 
   return (
-    <div className={styles.layout}>
+    <motion.div
+      className={styles.layout}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35, ease: easeOut }}
+    >
       <Sidebar step={step} />
 
       <div className={styles.main}>
         <TopBar />
 
-        <header className={styles.pageHeader}>
+        <motion.header
+          className={styles.pageHeader}
+          key={`header-${step}`}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: easeOut }}
+        >
           <h1>{meta.title}</h1>
           <p>{meta.subtitle}</p>
-        </header>
+        </motion.header>
 
         <Stepper
           current={step}
@@ -111,34 +129,57 @@ export function ProfileWizard() {
           onStepClick={(next) => setStep(next)}
         />
 
-        <div key={step} className={styles.panel}>
-          {step === 1 && <AboutYouStep data={data} onChange={updateField} />}
-          {step === 2 && <SkillsStep data={data} onChange={updateField} />}
-          {step === 3 && (
-            <PerformanceStep data={data} onChange={updateField} />
-          )}
-          {step === 4 && (
-            <AiInterviewStep data={data} onChange={updateField} />
-          )}
-          {step === 5 && (
-            <CompleteStep
-              data={data}
-              onEditStep={(next) => setStep(next)}
-            />
-          )}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            className={styles.panel}
+            variants={stepPanel}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {step === 1 && <AboutYouStep data={data} onChange={updateField} />}
+            {step === 2 && <SkillsStep data={data} onChange={updateField} />}
+            {step === 3 && (
+              <PerformanceStep data={data} onChange={updateField} />
+            )}
+            {step === 4 && (
+              <AiInterviewStep data={data} onChange={updateField} />
+            )}
+            {step === 5 && (
+              <CompleteStep
+                data={data}
+                onEditStep={(next) => setStep(next)}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
 
-        {step === 1 && <PrivacyBanner />}
+        <AnimatePresence>
+          {step === 1 && (
+            <motion.div
+              key="privacy"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+            >
+              <PrivacyBanner />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <footer
+        <motion.footer
           className={`${styles.actions} ${showAutoSaveFooter ? styles.actionsSplit : ''}`}
+          layout
+          transition={{ duration: 0.25, ease: easeOut }}
         >
           {showAutoSaveFooter ? (
             <>
-              <button
+              <MotionButton
                 type="button"
                 className={styles.backBtn}
                 onClick={() => setStep((prev) => (prev - 1) as WizardStep)}
+                lift
               >
                 <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
                   <path
@@ -150,7 +191,7 @@ export function ProfileWizard() {
                   />
                 </svg>
                 Back
-              </button>
+              </MotionButton>
 
               <p className={styles.autoSave}>
                 <span className={styles.autoSaveDot} aria-hidden="true">
@@ -167,11 +208,12 @@ export function ProfileWizard() {
                 All changes are saved automatically
               </p>
 
-              <button
+              <MotionButton
                 type="button"
                 className={styles.primaryBtn}
                 onClick={handleContinue}
                 disabled={saving}
+                lift
               >
                 {saving
                   ? 'Saving…'
@@ -187,34 +229,36 @@ export function ProfileWizard() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
+              </MotionButton>
             </>
           ) : (
             <>
-              <button
+              <MotionButton
                 type="button"
                 className={styles.secondaryBtn}
                 onClick={handleSaveExit}
                 disabled={saving}
+                lift
               >
                 Save & Exit
-              </button>
+              </MotionButton>
 
               <div className={styles.actionRight}>
                 {step > 1 && (
-                  <button
+                  <MotionButton
                     type="button"
                     className={styles.ghostBtn}
                     onClick={() => setStep((prev) => (prev - 1) as WizardStep)}
                   >
                     Back
-                  </button>
+                  </MotionButton>
                 )}
-                <button
+                <MotionButton
                   type="button"
                   className={styles.primaryBtn}
                   onClick={handleContinue}
                   disabled={saving}
+                  lift
                 >
                   {saving ? 'Saving…' : step === 5 ? 'Finish' : 'Save & Continue'}
                   {step < 5 && (
@@ -228,23 +272,32 @@ export function ProfileWizard() {
                       />
                     </svg>
                   )}
-                </button>
+                </MotionButton>
               </div>
             </>
           )}
-        </footer>
+        </motion.footer>
 
         <p className={styles.stepHint}>
           Step {step} of {STEPS.length}
         </p>
       </div>
 
-      {toast && (
-        <div className={styles.toast} role="status">
-          <span className={styles.toastDot} aria-hidden="true" />
-          {toast}
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            className={styles.toast}
+            role="status"
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            exit="hidden"
+          >
+            <span className={styles.toastDot} aria-hidden="true" />
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }

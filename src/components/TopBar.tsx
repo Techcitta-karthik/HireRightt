@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { easeOut } from '../motion/variants'
 import styles from './TopBar.module.css'
 
 interface TopBarProps {
@@ -8,6 +11,7 @@ interface TopBarProps {
 export function TopBar({ userName = 'Arjun' }: TopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     function onDoc(event: MouseEvent) {
@@ -17,9 +21,23 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
     return () => document.removeEventListener('mousedown', onDoc)
   }, [])
 
+  function go(path: string) {
+    setMenuOpen(false)
+    navigate(path)
+  }
+
   return (
-    <div className={styles.topbar}>
-      <div className={styles.safe}>
+    <motion.div
+      className={styles.topbar}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: easeOut }}
+    >
+      <motion.div
+        className={styles.safe}
+        whileHover={{ scale: 1.02 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+      >
         <span className={styles.shield} aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
             <path
@@ -38,15 +56,17 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
           </svg>
         </span>
         Your data is safe with us
-      </div>
+      </motion.div>
 
       <div className={styles.userWrap} ref={ref}>
-        <button
+        <motion.button
           type="button"
           className={styles.userBtn}
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-expanded={menuOpen}
           aria-haspopup="menu"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
         >
           <img
             className={styles.avatar}
@@ -54,11 +74,13 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
             alt=""
           />
           <span>Hi, {userName}</span>
-          <svg
+          <motion.svg
             className={`${styles.chevron} ${menuOpen ? styles.open : ''}`}
             viewBox="0 0 20 20"
             fill="none"
             aria-hidden="true"
+            animate={{ rotate: menuOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
           >
             <path
               d="M5 7.5L10 12.5L15 7.5"
@@ -67,23 +89,60 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-          </svg>
-        </button>
+          </motion.svg>
+        </motion.button>
 
-        {menuOpen && (
-          <div className={styles.menu} role="menu">
-            <button type="button" role="menuitem">
-              View profile
-            </button>
-            <button type="button" role="menuitem">
-              Account settings
-            </button>
-            <button type="button" role="menuitem" className={styles.danger}>
-              Sign out
-            </button>
-          </div>
-        )}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              className={styles.menu}
+              role="menu"
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.96 }}
+              transition={{ duration: 0.18, ease: easeOut }}
+            >
+              <motion.button
+                type="button"
+                role="menuitem"
+                onClick={() => go('/profile')}
+                whileHover={{ x: 4, backgroundColor: 'rgba(255,107,0,0.06)' }}
+                whileTap={{ scale: 0.98 }}
+              >
+                View profile
+              </motion.button>
+              <motion.button
+                type="button"
+                role="menuitem"
+                onClick={() => go('/settings')}
+                whileHover={{ x: 4, backgroundColor: 'rgba(255,107,0,0.06)' }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Account settings
+              </motion.button>
+              <motion.button
+                type="button"
+                role="menuitem"
+                onClick={() => go('/dashboard')}
+                whileHover={{ x: 4, backgroundColor: 'rgba(255,107,0,0.06)' }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Dashboard
+              </motion.button>
+              <motion.button
+                type="button"
+                role="menuitem"
+                className={styles.danger}
+                onClick={() => go('/login')}
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Sign out
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }

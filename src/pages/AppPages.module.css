@@ -1,0 +1,259 @@
+.page {
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.shell {
+  width: 85%;
+  margin: 0 auto;
+  padding-bottom: 48px;
+}
+
+.main {
+  padding-top: 24px;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.head h1 {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.head p {
+  margin-top: 6px;
+  color: #64748b;
+}
+
+.headActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.primary {
+  background: #ff6b00;
+  color: #fff;
+}
+
+.secondary {
+  border: 1.5px solid #ffd7b8;
+  color: #334155;
+  background: #fff;
+}
+
+.dashGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 14px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.card h2 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.progress {
+  margin: 18px auto;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, #fff 58%, transparent 59%),
+    conic-gradient(#ff6b00 0 85%, #ffe0c7 85% 100%);
+}
+
+.progress strong {
+  color: #ff6b00;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.strong {
+  text-align: center;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.muted {
+  margin-top: 6px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 14px;
+  color: #ff6b00;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.matchList {
+  list-style: none;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.matchList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.matchList strong {
+  display: block;
+  color: #0f172a;
+  font-size: 0.92rem;
+}
+
+.matchList span {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.matchList b {
+  color: #ff6b00;
+  white-space: nowrap;
+}
+
+.stats {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stats div {
+  background: #fff7ed;
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.stats strong {
+  display: block;
+  font-size: 1.2rem;
+  color: #0f172a;
+}
+
+.stats span {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.quick {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quick a {
+  color: #334155;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e8edf5;
+}
+
+.quick a:hover {
+  border-color: #ff6b00;
+  color: #ff6b00;
+}
+
+.jobList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jobCard {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  padding: 18px 20px;
+  flex-wrap: wrap;
+}
+
+.jobCard h2 {
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.jobCard p {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.jobRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.jobRight b {
+  color: #ff6b00;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    width: 92%;
+  }
+
+  .dashGrid,
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashGrid,
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}

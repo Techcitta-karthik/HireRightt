@@ -1,0 +1,147 @@
+.page {
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.shell {
+  width: 85%;
+  margin: 0 auto;
+  padding-bottom: 48px;
+}
+
+.card {
+  margin: 36px auto 0;
+  max-width: 480px;
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.kicker {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ff6b00;
+  background: #fff1e6;
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+.card h1 {
+  margin-top: 14px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.card h1 em {
+  font-style: normal;
+  color: #ff6b00;
+}
+
+.card > p {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.form {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.form input {
+  height: 46px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.form input:focus {
+  outline: none;
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.submit,
+.ghost {
+  height: 48px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.submit {
+  background: #ff6b00;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(255, 107, 0, 0.28);
+}
+
+.ghost {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  color: #334155;
+}
+
+.footer {
+  margin-top: 18px;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.footer a {
+  color: #ff6b00;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.settingsList {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settingsList > button:not(.submit):not(.ghost) {
+  text-align: left;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #e8edf5;
+  background: #fff;
+  font-weight: 600;
+  color: #334155;
+}
+
+.settingsList > button:not(.submit):not(.ghost):hover {
+  border-color: #ff6b00;
+  color: #ff6b00;
+}
+
+@media (max-width: 720px) {
+  .shell {
+    width: 92%;
+  }
+}

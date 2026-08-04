@@ -1,4 +1,5 @@
 import { useState, type KeyboardEvent } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   EMPLOYMENT_TYPE_OPTIONS,
   EXPERIENCE_OPTIONS,
@@ -7,6 +8,8 @@ import {
   type ProfileFormData,
   type WorkExperience,
 } from '../data/wizard'
+import { MotionButton } from '../motion/MotionButton'
+import { MotionItem, MotionStack } from '../motion/MotionStack'
 import { SelectField } from './SelectField'
 import styles from './SkillsStep.module.css'
 
@@ -91,8 +94,8 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
   )
 
   return (
-    <div className={styles.stack}>
-      <section className={styles.card}>
+    <MotionStack className={styles.stack}>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <h3>1. Add Your Skills</h3>
           <p>Add skills relevant to the roles you&apos;re interested in.</p>
@@ -113,19 +116,30 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
 
         {data.skills.length > 0 && (
           <div className={styles.tagList}>
-            {data.skills.map((skill) => (
-              <span key={skill} className={styles.skillTag}>
+            <AnimatePresence mode="popLayout">
+              {data.skills.map((skill) => (
+              <motion.span
+                key={skill}
+                className={styles.skillTag}
+                layout
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.85 }}
+                whileHover={{ y: -2, scale: 1.04 }}
+              >
                 {skill}
-                <button
+                <motion.button
                   type="button"
                   className={styles.tagRemove}
                   aria-label={`Remove ${skill}`}
                   onClick={() => removeSkill(skill)}
+                  whileTap={{ scale: 0.85 }}
                 >
                   ×
-                </button>
-              </span>
-            ))}
+                </motion.button>
+              </motion.span>
+              ))}
+            </AnimatePresence>
           </div>
         )}
 
@@ -134,21 +148,23 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
             <p className={styles.suggestLabel}>Suggested</p>
             <div className={styles.suggestRow}>
               {availableSuggestions.map((skill) => (
-                <button
+                <motion.button
                   key={skill}
                   type="button"
                   className={styles.suggestChip}
                   onClick={() => addSkill(skill)}
+                  whileHover={{ y: -2, scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
                 >
                   + {skill}
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
         )}
-      </section>
+      </MotionItem>
 
-      <section className={styles.card}>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <h3>2. Work Experience</h3>
           <p>Add your work experience details.</p>
@@ -156,7 +172,14 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
 
         <div className={styles.experienceList}>
           {data.workExperiences.map((exp, index) => (
-            <article key={exp.id} className={styles.experienceCard}>
+            <motion.article
+              key={exp.id}
+              className={styles.experienceCard}
+              layout
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -3 }}
+            >
               <div className={styles.expIcon} aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none">
                   <path
@@ -334,16 +357,21 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
                   </div>
                 </div>
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
 
-        <button type="button" className={styles.addExp} onClick={addExperience}>
+        <MotionButton
+          type="button"
+          className={styles.addExp}
+          onClick={addExperience}
+          lift
+        >
           <span aria-hidden="true">+</span> Add Another Experience
-        </button>
-      </section>
+        </MotionButton>
+      </MotionItem>
 
-      <section className={styles.card}>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <h3>3. Total Experience</h3>
           <p>Help us know your overall experience.</p>
@@ -359,7 +387,10 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
               onChange={(value) => onChange('totalExperience', value)}
             />
           </div>
-          <aside className={styles.motivate}>
+          <motion.aside
+            className={styles.motivate}
+            whileHover={{ y: -3, scale: 1.01 }}
+          >
             <div className={styles.motivateIcon} aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none">
                 <path
@@ -377,9 +408,9 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
                 opportunities for you.
               </p>
             </div>
-          </aside>
+          </motion.aside>
         </div>
-      </section>
-    </div>
+      </MotionItem>
+    </MotionStack>
   )
 }

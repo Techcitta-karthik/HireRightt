@@ -1,9 +1,11 @@
+import { motion } from 'framer-motion'
 import {
   TIME_PERIOD_OPTIONS,
   createEmptyCertification,
   createEmptyMetric,
   type ProfileFormData,
 } from '../data/wizard'
+import { MotionItem, MotionStack } from '../motion/MotionStack'
 import { SelectField } from './SelectField'
 import styles from './PerformanceStep.module.css'
 
@@ -127,8 +129,8 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
   }
 
   return (
-    <div className={styles.stack}>
-      <section className={styles.card}>
+    <MotionStack className={styles.stack}>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <div>
             <h3>1. Key Achievements</h3>
@@ -184,9 +186,8 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
         >
           + Add Another Achievement
         </button>
-      </section>
-
-      <section className={styles.card}>
+      </MotionItem>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <div>
             <h3>2. Performance Metrics</h3>
@@ -267,9 +268,8 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
         >
           + Add Another Metric
         </button>
-      </section>
-
-      <section className={styles.card}>
+      </MotionItem>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <div>
             <h3>3. Awards & Recognitions</h3>
@@ -320,9 +320,8 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
         >
           + Add Another Award
         </button>
-      </section>
-
-      <section className={styles.card}>
+      </MotionItem>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <div>
             <h3>4. Certifications</h3>
@@ -406,9 +405,8 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
         >
           + Add Another Certification
         </button>
-      </section>
-
-      <section className={styles.card}>
+      </MotionItem>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <div>
             <h3>5. Self Performance Rating (Optional)</h3>
@@ -425,7 +423,7 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
                 const value = index + 1
                 const active = data.selfRating >= value
                 return (
-                  <button
+                  <motion.button
                     key={value}
                     type="button"
                     role="radio"
@@ -437,6 +435,9 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
                         data.selfRating === value ? 0 : value,
                       )
                     }
+                    whileHover={{ scale: 1.15, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    animate={active ? { scale: 1.05 } : { scale: 1 }}
                   >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path
@@ -447,7 +448,7 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </button>
+                  </motion.button>
                 )
               })}
             </div>
@@ -472,7 +473,7 @@ export function PerformanceStep({ data, onChange }: PerformanceStepProps) {
             </p>
           </aside>
         </div>
-      </section>
-    </div>
+      </MotionItem>
+    </MotionStack>
   )
 }

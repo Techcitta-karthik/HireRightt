@@ -1,14 +1,49 @@
 .page {
   min-height: 100vh;
   width: 100%;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+/*
+  Full mockup image — fixed in the CENTER of the viewport.
+  Does not scroll with the page.
+*/
+.dashBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 3vw 20px;
+  pointer-events: none;
   background: #fafafa;
 }
 
-/* Content width = 85% of viewport (7.5% margin each side) */
+.dashBackdrop img {
+  width: min(92vw, 1200px);
+  height: auto;
+  max-height: calc(100vh - 96px);
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 28px 55px rgba(15, 23, 42, 0.12));
+}
+
+/* Content width = 85% of viewport */
 .shell {
   width: 85%;
   margin: 0 auto;
   max-width: none;
+  position: relative;
+  z-index: 1;
 }
 
 .navbar {
@@ -18,6 +53,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 18px;
+  position: relative;
+  z-index: 2;
 }
 
 .brand h1 {
@@ -126,15 +163,30 @@
 
 main {
   width: 100%;
-  padding: 8px 0 40px;
+  padding: 0 0 40px;
 }
 
-.hero {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 36px;
-  align-items: center;
-  padding: 28px 0 40px;
+/* Lets the fixed image show through for one full screen */
+.heroStage {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 88px);
+}
+
+.heroHitArea {
+  position: absolute;
+  left: 4%;
+  bottom: 26%;
+  display: flex;
+  gap: 12px;
+  width: min(420px, 48%);
+}
+
+.srCta,
+.srCtaSecondary {
+  flex: 1;
+  height: 52px;
+  opacity: 0;
 }
 
 .kicker {
@@ -148,35 +200,10 @@ main {
   padding: 8px 12px;
 }
 
-.heroLeft h2 {
-  margin-top: 16px;
-  font-size: clamp(2.4rem, 4.2vw, 3.6rem);
-  line-height: 1.08;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #0f172a;
-}
-
-.heroLeft h2 em,
 .featuresSection h3 em,
 .ctaCopy h3 em {
   font-style: normal;
   color: #ff6b00;
-}
-
-.heroLeft > p {
-  margin-top: 14px;
-  max-width: 480px;
-  font-size: 1.02rem;
-  line-height: 1.55;
-  color: #64748b;
-}
-
-.heroActions {
-  margin-top: 22px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .primaryHeroBtn {
@@ -184,12 +211,12 @@ main {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 48px;
-  padding: 0 20px;
+  height: 50px;
+  padding: 0 22px;
   border-radius: 12px;
   background: #ff6b00;
   color: #fff;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
   box-shadow: 0 10px 22px rgba(255, 107, 0, 0.28);
   transition: transform 0.2s ease, background 0.2s ease;
@@ -209,185 +236,42 @@ main {
 .secondaryHeroBtn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 48px;
-  padding: 0 18px;
+  gap: 10px;
+  height: 50px;
+  padding: 0 20px;
   border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  background: #fff;
-  color: #334155;
-  font-weight: 700;
-  font-size: 0.92rem;
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-
-.secondaryHeroBtn:hover {
-  border-color: #ff6b00;
+  border: 1.5px solid #ff6b00;
+  background: rgba(255, 255, 255, 0.85);
   color: #ff6b00;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
-.quickPoints {
-  margin-top: 18px;
-  display: flex;
-  gap: 18px;
-  flex-wrap: wrap;
-  font-size: 0.84rem;
-  color: #334155;
-  font-weight: 600;
-}
-
-.qIcon {
-  width: 18px;
-  height: 18px;
+.playBox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid #ff6b00;
   display: inline-grid;
   place-items: center;
-  margin-right: 6px;
-  color: #ff6b00;
-  vertical-align: -3px;
-}
-
-.qIcon svg {
-  width: 16px;
-  height: 16px;
-}
-
-.trustRow {
-  margin-top: 18px;
-}
-
-.trustRow p {
-  font-size: 0.84rem;
-  color: #94a3b8;
-  max-width: 420px;
-  line-height: 1.45;
-}
-
-.heroRight {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.dashboardCard {
-  width: 100%;
-  max-width: 520px;
-  background: #fff;
-  border: 1px solid #e8edf5;
-  border-radius: 18px;
-  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.1);
-  padding: 14px;
-  display: grid;
-  grid-template-columns: 54px 1fr;
-  gap: 12px;
-}
-
-.dashSidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 10px 8px;
-  border-radius: 12px;
-  background: #fff7ed;
-}
-
-.dashSidebar span {
-  width: 100%;
-  height: 28px;
-  border-radius: 8px;
-  background: #ffedd5;
-}
-
-.dashSidebar span:first-child {
-  background: #ff6b00;
-}
-
-.dashMain {
-  min-width: 0;
-}
-
-.dashTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eef2f7;
-  font-size: 0.86rem;
-}
-
-.dashTop strong {
-  color: #0f172a;
-  font-weight: 800;
-}
-
-.dashTop span {
-  color: #64748b;
-  font-weight: 500;
-}
-
-.dashGrid {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 10px;
-}
-
-.dashGrid article {
-  border: 1px solid #eef2f7;
-  border-radius: 12px;
-  padding: 12px;
-  background: #fff;
-}
-
-.dashGrid p {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #475569;
-}
-
-.progress {
-  margin: 12px auto 8px;
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at center, #fff 58%, transparent 59%),
-    conic-gradient(#ff6b00 0 85%, #ffe0c7 85% 100%);
-}
-
-.progress strong {
-  font-size: 1.15rem;
-  font-weight: 800;
   color: #ff6b00;
 }
 
-.dashGrid small {
-  display: block;
-  text-align: center;
-  color: #64748b;
-  font-size: 0.74rem;
+.playBox svg {
+  width: 11px;
+  height: 11px;
 }
 
-.dashGrid ul {
-  margin-top: 8px;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.dashGrid li {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 0.76rem;
-  color: #475569;
-}
-
-.dashGrid li b {
-  color: #ff6b00;
-  font-weight: 800;
+/* Covers the fixed image when you scroll past the hero */
+.contentPanel {
+  position: relative;
+  z-index: 2;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: #fafafa;
+  padding: 8px calc((100vw - 85vw) / 2) 40px;
+  box-shadow: 0 -24px 40px #fafafa;
 }
 
 .logos {
@@ -684,20 +568,11 @@ main {
     display: none;
   }
 
-  .hero,
   .featureGrid,
   .ctaStrip,
   .stats,
   .logoRow {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .hero {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboardCard {
-    max-width: none;
   }
 
   .logoItem:nth-child(even) {
@@ -710,11 +585,22 @@ main {
     width: 92%;
   }
 
+  .dashBackdrop img {
+    width: 96vw;
+  }
+
+  .contentPanel {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .featureGrid,
   .ctaStrip,
   .stats,
-  .logoRow,
-  .dashGrid {
+  .logoRow {
     grid-template-columns: 1fr;
   }
 
@@ -726,17 +612,5 @@ main {
 
   .logoItem:last-child {
     border-bottom: none;
-  }
-
-  .dashboardCard {
-    grid-template-columns: 1fr;
-  }
-
-  .dashSidebar {
-    flex-direction: row;
-  }
-
-  .dashSidebar span {
-    height: 10px;
   }
 }

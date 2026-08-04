@@ -1,0 +1,137 @@
+.navbar {
+  width: 100%;
+  padding: 20px 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  position: relative;
+  z-index: 2;
+}
+
+.brand {
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.brand:hover h1 {
+  color: #ff6b00;
+}
+
+.brand sup {
+  margin-left: 2px;
+  color: #ff6b00;
+  font-size: 0.48em;
+  vertical-align: super;
+}
+
+.brand p {
+  margin-top: 4px;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.brand span {
+  color: #ff6b00;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  text-decoration: none;
+}
+
+.navLink:hover,
+.active {
+  color: #0f172a;
+}
+
+.active {
+  font-weight: 700;
+}
+
+.chevron {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #94a3b8;
+  margin-top: 2px;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loginBtn {
+  display: inline-flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 18px;
+  border: 1.5px solid #ffd7b8;
+  border-radius: 999px;
+  background: #fff;
+  color: #334155;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.loginBtn:hover {
+  background: #fff7ed;
+  border-color: #ff6b00;
+}
+
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #ff6b00;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(255, 107, 0, 0.28);
+}
+
+.ctaBtn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ctaBtn:hover {
+  background: #ea580c;
+}
+
+@media (max-width: 1100px) {
+  .navLinks {
+    display: none;
+  }
+}

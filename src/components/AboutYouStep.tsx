@@ -5,6 +5,7 @@ import {
   NOTICE_OPTIONS,
   ROLE_OPTIONS,
 } from '../data/wizard'
+import { MotionItem, MotionStack } from '../motion/MotionStack'
 import { CharacterTextarea } from './CharacterTextarea'
 import { ResumeUpload } from './ResumeUpload'
 import { SelectField } from './SelectField'
@@ -20,13 +21,15 @@ interface AboutYouStepProps {
 
 export function AboutYouStep({ data, onChange }: AboutYouStepProps) {
   return (
-    <div className={styles.stack}>
-      <ResumeUpload
-        file={data.resumeFile}
-        onFileChange={(file) => onChange('resumeFile', file)}
-      />
+    <MotionStack className={styles.stack}>
+      <MotionItem>
+        <ResumeUpload
+          file={data.resumeFile}
+          onFileChange={(file) => onChange('resumeFile', file)}
+        />
+      </MotionItem>
 
-      <section className={styles.card}>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <h3>2. Tell Us About Yourself</h3>
           <p>Help us know you better in a few words.</p>
@@ -57,9 +60,9 @@ export function AboutYouStep({ data, onChange }: AboutYouStepProps) {
           onChange={(value) => onChange('keyStrengths', value)}
           rows={3}
         />
-      </section>
+      </MotionItem>
 
-      <section className={styles.card}>
+      <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <h3>3. Your Current Snapshot</h3>
         </div>
@@ -93,7 +96,7 @@ export function AboutYouStep({ data, onChange }: AboutYouStepProps) {
             onChange={(value) => onChange('noticePeriod', value)}
           />
         </div>
-      </section>
-    </div>
+      </MotionItem>
+    </MotionStack>
   )
 }

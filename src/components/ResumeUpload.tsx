@@ -1,4 +1,6 @@
 import { useRef, useState, type DragEvent } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { easeOut } from '../motion/variants'
 import styles from './ResumeUpload.module.css'
 
 interface ResumeUploadProps {
@@ -54,32 +56,52 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
   }
 
   return (
-    <section className={styles.card}>
+    <motion.section
+      className={styles.card}
+      whileHover={{ y: -2 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+    >
       <div className={styles.header}>
         <h3>1. Upload Your Resume</h3>
-        <button
+        <motion.button
           type="button"
           className={styles.whyLink}
           onClick={() => setShowWhy((prev) => !prev)}
           aria-expanded={showWhy}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
         >
           Why upload?
           <span className={styles.infoIcon} aria-hidden="true">
             i
           </span>
-        </button>
+        </motion.button>
       </div>
 
-      {showWhy && (
-        <div className={styles.whyPanel} role="note">
-          Uploading your resume helps AI pre-fill your profile, match you with
-          better roles, and save time on later steps. Your file stays private
-          and encrypted.
-        </div>
-      )}
+      <AnimatePresence>
+        {showWhy && (
+          <motion.div
+            className={styles.whyPanel}
+            role="note"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: easeOut }}
+          >
+            Uploading your resume helps AI pre-fill your profile, match you with
+            better roles, and save time on later steps. Your file stays private
+            and encrypted.
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className={styles.body}>
-        <div className={styles.illustration} aria-hidden="true">
+        <motion.div
+          className={styles.illustration}
+          aria-hidden="true"
+          animate={{ y: [0, -6, 0] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <div className={styles.docStack}>
             <div className={styles.docBack} />
             <div className={styles.docFront}>
@@ -108,9 +130,9 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
           className={`${styles.dropzone} ${dragging ? styles.dragging : ''} ${file ? styles.hasFile : ''}`}
           onDragOver={(event) => {
             event.preventDefault()
@@ -118,6 +140,9 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
           }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
+          animate={dragging ? { scale: 1.02, borderColor: '#ff6b00' } : { scale: 1 }}
+          whileHover={{ scale: file ? 1 : 1.01 }}
+          transition={{ type: 'spring', stiffness: 360, damping: 26 }}
         >
           <input
             ref={inputRef}
@@ -146,16 +171,18 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
                   {(file.size / 1024).toFixed(1)} KB · Ready to upload
                 </p>
               </div>
-              <button
+              <motion.button
                 type="button"
                 className={styles.removeBtn}
                 onClick={() => {
                   validateAndSet(null)
                   if (inputRef.current) inputRef.current.value = ''
                 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Remove
-              </button>
+              </motion.button>
             </div>
           ) : (
             <>
@@ -179,22 +206,32 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
               <p className={styles.dropText}>
                 Drag & drop your resume here or
               </p>
-              <button
+              <motion.button
                 type="button"
                 className={styles.browseBtn}
                 onClick={() => inputRef.current?.click()}
+                whileHover={{ scale: 1.04, y: -1 }}
+                whileTap={{ scale: 0.97 }}
               >
                 Browse Files
-              </button>
+              </motion.button>
               <p className={styles.formats}>
                 Supports PDF, DOC, DOCX (Max 5MB)
               </p>
             </>
           )}
-        </div>
+        </motion.div>
       </div>
 
-      {error && <p className={styles.error}>{error}</p>}
+      {error && (
+        <motion.p
+          className={styles.error}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {error}
+        </motion.p>
+      )}
 
       <div className={styles.secureNote}>
         <span className={styles.secureCheck} aria-hidden="true">
@@ -210,6 +247,6 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
         </span>
         Your resume is secure and only visible to you.
       </div>
-    </section>
+    </motion.section>
   )
 }
