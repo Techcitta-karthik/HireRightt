@@ -67,6 +67,14 @@
   height: 76px;
 }
 
+.rocket {
+  width: 120px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 12px 24px rgba(240, 81, 14, 0.28));
+  object-fit: contain;
+}
+
 h4 {
   font-size: 1.05rem;
   font-weight: 800;
@@ -300,7 +308,8 @@ h4 {
     grid-template-columns: 1fr;
   }
 
-  .bot {
+  .bot,
+  .rocket {
     display: none;
   }
 

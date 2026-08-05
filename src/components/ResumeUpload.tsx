@@ -1,11 +1,16 @@
 import { useRef, useState, type DragEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import {
+  parseResumeFile,
+  type ResumeExtract,
+} from '../lib/resumeParser'
 import { easeOut } from '../motion/variants'
 import styles from './ResumeUpload.module.css'
 
 interface ResumeUploadProps {
   file: File | null
   onFileChange: (file: File | null) => void
+  onParsed?: (extract: ResumeExtract) => void
 }
 
 const ACCEPTED = [
@@ -25,14 +30,21 @@ function isAccepted(file: File) {
   )
 }
 
-export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
+export function ResumeUpload({
+  file,
+  onFileChange,
+  onParsed,
+}: ResumeUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
+  const [status, setStatus] = useState('')
+  const [parsing, setParsing] = useState(false)
   const [showWhy, setShowWhy] = useState(false)
 
-  function validateAndSet(next: File | null) {
+  async function validateAndSet(next: File | null) {
     setError('')
+    setStatus('')
     if (!next) {
       onFileChange(null)
       return
@@ -45,14 +57,34 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
       setError('File must be 5MB or smaller.')
       return
     }
+
     onFileChange(next)
+    setParsing(true)
+    setStatus('Reading your resume…')
+    try {
+      const extract = await parseResumeFile(next)
+      onParsed?.(extract)
+      const filled = Object.keys(extract).filter((key) => key !== 'fullName').length
+      setStatus(
+        filled > 0
+          ? `Extracted ${filled} field${filled === 1 ? '' : 's'} from your resume.`
+          : 'Resume uploaded. We couldn’t auto-detect much — fill in the fields below.',
+      )
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Could not extract resume data.'
+      setError(message)
+      setStatus('')
+    } finally {
+      setParsing(false)
+    }
   }
 
   function onDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault()
     setDragging(false)
     const dropped = event.dataTransfer.files?.[0] ?? null
-    validateAndSet(dropped)
+    void validateAndSet(dropped)
   }
 
   return (
@@ -149,7 +181,9 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
             type="file"
             accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             className={styles.hiddenInput}
-            onChange={(event) => validateAndSet(event.target.files?.[0] ?? null)}
+            onChange={(event) => {
+              void validateAndSet(event.target.files?.[0] ?? null)
+            }}
           />
 
           {file ? (
@@ -168,14 +202,15 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
               <div className={styles.fileMeta}>
                 <p className={styles.fileName}>{file.name}</p>
                 <p className={styles.fileSize}>
-                  {(file.size / 1024).toFixed(1)} KB · Ready to upload
+                  {(file.size / 1024).toFixed(1)} KB ·{' '}
+                  {parsing ? 'Extracting…' : 'Ready'}
                 </p>
               </div>
               <motion.button
                 type="button"
                 className={styles.removeBtn}
                 onClick={() => {
-                  validateAndSet(null)
+                  void validateAndSet(null)
                   if (inputRef.current) inputRef.current.value = ''
                 }}
                 whileHover={{ scale: 1.05 }}
@@ -222,6 +257,16 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
           )}
         </motion.div>
       </div>
+
+      {status && !error && (
+        <motion.p
+          className={styles.status}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {status}
+        </motion.p>
+      )}
 
       {error && (
         <motion.p

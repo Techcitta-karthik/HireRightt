@@ -8,8 +8,10 @@ import { SolutionsPage } from './pages/SolutionsPage'
 import { ResourcesPage } from './pages/ResourcesPage'
 import { AboutPage } from './pages/AboutPage'
 import { HowItWorksPage } from './pages/HowItWorksPage'
-import { LoginPage, SettingsPage } from './pages/AuthPages'
+import { LoginPage, SettingsPage, SignupPage } from './pages/AuthPages'
 import { DashboardPage, JobsPage, ProfilePage } from './pages/AppPages'
+import { InterviewPage } from './pages/InterviewPage'
+import { RequireAuth } from './components/RequireAuth'
 import { pageTransition } from './motion/variants'
 
 function AnimatedRoutes() {
@@ -27,7 +29,6 @@ function AnimatedRoutes() {
       >
         <Routes location={location}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/onboarding" element={<ProfileWizard />} />
           <Route path="/job-seekers" element={<JobSeekersPage />} />
           <Route path="/why" element={<WhyPage />} />
           <Route path="/solutions" element={<SolutionsPage />} />
@@ -35,10 +36,55 @@ function AnimatedRoutes() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/jobs" element={<JobsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route
+            path="/onboarding"
+            element={
+              <RequireAuth>
+                <ProfileWizard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/interview"
+            element={
+              <RequireAuth>
+                <InterviewPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/jobs"
+            element={
+              <RequireAuth>
+                <JobsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <ProfilePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <RequireAuth>
+                <SettingsPage />
+              </RequireAuth>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </motion.div>

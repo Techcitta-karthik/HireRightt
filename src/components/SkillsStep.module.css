@@ -13,7 +13,9 @@
   animation: fade-up 0.4s var(--ease) both;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sectionHead {
@@ -42,6 +44,13 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--gray-700);
+}
+
+.fieldLabel {
+  margin-bottom: 0;
+}
+
+.field label {
   margin-bottom: 8px;
 }
 
@@ -63,6 +72,8 @@
 .textInput {
   height: 46px;
   padding: 0 14px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .textarea {
@@ -234,7 +245,7 @@
 }
 
 .twoCol {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .threeCol {
@@ -342,9 +353,10 @@
 
 .totalRow {
   display: grid;
-  grid-template-columns: minmax(220px, 320px) 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
   gap: 16px;
   align-items: stretch;
+  width: 100%;
 }
 
 .totalSelect {

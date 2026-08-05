@@ -16,6 +16,8 @@ import {
   type ProfileFormData,
   type WizardStep,
 } from '../data/wizard'
+import { firstName, getProfile, saveProfile } from '../lib/store'
+import { apiHealth, apiSaveProfile } from '../lib/api'
 import { MotionButton } from '../motion/MotionButton'
 import { easeOut, fadeUp, stepPanel } from '../motion/variants'
 import styles from './ProfileWizard.module.css'
@@ -50,9 +52,44 @@ export function ProfileWizard() {
   const navigate = useNavigate()
   const [step, setStep] = useState<WizardStep>(1)
   const [completedThrough, setCompletedThrough] = useState(0)
-  const [data, setData] = useState<ProfileFormData>(initialFormData)
+  const [userName, setUserName] = useState(() => firstName())
+  const [data, setData] = useState<ProfileFormData>(() => {
+    const saved = getProfile()
+    if (!saved) return initialFormData
+    return {
+      ...initialFormData,
+      whoAreYou: saved.whoAreYou,
+      whatDrivesYou: saved.whatDrivesYou,
+      keyStrengths: saved.keyStrengths,
+      currentRole: saved.currentRole,
+      totalExperience: saved.totalExperience,
+      currentLocation: saved.currentLocation,
+      noticePeriod: saved.noticePeriod,
+      skills: saved.skills,
+      experienceSummary: saved.experienceSummary,
+      workExperiences: saved.workExperiences,
+      achievements: saved.achievements,
+      metrics: saved.metrics,
+      awards: saved.awards,
+      certifications: saved.certifications,
+      selfRating: saved.selfRating,
+      preferredRoles: saved.preferredRoles,
+      preferredLocations: saved.preferredLocations,
+      workMode: saved.workMode,
+      salaryExpectation: saved.salaryExpectation,
+      interviewNotes: saved.interviewNotes,
+      resumeFile: null,
+    }
+  })
   const [toast, setToast] = useState('')
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const saved = getProfile()
+    if (saved?.completedSteps) {
+      setCompletedThrough(saved.completedSteps)
+    }
+  }, [])
 
   useEffect(() => {
     if (!toast) return
@@ -67,13 +104,23 @@ export function ProfileWizard() {
     setData((prev) => ({ ...prev, [key]: value }))
   }
 
+  function patchFields(patch: Partial<ProfileFormData>) {
+    setData((prev) => ({ ...prev, ...patch }))
+  }
+
   function showToast(message: string) {
     setToast(message)
   }
 
-  async function persist(message: string) {
+  async function persist(message: string, nextCompleted?: number) {
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 450))
+    const saved = saveProfile(data, nextCompleted ?? completedThrough)
+    try {
+      if (await apiHealth()) await apiSaveProfile(saved)
+    } catch {
+      // local save is enough when API is offline
+    }
+    await new Promise((resolve) => setTimeout(resolve, 350))
     setSaving(false)
     showToast(message)
   }
@@ -83,12 +130,14 @@ export function ProfileWizard() {
   }
 
   async function handleContinue() {
+    const nextCompleted = Math.max(completedThrough, step)
     await persist(
       step === 5
         ? 'Profile submitted successfully!'
         : `Step ${step} saved. Moving forward…`,
+      nextCompleted,
     )
-    setCompletedThrough((prev) => Math.max(prev, step))
+    setCompletedThrough(nextCompleted)
     if (step < 5) {
       setStep((prev) => (prev + 1) as WizardStep)
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -110,7 +159,7 @@ export function ProfileWizard() {
       <Sidebar step={step} />
 
       <div className={styles.main}>
-        <TopBar />
+        <TopBar userName={userName} />
 
         <motion.header
           className={styles.pageHeader}
@@ -138,7 +187,23 @@ export function ProfileWizard() {
             animate="animate"
             exit="exit"
           >
-            {step === 1 && <AboutYouStep data={data} onChange={updateField} />}
+            {step === 1 && (
+              <AboutYouStep
+                data={data}
+                onChange={updateField}
+                onPatch={patchFields}
+                onExtracted={({ firstName: extractedName, fieldCount }) => {
+                  if (extractedName) setUserName(extractedName)
+                  if (fieldCount > 0) {
+                    showToast(
+                      extractedName
+                        ? `Welcome, ${extractedName} — profile pre-filled from your resume.`
+                        : 'Profile pre-filled from your resume.',
+                    )
+                  }
+                }}
+              />
+            )}
             {step === 2 && <SkillsStep data={data} onChange={updateField} />}
             {step === 3 && (
               <PerformanceStep data={data} onChange={updateField} />

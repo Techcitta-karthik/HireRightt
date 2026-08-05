@@ -23,7 +23,7 @@ export function ResourcesPage() {
         },
         {
           title: 'Career Updates',
-          body: 'Product news, hiring trends, and tips from the HRERIGHT team.',
+          body: 'Product news, hiring trends, and tips from the HIRERIGHT team.',
         },
       ]}
     />

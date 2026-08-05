@@ -10,7 +10,7 @@
   padding: 22px 36px 36px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
 .pageHeader h1 {
@@ -30,6 +30,8 @@
 
 .panel {
   animation: fade-up 0.35s var(--ease);
+  width: 100%;
+  max-width: none;
 }
 
 .actions {
@@ -186,7 +188,7 @@
   font-size: 0.75rem;
   color: var(--gray-400);
   text-align: right;
-  margin-top: -10px;
+  margin-top: 0;
 }
 
 .toast {
@@ -213,6 +215,18 @@
   border-radius: 50%;
   background: var(--green-500);
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25);
+}
+
+@media (max-width: 1100px) {
+  .actionsSplit {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .actionsSplit .primaryBtn {
+    margin-left: auto;
+  }
 }
 
 @media (max-width: 900px) {

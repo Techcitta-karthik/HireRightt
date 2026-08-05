@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { firstName, getUser, logout } from '../lib/store'
 import { easeOut } from '../motion/variants'
 import styles from './TopBar.module.css'
 
@@ -8,10 +9,15 @@ interface TopBarProps {
   userName?: string
 }
 
-export function TopBar({ userName = 'Arjun' }: TopBarProps) {
+export function TopBar({ userName }: TopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [name, setName] = useState(() => userName ?? firstName())
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    setName(userName ?? firstName())
+  }, [userName])
 
   useEffect(() => {
     function onDoc(event: MouseEvent) {
@@ -25,6 +31,19 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
     setMenuOpen(false)
     navigate(path)
   }
+
+  function signOut() {
+    setMenuOpen(false)
+    logout()
+    navigate('/login')
+  }
+
+  const initials = (getUser()?.name ?? name)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('') || '?'
 
   return (
     <motion.div
@@ -68,12 +87,10 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
         >
-          <img
-            className={styles.avatar}
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&crop=faces"
-            alt=""
-          />
-          <span>Hi, {userName}</span>
+          <span className={styles.avatar} aria-hidden="true">
+            {initials}
+          </span>
+          <span>Hi, {name}</span>
           <motion.svg
             className={`${styles.chevron} ${menuOpen ? styles.open : ''}`}
             viewBox="0 0 20 20"
@@ -133,7 +150,7 @@ export function TopBar({ userName = 'Arjun' }: TopBarProps) {
                 type="button"
                 role="menuitem"
                 className={styles.danger}
-                onClick={() => go('/login')}
+                onClick={signOut}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
               >

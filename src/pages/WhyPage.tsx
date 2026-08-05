@@ -3,13 +3,13 @@ import { MarketingPage } from '../components/MarketingPage'
 export function WhyPage() {
   return (
     <MarketingPage
-      kicker="WHY HRERIGHT"
+      kicker="WHY HIRERIGHT"
       title={
         <>
           Hiring that puts <em>talent</em> first.
         </>
       }
-      subtitle="HRERIGHT connects job seekers and employers with AI matching, verified opportunities, and privacy-first profiles."
+      subtitle="HIRERIGHT connects job seekers and employers with AI matching, verified opportunities, and privacy-first profiles."
       sections={[
         {
           title: 'Talent to Talent',

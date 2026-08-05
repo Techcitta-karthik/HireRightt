@@ -1,16 +1,16 @@
 :root {
-  --purple-50: #f3efff;
-  --purple-100: #e8deff;
-  --purple-200: #d9c8ff;
-  --purple-300: #bca0ff;
-  --purple-400: #9a78ff;
-  --purple-500: #7a55ff;
-  --purple-600: #6f4bf3;
-  --purple-700: #5e3ed8;
-  --purple-800: #4e34b3;
-  --navy-900: #081235;
-  --navy-850: #0f1a45;
-  --navy-800: #172458;
+  --purple-50: #fff4ea;
+  --purple-100: #ffe9d6;
+  --purple-200: #ffd3b3;
+  --purple-300: #ffb27d;
+  --purple-400: #ff8a3d;
+  --purple-500: #f4610f;
+  --purple-600: #f0510e;
+  --purple-700: #d9490c;
+  --purple-800: #b03a08;
+  --navy-900: #131828;
+  --navy-850: #1a2033;
+  --navy-800: #232a40;
   --gray-50: #f8faff;
   --gray-100: #f1f4fb;
   --gray-200: #e4e9f5;
@@ -35,7 +35,8 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --font: 'Manrope', system-ui, sans-serif;
+  --font: 'Inter', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --sidebar-width: 340px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -48,6 +49,11 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
 html,
 body,
 #root {
@@ -57,10 +63,16 @@ body,
 body {
   font-family: var(--font);
   color: var(--gray-800);
-  background: #fafafa;
+  background: #fbf8f3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
 }
 
 button,

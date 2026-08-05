@@ -24,7 +24,7 @@ export function Sidebar({ step = 1 }: SidebarProps) {
   return (
     <motion.aside
       className={styles.sidebar}
-      aria-label="HRERIGHT introduction"
+      aria-label="HIRERIGHT introduction"
       initial={{ opacity: 0, x: -24 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: easeOut }}
@@ -47,7 +47,7 @@ export function Sidebar({ step = 1 }: SidebarProps) {
       <div className={styles.inner}>
         <Link to="/" className={styles.brand}>
           <h1 className={styles.logo}>
-            HRERIGHT
+            HIRERIGHT
             <sup className={styles.ttt}>TTT</sup>
           </h1>
           <p className={styles.tagline}>
@@ -237,7 +237,7 @@ export function Sidebar({ step = 1 }: SidebarProps) {
                 </motion.div>
 
                 <motion.div className={styles.why} variants={fadeUp}>
-                  <h3>Why HRERIGHT</h3>
+                  <h3>Why HIRERIGHT</h3>
                   <ul>
                     {WHY_ITEMS.map((item) => (
                       <motion.li key={item} whileHover={{ x: 4 }}>
@@ -293,8 +293,8 @@ export function Sidebar({ step = 1 }: SidebarProps) {
           </div>
           <div>
             <p className={styles.helpTitle}>Need help?</p>
-            <a href="mailto:care@hreright.com" className={styles.helpLink}>
-              care@hreright.com
+            <a href="mailto:care@HIRERIGHT.com" className={styles.helpLink}>
+              care@HIRERIGHT.com
             </a>
           </div>
         </motion.div>

@@ -5,6 +5,8 @@ import {
   NOTICE_OPTIONS,
   ROLE_OPTIONS,
 } from '../data/wizard'
+import type { ResumeExtract } from '../lib/resumeParser'
+import { updateUserName } from '../lib/store'
 import { MotionItem, MotionStack } from '../motion/MotionStack'
 import { CharacterTextarea } from './CharacterTextarea'
 import { ResumeUpload } from './ResumeUpload'
@@ -17,15 +19,57 @@ interface AboutYouStepProps {
     key: K,
     value: ProfileFormData[K],
   ) => void
+  onPatch: (patch: Partial<ProfileFormData>) => void
+  onExtracted?: (info: { firstName?: string; fieldCount: number }) => void
 }
 
-export function AboutYouStep({ data, onChange }: AboutYouStepProps) {
+export function AboutYouStep({
+  data,
+  onChange,
+  onPatch,
+  onExtracted,
+}: AboutYouStepProps) {
+  const roleOptions =
+    data.currentRole && !ROLE_OPTIONS.includes(data.currentRole)
+      ? [data.currentRole, ...ROLE_OPTIONS]
+      : ROLE_OPTIONS
+
+  function applyExtract(extract: ResumeExtract) {
+    const patch: Partial<ProfileFormData> = {}
+    if (extract.whoAreYou) patch.whoAreYou = extract.whoAreYou
+    if (extract.whatDrivesYou) patch.whatDrivesYou = extract.whatDrivesYou
+    if (extract.keyStrengths) patch.keyStrengths = extract.keyStrengths
+    if (extract.currentRole) patch.currentRole = extract.currentRole
+    if (extract.totalExperience) patch.totalExperience = extract.totalExperience
+    if (extract.currentLocation) patch.currentLocation = extract.currentLocation
+    if (extract.skills?.length) patch.skills = extract.skills
+    if (extract.experienceSummary) patch.experienceSummary = extract.experienceSummary
+    if (extract.workExperiences?.length) {
+      patch.workExperiences = extract.workExperiences
+    }
+    if (extract.achievements?.length) patch.achievements = extract.achievements
+
+    if (Object.keys(patch).length) onPatch(patch)
+
+    let nextFirst: string | undefined
+    if (extract.fullName) {
+      const updated = updateUserName(extract.fullName)
+      nextFirst = updated?.name.split(' ')[0]
+    }
+
+    onExtracted?.({
+      firstName: nextFirst,
+      fieldCount: Object.keys(patch).length,
+    })
+  }
+
   return (
     <MotionStack className={styles.stack}>
       <MotionItem>
         <ResumeUpload
           file={data.resumeFile}
           onFileChange={(file) => onChange('resumeFile', file)}
+          onParsed={applyExtract}
         />
       </MotionItem>
 
@@ -70,7 +114,7 @@ export function AboutYouStep({ data, onChange }: AboutYouStepProps) {
           <SelectField
             label="Current Role"
             value={data.currentRole}
-            options={ROLE_OPTIONS}
+            options={roleOptions}
             placeholder="Select role"
             onChange={(value) => onChange('currentRole', value)}
           />

@@ -474,7 +474,10 @@
   .sidebar {
     width: 100%;
     min-width: 0;
+    height: auto;
     min-height: auto;
+    position: relative;
+    overflow: visible;
   }
 
   .inner {

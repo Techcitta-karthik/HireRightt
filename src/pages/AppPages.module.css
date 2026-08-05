@@ -1,16 +1,21 @@
 .page {
   min-height: 100vh;
-  background: #fafafa;
+  background:
+    radial-gradient(900px 500px at 85% -5%, rgba(255, 138, 61, 0.09), transparent 65%),
+    radial-gradient(700px 420px at -10% 20%, rgba(255, 107, 0, 0.05), transparent 60%),
+    linear-gradient(180deg, #fbf8f3 0%, #ffffff 42%);
+  color: #191f2e;
+  font-family: var(--font);
 }
 
 .shell {
   width: 85%;
   margin: 0 auto;
-  padding-bottom: 48px;
+  padding-bottom: 64px;
 }
 
 .main {
-  padding-top: 24px;
+  padding-top: 28px;
 }
 
 .head {
@@ -19,23 +24,25 @@
   gap: 16px;
   align-items: flex-end;
   flex-wrap: wrap;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .head h1 {
+  font-family: var(--font-display);
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   font-weight: 800;
-  color: #0f172a;
+  letter-spacing: -0.02em;
+  color: #171d2d;
 }
 
 .head p {
   margin-top: 6px;
-  color: #64748b;
+  color: #5c6577;
 }
 
 .headActions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
@@ -45,41 +52,67 @@
   align-items: center;
   justify-content: center;
   height: 44px;
-  padding: 0 16px;
-  border-radius: 12px;
-  font-weight: 700;
+  padding: 0 20px;
+  border-radius: 14px;
+  font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .primary {
-  background: #ff6b00;
+  background: linear-gradient(135deg, #ff7d26 0%, #f0510e 100%);
   color: #fff;
+  box-shadow:
+    0 12px 26px rgba(240, 81, 14, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: box-shadow 0.25s ease;
+}
+
+.primary:hover {
+  box-shadow:
+    0 16px 34px rgba(240, 81, 14, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .secondary {
-  border: 1.5px solid #ffd7b8;
-  color: #334155;
-  background: #fff;
+  border: 1px solid #f3d9c4;
+  color: #d9490c;
+  background: rgba(255, 255, 255, 0.85);
+  transition: border-color 0.25s ease;
+}
+
+.secondary:hover {
+  border-color: #f5a06b;
 }
 
 .dashGrid {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
-  gap: 14px;
+  gap: 16px;
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #e8edf5;
-  border-radius: 16px;
-  padding: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #fffdfa 100%);
+  border: 1px solid #f0ebe2;
+  border-radius: 20px;
+  padding: 22px;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card:hover {
+  border-color: #ffd3b3;
+  box-shadow: 0 16px 36px rgba(23, 29, 45, 0.07);
 }
 
 .card h2 {
+  font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 800;
-  color: #0f172a;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #1c2333;
 }
 
 .progress {
@@ -91,33 +124,34 @@
   place-items: center;
   background:
     radial-gradient(circle at center, #fff 58%, transparent 59%),
-    conic-gradient(#ff6b00 0 85%, #ffe0c7 85% 100%);
+    conic-gradient(#f0510e 0 85%, #ffe0c7 85% 100%);
 }
 
 .progress strong {
-  color: #ff6b00;
+  color: #ec5310;
   font-size: 1.4rem;
   font-weight: 800;
+  font-family: var(--font-display);
 }
 
 .strong {
   text-align: center;
-  font-weight: 800;
+  font-weight: 700;
   color: #16a34a;
 }
 
 .muted {
   margin-top: 6px;
   text-align: center;
-  color: #64748b;
+  color: #8a92a4;
   font-size: 0.86rem;
 }
 
 .link {
   display: inline-block;
   margin-top: 14px;
-  color: #ff6b00;
-  font-weight: 700;
+  color: #ec5310;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -134,22 +168,22 @@
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid #f4efe7;
 }
 
 .matchList strong {
   display: block;
-  color: #0f172a;
+  color: #1c2333;
   font-size: 0.92rem;
 }
 
 .matchList span {
-  color: #64748b;
+  color: #8a92a4;
   font-size: 0.8rem;
 }
 
 .matchList b {
-  color: #ff6b00;
+  color: #ec5310;
   white-space: nowrap;
 }
 
@@ -161,21 +195,22 @@
 }
 
 .stats div {
-  background: #fff7ed;
-  border-radius: 12px;
+  background: linear-gradient(150deg, #fff1e5, #ffe9d6);
+  border-radius: 14px;
   padding: 14px 10px;
   text-align: center;
 }
 
 .stats strong {
   display: block;
+  font-family: var(--font-display);
   font-size: 1.2rem;
-  color: #0f172a;
+  color: #171d2d;
 }
 
 .stats span {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #737c8e;
 }
 
 .quick {
@@ -186,17 +221,18 @@
 }
 
 .quick a {
-  color: #334155;
+  color: #1c2333;
   font-weight: 600;
   text-decoration: none;
   padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #e8edf5;
+  border-radius: 12px;
+  border: 1px solid #f0ebe2;
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
 
 .quick a:hover {
-  border-color: #ff6b00;
-  color: #ff6b00;
+  border-color: #f5a06b;
+  color: #ec5310;
 }
 
 .jobList {
@@ -210,21 +246,29 @@
   justify-content: space-between;
   gap: 16px;
   align-items: center;
-  background: #fff;
-  border: 1px solid #e8edf5;
-  border-radius: 16px;
-  padding: 18px 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #fffdfa 100%);
+  border: 1px solid #f0ebe2;
+  border-radius: 20px;
+  padding: 18px 22px;
   flex-wrap: wrap;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.jobCard:hover {
+  border-color: #ffd3b3;
+  box-shadow: 0 16px 36px rgba(23, 29, 45, 0.07);
 }
 
 .jobCard h2 {
+  font-family: var(--font-display);
   font-size: 1.05rem;
-  color: #0f172a;
+  letter-spacing: -0.01em;
+  color: #1c2333;
 }
 
 .jobCard p {
   margin-top: 4px;
-  color: #64748b;
+  color: #737c8e;
   font-size: 0.88rem;
 }
 
@@ -236,15 +280,59 @@
 }
 
 .jobRight b {
-  color: #ff6b00;
+  color: #ec5310;
   font-weight: 800;
 }
 
-@media (max-width: 900px) {
-  .shell {
-    width: 92%;
-  }
+.toast {
+  margin: 0 0 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #fff0e4;
+  border: 1px solid #ffdcc2;
+  color: #d9490c;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
 
+.bio {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #f4efe7;
+}
+
+.bio h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: #1c2333;
+}
+
+.bio p {
+  margin: 0;
+  color: #5c6577;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.skillWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.skill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff0e4;
+  border: 1px solid #ffdcc2;
+  color: #d9490c;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
   .dashGrid,
   .stats {
     grid-template-columns: 1fr 1fr;

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import type { ProfileFormData } from '../data/wizard'
+import { firstName, getUser } from '../lib/store'
 import { MotionButton } from '../motion/MotionButton'
 import { MotionItem, MotionStack } from '../motion/MotionStack'
 import styles from './CompleteStep.module.css'
@@ -12,6 +13,9 @@ interface CompleteStepProps {
 
 export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
   const navigate = useNavigate()
+  const name = firstName()
+  const fullName = getUser()?.name ?? name
+  const location = data.currentLocation || 'Location not set'
 
   return (
     <MotionStack className={styles.stack}>
@@ -26,7 +30,7 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
           ✓
         </motion.div>
         <div>
-          <p className={styles.congrats}>Congratulations, Arjun!</p>
+          <p className={styles.congrats}>Congratulations, {name}!</p>
           <h3>You&apos;re All Set!</h3>
           <p>
             Your profile is complete and verified. You&apos;re now visible to top
@@ -34,19 +38,14 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
             you.
           </p>
         </div>
-        <motion.div
-          className={styles.bot}
+        <motion.img
+          src="/rocket.png"
+          alt=""
+          className={styles.rocket}
           aria-hidden="true"
           animate={{ y: [0, -8, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <svg viewBox="0 0 64 64">
-            <rect x="12" y="18" width="40" height="30" rx="14" fill="currentColor" />
-            <circle cx="26" cy="33" r="3" fill="#fff" />
-            <circle cx="38" cy="33" r="3" fill="#fff" />
-            <rect x="29" y="10" width="6" height="8" rx="3" fill="currentColor" />
-          </svg>
-        </motion.div>
+        />
       </MotionItem>
 
       <MotionItem as="section" className={styles.card}>
@@ -115,9 +114,9 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
             </svg>
           </div>
           <div>
-            <h5>Arjun Kumar</h5>
-            <p>{data.currentRole || 'Software Engineer'}</p>
-            <small>Hyderabad, India</small>
+            <h5>{fullName}</h5>
+            <p>{data.currentRole || 'Role not set'}</p>
+            <small>{location}</small>
           </div>
           <span className={styles.completeTag}>Profile Complete</span>
         </div>

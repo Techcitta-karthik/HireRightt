@@ -9,9 +9,9 @@ export function AboutPage() {
           Talent to talent — that&apos;s the <em>Right</em> way.
         </>
       }
-      subtitle="HRERIGHT is building a privacy-first hiring platform where AI helps people find opportunities that truly fit."
-      primaryCta={{ label: 'Join HRERIGHT', to: '/onboarding' }}
-      secondaryCta={{ label: 'Contact Support', to: 'mailto:care@hreright.com' }}
+      subtitle="HIRERIGHT is building a privacy-first hiring platform where AI helps people find opportunities that truly fit."
+      primaryCta={{ label: 'Join HIRERIGHT', to: '/onboarding' }}
+      secondaryCta={{ label: 'Contact Support', to: 'mailto:care@HIRERIGHT.com' }}
       sections={[
         {
           title: 'Our Mission',
@@ -23,7 +23,7 @@ export function AboutPage() {
         },
         {
           title: 'Get Help',
-          body: 'Need support? Reach us anytime at care@hreright.com.',
+          body: 'Need support? Reach us anytime at care@HIRERIGHT.com.',
         },
       ]}
     />

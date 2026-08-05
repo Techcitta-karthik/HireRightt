@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { SiteNav } from './SiteNav'
+import { SiteFooter } from './SiteFooter'
 import { fadeUp, staggerContainer } from '../motion/variants'
 import styles from './MarketingPage.module.css'
 
@@ -25,7 +26,7 @@ export function MarketingPage({
   title,
   subtitle,
   sections = [],
-  primaryCta = { label: 'Get Started Free', to: '/onboarding' },
+  primaryCta = { label: 'Get Started Free', to: '/signup' },
   secondaryCta = { label: 'How It Works', to: '/how-it-works' },
   children,
 }: MarketingPageProps) {
@@ -79,6 +80,8 @@ export function MarketingPage({
           {children}
         </motion.main>
       </div>
+
+      <SiteFooter />
     </div>
   )
 }

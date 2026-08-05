@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { ProfileFormData } from '../data/wizard'
+import { firstName } from '../lib/store'
 import { MotionButton } from '../motion/MotionButton'
 import { MotionItem, MotionStack } from '../motion/MotionStack'
 import styles from './AiInterviewStep.module.css'
@@ -18,23 +19,55 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
   const navigate = useNavigate()
   const [selectedReminder, setSelectedReminder] = useState(2)
   const [status, setStatus] = useState('')
+  const name = firstName()
+  const interviewWhen = (() => {
+    const when = new Date()
+    when.setDate(when.getDate() + 2)
+    when.setHours(13, 30, 0, 0)
+    return when
+  })()
+  const dateLabel = interviewWhen.toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+  const shortDateLabel = interviewWhen.toLocaleDateString(undefined, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+  const timeLabel = interviewWhen.toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  })
 
   function handleCalendar() {
     onChange(
       'interviewNotes',
-      `Interview confirmed for Mon, 19 May 2025 at 01:30 PM (IST).`,
+      `Interview scheduled for ${shortDateLabel} at ${timeLabel}.`,
     )
     setStatus('Calendar event prepared. Opening your calendar…')
+    const start = interviewWhen
+      .toISOString()
+      .replace(/[-:]/g, '')
+      .replace(/\.\d{3}/, '')
+    const endDate = new Date(interviewWhen.getTime() + 15 * 60 * 1000)
+    const end = endDate
+      .toISOString()
+      .replace(/[-:]/g, '')
+      .replace(/\.\d{3}/, '')
     window.open(
-      'https://calendar.google.com/calendar/render?action=TEMPLATE&text=HRERIGHT%20AI%20Interview&dates=20250519T080000Z/20250519T081500Z&details=15-minute%20AI%20Interview',
+      `https://calendar.google.com/calendar/render?action=TEMPLATE&text=HIRERIGHT%20AI%20Interview&dates=${start}/${end}&details=15-minute%20AI%20Interview`,
       '_blank',
       'noopener,noreferrer',
     )
   }
 
   function handleGuide() {
-    setStatus('Opening interview guide…')
-    navigate('/resources')
+    setStatus('Opening your video AI interview room…')
+    navigate('/interview')
   }
 
   return (
@@ -59,7 +92,7 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
             </svg>
           </motion.div>
           <div className={styles.bannerText}>
-            <p className={styles.bannerEyebrow}>All Set, Arjun!</p>
+            <p className={styles.bannerEyebrow}>All Set, {name}!</p>
             <h3>Your 15-Minute AI Interview is Confirmed!</h3>
             <p>
               We&apos;re excited to connect with you and help you take the next
@@ -91,7 +124,7 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
             {[
               {
                 label: 'Date',
-                value: 'Monday, 19 May 2025',
+                value: dateLabel,
                 icon: (
                   <>
                     <rect x="3" y="4.5" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5" />
@@ -103,7 +136,8 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
                 label: 'Time',
                 value: (
                   <>
-                    01:30 PM (IST) <span className={styles.badge}>15 Min Interview</span>
+                    {timeLabel}{' '}
+                    <span className={styles.badge}>15 Min Interview</span>
                   </>
                 ),
                 icon: (
@@ -155,7 +189,7 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
           >
             <h5>What&apos;s Next?</h5>
             <ul>
-              <li>Our AI will conduct a fair and personalized conversation.</li>
+              <li>Our AI will run a live video interview — camera on, spoken answers.</li>
               <li>Showcase your skills, experiences and problem-solving approach.</li>
               <li>Get matched with opportunities that are right for you.</li>
             </ul>
@@ -177,7 +211,7 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
             onClick={handleGuide}
             lift
           >
-            View Interview Guide →
+            Start video interview →
           </MotionButton>
         </div>
       </MotionItem>
@@ -197,10 +231,10 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
               <span className={styles.sent}>Sent</span>
             </div>
             <div className={styles.messageBox}>
-              <p>Hi Arjun,</p>
+              <p>Hi {name},</p>
               <p>Your 15-minute AI interview is confirmed.</p>
-              <p>Date: Monday, 19 May 2025</p>
-              <p>Time: 01:30 PM (IST)</p>
+              <p>Date: {dateLabel}</p>
+              <p>Time: {timeLabel}</p>
             </div>
             <MotionButton
               type="button"
@@ -223,9 +257,11 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
               <span className={styles.sent}>Sent</span>
             </div>
             <div className={styles.messageBox}>
-              <p>Hi Arjun,</p>
+              <p>Hi {name},</p>
               <p>Your 15-minute AI interview is confirmed.</p>
-              <p>Mon, 19 May 2025 · 01:30 PM (IST)</p>
+              <p>
+                {shortDateLabel} · {timeLabel}
+              </p>
             </div>
             <MotionButton
               type="button"
@@ -269,7 +305,7 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
                 <p>{item}</p>
                 <span>
                   {index === 3
-                    ? 'Join and ace your AI interview'
+                    ? 'Join your video AI interview'
                     : 'Quick reminder with interview instructions'}
                 </span>
               </div>
@@ -301,7 +337,7 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
             for you.
           </p>
           <small>
-            If you need any help, reach out to us at care@hreright.com
+            If you need any help, reach out to us at care@HIRERIGHT.com
           </small>
         </div>
       </MotionItem>

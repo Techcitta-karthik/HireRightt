@@ -2,9 +2,14 @@
   background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
-  padding: 22px 24px 18px;
+  padding: 22px 24px;
   box-shadow: var(--shadow-sm);
   animation: fade-up 0.45s var(--ease) both;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header {
@@ -12,7 +17,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 
 .header h3 {
@@ -298,6 +303,13 @@
   font-size: 0.82rem;
   color: #dc2626;
   font-weight: 500;
+}
+
+.status {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: #047857;
+  font-weight: 600;
 }
 
 .secureNote {

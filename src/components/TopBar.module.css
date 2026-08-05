@@ -58,9 +58,16 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  object-fit: cover;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  background: linear-gradient(135deg, #fb923c 0%, #ff6b6b 100%);
   border: 2px solid var(--white);
   box-shadow: 0 0 0 1.5px var(--purple-200);
+  flex-shrink: 0;
 }
 
 .chevron {
