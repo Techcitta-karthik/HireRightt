@@ -44,7 +44,7 @@ export function SignupPage() {
         email: email.trim().toLowerCase(),
         password,
       })
-      navigate('/onboarding')
+      navigate('/interview')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create account.')
     }
@@ -60,12 +60,12 @@ export function SignupPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: easeOut }}
         >
-          <span className={styles.kicker}>GET STARTED FREE</span>
+          <span className={styles.kicker}>AI INTERVIEW FIRST</span>
           <h1>
-            Create your <em>HIRERIGHT</em> account
+            Create your account & <em>meet Ava</em>
           </h1>
           <p>
-            One account for your profile, AI interviews, and job matches.
+            Sign up, join the video interview studio, get scored, then unlock matched roles.
           </p>
 
           <form className={styles.form} onSubmit={handleSubmit}>
@@ -166,11 +166,11 @@ export function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: easeOut }}
         >
-          <span className={styles.kicker}>WELCOME BACK</span>
+          <span className={styles.kicker}>WELCOME BACK · AI INTERVIEW</span>
           <h1>
             Login to <em>HIRERIGHT</em>
           </h1>
-          <p>Access your dashboard, matches, and interview updates.</p>
+          <p>Sign in to your interview studio, talent score, and unlocked matches.</p>
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <label>

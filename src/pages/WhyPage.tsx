@@ -6,22 +6,28 @@ export function WhyPage() {
       kicker="WHY HIRERIGHT"
       title={
         <>
-          Hiring that puts <em>talent</em> first.
+          Hiring should start with a <em>conversation</em> — not a PDF.
         </>
       }
-      subtitle="HIRERIGHT connects job seekers and employers with AI matching, verified opportunities, and privacy-first profiles."
+      subtitle="We built an AI interview studio so candidates prove skill live, and opportunities open based on performance — fair, fast, and structured."
+      primaryCta={{ label: 'Take AI Interview', to: '/signup' }}
+      secondaryCta={{ label: 'For candidates', to: '/job-seekers' }}
       sections={[
         {
-          title: 'Talent to Talent',
-          body: 'Built for people who want meaningful matches — not endless noise.',
+          title: 'Interview-first by design',
+          body: 'The product loop is signup → live AI interview → score → matches. Everything else supports that.',
         },
         {
-          title: 'Enterprise Security',
-          body: 'Your profile is protected with encryption and clear consent controls.',
+          title: 'Consistent & fair',
+          body: 'Same structured questions and scoring dimensions for every candidate in a role track.',
         },
         {
-          title: 'Trusted Employers',
-          body: 'Only verified companies. Real jobs. Real opportunities worldwide.',
+          title: 'Privacy-first',
+          body: 'Your session stays yours. Camera and mic are used only for the interview experience.',
+        },
+        {
+          title: 'Built for modern hiring',
+          body: 'Inspired by platforms like CloudHire and Micro1 — video AI screens that replace resume roulette.',
         },
       ]}
     />

@@ -184,25 +184,82 @@ export function getProfile(): SavedProfile | null {
 }
 
 export function calcProfileStrength(profile: SavedProfile | null): number {
-  if (!profile) return 12
-  let score = 8
-  if (profile.resumeName) score += 10
-  if (profile.whoAreYou.length > 40) score += 8
-  if (profile.whatDrivesYou.length > 20) score += 6
-  if (profile.keyStrengths.length > 10) score += 6
-  if (profile.currentRole) score += 6
-  if (profile.totalExperience) score += 5
-  if (profile.currentLocation) score += 4
-  if (profile.skills.length >= 3) score += 10
-  if (profile.skills.length >= 8) score += 4
-  if (profile.workExperiences.some((w) => w.jobTitle && w.company)) score += 10
-  if (profile.achievements.filter(Boolean).length > 0) score += 6
-  if (profile.metrics.some((m) => m.metric)) score += 6
-  if (profile.certifications.some((c) => c.name)) score += 5
-  if (profile.selfRating > 0) score += 4
-  if (profile.preferredRoles.length > 0) score += 4
-  if (getInterviewResult()) score += 8
+  if (!profile) {
+    const interviewOnly = getInterviewResult()
+    return interviewOnly ? Math.min(100, 28 + Math.round(interviewOnly.overall * 0.35)) : 8
+  }
+  let score = 6
+  if (profile.resumeName) score += 6
+  if (profile.whoAreYou.length > 40) score += 5
+  if (profile.whatDrivesYou.length > 20) score += 4
+  if (profile.keyStrengths.length > 10) score += 4
+  if (profile.currentRole) score += 4
+  if (profile.totalExperience) score += 3
+  if (profile.currentLocation) score += 3
+  if (profile.skills.length >= 3) score += 6
+  if (profile.skills.length >= 8) score += 3
+  if (profile.workExperiences.some((w) => w.jobTitle && w.company)) score += 6
+  if (profile.achievements.filter(Boolean).length > 0) score += 4
+  if (profile.metrics.some((m) => m.metric)) score += 3
+  if (profile.certifications.some((c) => c.name)) score += 3
+  if (profile.selfRating > 0) score += 2
+  if (profile.preferredRoles.length > 0) score += 3
+  const interview = getInterviewResult()
+  if (interview) score += 20 + Math.round(interview.overall * 0.25)
   return Math.min(100, score)
+}
+
+/** Minimum AI interview score required to apply to jobs. */
+export const MIN_APPLY_SCORE = 40
+
+export function hasInterviewScore(): boolean {
+  return Boolean(getInterviewResult())
+}
+
+export function canApplyToJobs(): boolean {
+  const interview = getInterviewResult()
+  return Boolean(interview && interview.overall >= MIN_APPLY_SCORE)
+}
+
+export type RankedJob = {
+  title: string
+  company: string
+  location: string
+  match: number
+  locked: boolean
+}
+
+export function getRankedJobs(): RankedJob[] {
+  const interview = getInterviewResult()
+  const profile = getProfile()
+  const unlocked = Boolean(interview)
+  const boost = interview ? Math.round(interview.overall / 20) : 0
+  const roleHint = (
+    interview?.role ||
+    profile?.currentRole ||
+    profile?.preferredRoles[0] ||
+    ''
+  ).toLowerCase()
+
+  return JOB_MATCHES.map((job) => {
+    let match = job.match
+    if (unlocked) {
+      match = Math.min(99, job.match + boost)
+      if (roleHint && job.title.toLowerCase().includes(roleHint.split(' ')[0] ?? '')) {
+        match = Math.min(99, match + 3)
+      }
+      if (profile?.skills.some((s) => job.title.toLowerCase().includes(s.toLowerCase().slice(0, 4)))) {
+        match = Math.min(99, match + 2)
+      }
+    } else {
+      match = Math.max(40, job.match - 18)
+    }
+    return {
+      ...job,
+      match,
+      locked: !unlocked,
+    }
+  }).sort((a, b) => b.match - a.match)
 }
 
 export function saveInterviewResult(result: InterviewResult) {
@@ -244,6 +301,11 @@ export function applyToJob(job: {
   location: string
   match: number
 }): Application {
+  if (!canApplyToJobs()) {
+    throw new Error(
+      `Complete an AI interview scoring at least ${MIN_APPLY_SCORE} to apply.`,
+    )
+  }
   const apps = getApplications()
   if (apps.some((a) => a.title === job.title && a.company === job.company)) {
     return apps.find((a) => a.title === job.title)!

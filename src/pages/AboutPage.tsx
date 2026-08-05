@@ -3,27 +3,31 @@ import { MarketingPage } from '../components/MarketingPage'
 export function AboutPage() {
   return (
     <MarketingPage
-      kicker="ABOUT US"
+      kicker="ABOUT"
       title={
         <>
-          Talent to talent — that&apos;s the <em>Right</em> way.
+          Talent to talent — through a <em>real AI interview.</em>
         </>
       }
-      subtitle="HIRERIGHT is building a privacy-first hiring platform where AI helps people find opportunities that truly fit."
-      primaryCta={{ label: 'Join HIRERIGHT', to: '/onboarding' }}
-      secondaryCta={{ label: 'Contact Support', to: 'mailto:care@HIRERIGHT.com' }}
+      subtitle="HIRERIGHT exists so job seekers can prove ability on camera and move forward with a score employers can trust."
+      primaryCta={{ label: 'Take AI Interview', to: '/signup' }}
+      secondaryCta={{ label: 'Why HIRERIGHT', to: '/why' }}
       sections={[
         {
-          title: 'Our Mission',
-          body: 'Make hiring fairer, faster, and more human — powered by intelligent matching.',
+          title: 'Our mission',
+          body: 'Replace resume black holes with structured AI video interviews that showcase how people actually communicate and think.',
         },
         {
-          title: 'Our Promise',
-          body: 'Your data is encrypted and never shared without consent. You stay in control.',
+          title: 'What we built',
+          body: 'An interview studio, scoring engine, and match experience — not another generic job board.',
         },
         {
-          title: 'Get Help',
-          body: 'Need support? Reach us anytime at care@HIRERIGHT.com.',
+          title: 'For candidates first',
+          body: 'You own your score. Retake, improve, and unlock better-ranked opportunities over time.',
+        },
+        {
+          title: 'Privacy & fairness',
+          body: 'Same interview format for everyone. Your data stays private and under your control.',
         },
       ]}
     />

@@ -9,28 +9,28 @@ export function HowItWorksPage() {
       kicker="HOW IT WORKS"
       title={
         <>
-          Four steps to the <em>Right</em> start.
+          Interview first. <em>Get scored.</em> Unlock roles.
         </>
       }
-      subtitle="Create your profile, add skills and proof of impact, complete a short AI interview, then explore matched roles."
-      primaryCta={{ label: 'Create Your Profile', to: '/onboarding' }}
-      secondaryCta={{ label: 'Take AI Interview', to: '/interview' }}
+      subtitle="HIRERIGHT works like CloudHire and Micro1 — prove yourself in a live AI video interview, then match to opportunities with a real score."
+      primaryCta={{ label: 'Take AI Interview', to: '/signup' }}
+      secondaryCta={{ label: 'See the studio', to: '/interview' }}
       sections={[
         {
-          title: '1. Build Your Profile',
-          body: 'Upload your resume and share who you are, what drives you, and your strengths.',
+          title: '1. Create your account',
+          body: 'Sign up free. Optional short profile helps Ava tailor questions to your role.',
         },
         {
-          title: '2. Add Skills & Experience',
-          body: 'Highlight skills and work history so AI can understand your expertise.',
+          title: '2. Enter the interview studio',
+          body: 'Enable camera and mic. Meet Ava — she asks out loud; you answer by speaking.',
         },
         {
-          title: '3. Showcase Performance',
-          body: 'Add achievements, metrics, awards, and certifications that prove your impact.',
+          title: '3. Get your talent score',
+          body: 'Instant breakdown across communication, technical depth, problem solving, and experience.',
         },
         {
-          title: '4. AI Interview & Match',
-          body: 'Complete a short AI interview, then get matched with verified opportunities.',
+          title: '4. Unlock ranked matches',
+          body: 'Browse roles ranked by your interview score and apply with proof of skill — not just a resume.',
         },
       ]}
     >
@@ -49,14 +49,13 @@ export function HowItWorksPage() {
         />
         <div className={styles.launchCopy}>
           <h2>
-            Ready to <em>launch</em> your next move?
+            Ready to <em>interview</em> with Ava?
           </h2>
           <p>
-            Sign up free, build your profile, and take the AI interview in
-            minutes.
+            Join the video room in minutes. Your score unlocks matched roles on the dashboard.
           </p>
           <Link to="/signup" className={styles.primary}>
-            Get Started Now →
+            Start AI Interview →
           </Link>
         </div>
       </motion.section>

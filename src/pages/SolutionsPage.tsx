@@ -1,7 +1,4 @@
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { MarketingPage } from '../components/MarketingPage'
-import styles from '../components/MarketingPage.module.css'
 
 export function SolutionsPage() {
   return (
@@ -9,50 +6,30 @@ export function SolutionsPage() {
       kicker="SOLUTIONS"
       title={
         <>
-          Solutions for seekers and <em>hiring teams</em>.
+          One studio for <em>interview-ready</em> talent.
         </>
       }
-      subtitle="From profile building to AI interviews and employer matching — everything in one hiring platform."
-      primaryCta={{ label: 'Start Free', to: '/signup' }}
-      secondaryCta={{ label: 'Talk to Us', to: '/about' }}
+      subtitle="HIRERIGHT helps candidates become interview-certified and discover roles ranked by real AI interview performance."
+      primaryCta={{ label: 'Start AI Interview', to: '/signup' }}
+      secondaryCta={{ label: 'How it works', to: '/how-it-works' }}
       sections={[
         {
-          title: 'For Candidates',
-          body: 'Profile wizard, skills tracking, AI interview, and personalized job matches.',
+          title: 'Candidate interview studio',
+          body: 'Live video room with Ava — device check, spoken Q&A, captions, and instant scoring.',
         },
         {
-          title: 'For Employers',
-          body: 'Discover verified talent faster with AI ranking and secure candidate profiles.',
+          title: 'Talent scorecards',
+          body: 'Dashboard and profile surface overall score, category breakdown, strengths, and next steps.',
         },
         {
-          title: 'For Teams',
-          body: 'Track applications, interviews, and offers with one shared hiring workspace.',
+          title: 'Score-gated opportunities',
+          body: 'Job matches unlock after your AI interview so applications carry proof of skill.',
+        },
+        {
+          title: 'Role-tailored questions',
+          body: 'Pick your track and level — Ava asks questions relevant to how you want to get hired.',
         },
       ]}
-    >
-      <motion.section
-        className={styles.launchCta}
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-      >
-        <motion.img
-          src="/rocket.png"
-          alt=""
-          className={styles.launchRocket}
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <div className={styles.launchCopy}>
-          <h2>
-            Launch with the <em>Right</em> platform
-          </h2>
-          <p>One place for profiles, AI interviews, scoring, and job matches.</p>
-          <Link to="/signup" className={styles.primary}>
-            Start Free →
-          </Link>
-        </div>
-      </motion.section>
-    </MarketingPage>
+    />
   )
 }

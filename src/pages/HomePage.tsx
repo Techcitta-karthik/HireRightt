@@ -8,51 +8,51 @@ import { fadeIn, fadeUp, scaleIn, staggerContainer } from '../motion/variants'
 
 const FEATURES = [
   {
-    title: 'Trusted & Reliable',
-    desc: 'Accurate background checks that build employer trust.',
-    icon: 'shield',
-  },
-  {
-    title: 'Faster Opportunities',
-    desc: 'Quick & digital process that keeps you ahead in the hiring race.',
+    title: 'Live AI Video Interview',
+    desc: 'Meet Ava on camera — she asks out loud, you answer spoken, like a real screen.',
     icon: 'bolt',
   },
   {
-    title: 'Secure & Private',
-    desc: 'Your data is protected with industry-leading security.',
-    icon: 'lock',
+    title: 'Instant Talent Score',
+    desc: 'Get scored on communication, depth, problem-solving, and experience in minutes.',
+    icon: 'badge',
   },
   {
-    title: 'Stay Job-Ready',
-    desc: 'A verified profile makes you a more confident candidate.',
+    title: 'Interview-First Matching',
+    desc: 'Unlock ranked roles only after your AI interview — employers see proof, not just a resume.',
+    icon: 'briefcase',
+  },
+  {
+    title: 'Scored Profile Card',
+    desc: 'Your scorecard travels with you — strengths, categories, and interview-ready status.',
     icon: 'user',
   },
   {
-    title: 'Global Standards',
-    desc: 'Screening aligned with global compliance & quality.',
-    icon: 'star',
+    title: 'Private & Fair',
+    desc: 'Structured questions, consistent scoring, and your data stays under your control.',
+    icon: 'lock',
   },
 ]
 
 const STEPS = [
   {
-    title: 'Create Your Profile',
-    desc: 'Sign up in minutes and share the necessary details.',
+    title: 'Sign Up Free',
+    desc: 'Create your account in under a minute — no long forms to start.',
     icon: 'user',
   },
   {
-    title: 'We Run Secure Checks',
-    desc: 'Our technology verifies your information quickly & accurately.',
-    icon: 'doc',
+    title: 'Take the AI Interview',
+    desc: 'Join the video room with Ava. Speak your answers. Get a live transcript.',
+    icon: 'bolt',
   },
   {
-    title: 'Results Delivered',
-    desc: 'Reports are shared with employers seamlessly.',
+    title: 'Get Your Score',
+    desc: 'Instant report across four dimensions — know exactly where you stand.',
     icon: 'badge',
   },
   {
-    title: 'You Move Forward',
-    desc: 'More trust. More confidence. More opportunities.',
+    title: 'Unlock Matched Roles',
+    desc: 'Browse jobs ranked by your interview score and apply with proof of skill.',
     icon: 'briefcase',
   },
 ]
@@ -229,28 +229,28 @@ export function HomePage() {
                 <i className={styles.kickerIcon}>
                   <Icon name="bolt" />
                 </i>
-                AI-POWERED HIRING PLATFORM
+                AI VIDEO INTERVIEW PLATFORM
               </motion.span>
 
               <motion.h1 variants={fadeUp}>
-                Your Dream Job
+                Prove your skills
                 <br />
-                Deserves the
+                in a live
                 <br />
-                <em>Right</em> Start.
+                <em>AI interview.</em>
               </motion.h1>
 
               <motion.p className={styles.heroSub} variants={fadeUp}>
-                AI-powered matching, secure profiles,
+                Camera on. Speak with Ava. Get scored instantly —
                 <br />
-                and faster opportunities — all in one place.
+                then unlock roles matched to your interview.
               </motion.p>
 
               <motion.div className={styles.heroActions} variants={fadeUp}>
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                   <Link to="/signup" className={styles.primaryBtn}>
-                    <Icon name="user" />
-                    Create Your Profile
+                    <Icon name="bolt" />
+                    Take AI Interview
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
@@ -258,7 +258,7 @@ export function HomePage() {
                     <span className={styles.playBox} aria-hidden="true">
                       <Icon name="play" />
                     </span>
-                    How It Works
+                    See how it works
                   </Link>
                 </motion.div>
               </motion.div>
@@ -266,20 +266,11 @@ export function HomePage() {
               <motion.div className={styles.quickPoints} variants={fadeUp}>
                 <div className={styles.quickItem}>
                   <i className={styles.qIcon}>
-                    <Icon name="people" />
+                    <Icon name="bolt" />
                   </i>
                   <div>
-                    <strong>AI Matching</strong>
-                    <span>Smart opportunities</span>
-                  </div>
-                </div>
-                <div className={styles.quickItem}>
-                  <i className={styles.qIcon}>
-                    <Icon name="shield" />
-                  </i>
-                  <div>
-                    <strong>Secure & Private</strong>
-                    <span>Your data is safe</span>
+                    <strong>Live video AI</strong>
+                    <span>Spoken answers</span>
                   </div>
                 </div>
                 <div className={styles.quickItem}>
@@ -287,8 +278,17 @@ export function HomePage() {
                     <Icon name="badge" />
                   </i>
                   <div>
-                    <strong>Trusted by Top</strong>
-                    <span>Employers globally</span>
+                    <strong>Instant score</strong>
+                    <span>4 skill dimensions</span>
+                  </div>
+                </div>
+                <div className={styles.quickItem}>
+                  <i className={styles.qIcon}>
+                    <Icon name="briefcase" />
+                  </i>
+                  <div>
+                    <strong>Unlock matches</strong>
+                    <span>Apply with proof</span>
                   </div>
                 </div>
               </motion.div>
@@ -358,12 +358,12 @@ export function HomePage() {
             variants={staggerContainer}
           >
             <motion.span className={styles.kickerPill} variants={fadeUp}>
-              WHY JOB SEEKERS CHOOSE HIRERIGHT
+              WHY CANDIDATES CHOOSE HIRERIGHT
             </motion.span>
             <motion.h2 className={styles.featuresTitle} variants={fadeUp}>
-              Everything you need to get hired,
+              An AI interview platform —
               <br />
-              faster and <em>smarter.</em>
+              not just another <em>job board.</em>
             </motion.h2>
 
             <div className={styles.featureGrid}>
@@ -432,16 +432,18 @@ export function HomePage() {
 
             <div className={styles.ctaCopy}>
               <h2>
-                Take the <em>Right</em> Step Today
+                Ready for your <em>AI interview?</em>
               </h2>
-              <p>A trusted profile today can open doors to endless tomorrow.</p>
+              <p>
+                Sign up, join Ava in the video room, and unlock matched roles with your score.
+              </p>
               <motion.div
                 className={styles.stripActions}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <Link to="/signup" className={styles.primaryBtn}>
-                  Get Started Now
+                  Start AI Interview
                   <span aria-hidden="true">→</span>
                 </Link>
               </motion.div>

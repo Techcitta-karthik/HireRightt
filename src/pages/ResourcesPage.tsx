@@ -6,24 +6,28 @@ export function ResourcesPage() {
       kicker="RESOURCES"
       title={
         <>
-          Guides to help you get hired <em>smarter</em>.
+          Prep for your <em>AI video interview.</em>
         </>
       }
-      subtitle="Interview tips, profile best practices, and product updates — practical resources for your next move."
-      primaryCta={{ label: 'Build Profile', to: '/onboarding' }}
-      secondaryCta={{ label: 'How It Works', to: '/how-it-works' }}
+      subtitle="Quick guidance so you walk into Ava’s studio ready — camera, mic, and clear spoken answers."
+      primaryCta={{ label: 'Enter interview studio', to: '/signup' }}
+      secondaryCta={{ label: 'How it works', to: '/how-it-works' }}
       sections={[
         {
-          title: 'Profile Playbook',
-          body: 'How to write strengths, achievements, and skills that improve match accuracy.',
+          title: 'Setup checklist',
+          body: 'Quiet room, good lighting, stable internet, Chrome or Edge, camera and mic allowed.',
         },
         {
-          title: 'AI Interview Prep',
-          body: 'What to expect in a 15-minute AI interview and how to showcase impact.',
+          title: 'How to answer',
+          body: 'Speak in 60–150 words. Structure: situation → action → result. Look at the camera.',
         },
         {
-          title: 'Career Updates',
-          body: 'Product news, hiring trends, and tips from the HIRERIGHT team.',
+          title: 'What Ava scores',
+          body: 'Communication clarity, technical depth, problem solving, and relevant experience.',
+        },
+        {
+          title: 'After your score',
+          body: 'Open Matches to apply. Retake the interview anytime to improve your ranking.',
         },
       ]}
     />

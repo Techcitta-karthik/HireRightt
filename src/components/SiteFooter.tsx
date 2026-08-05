@@ -3,30 +3,30 @@ import styles from './SiteFooter.module.css'
 
 const COLUMNS = [
   {
-    title: 'For Job Seekers',
+    title: 'AI Interview',
     links: [
-      { label: 'Create Your Account', to: '/signup' },
-      { label: 'AI Interview', to: '/interview' },
+      { label: 'Take AI Interview', to: '/signup' },
+      { label: 'Interview Studio', to: '/interview' },
       { label: 'How It Works', to: '/how-it-works' },
-      { label: 'Why HIRERIGHT', to: '/why' },
-      { label: 'FAQs', to: '/resources' },
+      { label: 'Interview Prep', to: '/resources' },
+      { label: 'Job Matches', to: '/jobs' },
     ],
   },
   {
-    title: 'Resources',
+    title: 'For Candidates',
     links: [
-      { label: 'Blog', to: '/resources' },
-      { label: 'Guides', to: '/resources' },
-      { label: 'Help Center', to: '/resources' },
+      { label: 'Why Interview-First', to: '/why' },
+      { label: 'For Candidates', to: '/job-seekers' },
+      { label: 'Solutions', to: '/solutions' },
+      { label: 'Dashboard', to: '/dashboard' },
     ],
   },
   {
-    title: 'About HIRERIGHT',
+    title: 'Company',
     links: [
       { label: 'About Us', to: '/about' },
-      { label: 'Solutions', to: '/solutions' },
-      { label: 'Careers', to: '/about' },
-      { label: 'Newsroom', to: '/resources' },
+      { label: 'Resources', to: '/resources' },
+      { label: 'Privacy', to: '/why' },
     ],
   },
 ]

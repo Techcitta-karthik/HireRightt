@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import type { ProfileFormData } from '../data/wizard'
-import { firstName, getUser } from '../lib/store'
+import { firstName, getInterviewResult, getUser } from '../lib/store'
 import { MotionButton } from '../motion/MotionButton'
 import { MotionItem, MotionStack } from '../motion/MotionStack'
 import styles from './CompleteStep.module.css'
@@ -16,6 +16,7 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
   const name = firstName()
   const fullName = getUser()?.name ?? name
   const location = data.currentLocation || 'Location not set'
+  const interview = getInterviewResult()
 
   return (
     <MotionStack className={styles.stack}>
@@ -57,23 +58,25 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
         <div className={styles.nextGrid}>
           {[
             {
-              title: 'AI is Matching You',
-              desc: 'Our AI is scanning opportunities that match your profile.',
-              to: '/jobs',
+              title: interview ? 'Unlock matched roles' : 'Take AI interview',
+              desc: interview
+                ? `Your score is ${interview.overall}. Browse roles ranked by that score.`
+                : 'Enter the studio with Ava — required to unlock job applications.',
+              to: interview ? '/jobs' : '/interview',
             },
             {
-              title: 'Get Interview Invites',
-              desc: "You'll receive interview requests from top companies.",
-              to: '/dashboard',
+              title: 'Open talent scorecard',
+              desc: 'See category scores, strengths, and what to improve next.',
+              to: '/profile',
             },
             {
-              title: 'Stay Notified',
-              desc: "We'll keep you updated on opportunities and profile views.",
-              to: '/settings',
+              title: 'Retake anytime',
+              desc: 'Improve your AI interview score to climb the match list.',
+              to: '/interview',
             },
             {
-              title: 'Track Your Progress',
-              desc: 'Monitor applications, interviews, and offers from your dashboard.',
+              title: 'Dashboard',
+              desc: 'Track applications and readiness in one place.',
               to: '/dashboard',
             },
           ].map((item) => (
@@ -118,16 +121,18 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
             <p>{data.currentRole || 'Role not set'}</p>
             <small>{location}</small>
           </div>
-          <span className={styles.completeTag}>Profile Complete</span>
+          <span className={styles.completeTag}>
+            {interview ? `Score ${interview.overall}` : 'Interview pending'}
+          </span>
         </div>
         <div className={styles.statsRow}>
           {(
             [
-              [2, data.totalExperience || '2 – 3 Years', 'Experience'],
-              [2, String(data.skills.length), 'Skills Added'],
+              [2, data.totalExperience || '—', 'Experience'],
+              [2, String(data.skills.length), 'Skills'],
               [3, String(data.achievements.filter(Boolean).length), 'Achievements'],
-              [3, String(data.certifications.length), 'Certifications'],
-              [4, data.interviewNotes ? 'Yes' : 'Ready', 'Interview Ready'],
+              [4, interview ? String(interview.overall) : '—', 'AI Score'],
+              [4, interview ? 'Certified' : 'Take interview', 'Status'],
             ] as const
           ).map(([step, value, label]) => (
             <motion.button
@@ -172,28 +177,31 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
           </svg>
         </motion.div>
         <div>
-          <h4>Your Journey Starts Now!</h4>
+          <h4>
+            {interview ? 'Matches unlocked' : 'Interview to unlock matches'}
+          </h4>
           <p>
-            Opportunities are waiting for you. Let&apos;s make your next career
-            move your best one yet.
+            {interview
+              ? 'Your AI score is live. Browse ranked roles and apply with proof of skill.'
+              : 'Finish the AI video interview with Ava to unlock applications.'}
           </p>
         </div>
         <div className={styles.journeyActions}>
           <MotionButton
             type="button"
             className={styles.primaryWide}
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(interview ? '/jobs' : '/interview')}
             lift
           >
-            Go to Dashboard →
+            {interview ? 'Browse matched roles →' : 'Enter interview studio →'}
           </MotionButton>
           <MotionButton
             type="button"
             className={styles.secondaryWide}
-            onClick={() => navigate('/jobs')}
+            onClick={() => navigate('/dashboard')}
             lift
           >
-            Explore Opportunities
+            Go to dashboard
           </MotionButton>
         </div>
       </MotionItem>

@@ -6,12 +6,12 @@ import { firstName, isLoggedIn, logout } from '../lib/store'
 import styles from './SiteNav.module.css'
 
 const NAV = [
-  { to: '/job-seekers', label: 'For Job Seekers' },
-  { to: '/why', label: 'Why HIRERIGHT' },
-  { to: '/solutions', label: 'Solutions' },
-  { to: '/how-it-works', label: 'How It Works' },
   { to: '/interview', label: 'AI Interview' },
-  { to: '/about', label: 'About' },
+  { to: '/how-it-works', label: 'How It Works' },
+  { to: '/job-seekers', label: 'For Candidates' },
+  { to: '/jobs', label: 'Matches' },
+  { to: '/resources', label: 'Prep' },
+  { to: '/why', label: 'Why HIRERIGHT' },
 ]
 
 type SiteNavProps = {
@@ -75,10 +75,10 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
             </Link>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Link
-                to="/dashboard"
+                to="/interview"
                 className={dark ? styles.ctaBtnDark : styles.ctaBtn}
               >
-                Dashboard
+                Interview studio
               </Link>
             </motion.div>
           </>
@@ -94,7 +94,7 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
                 to="/signup"
                 className={dark ? styles.ctaBtnDark : styles.ctaBtn}
               >
-                Sign Up Free
+                Take AI Interview
                 <span aria-hidden="true">→</span>
               </Link>
             </motion.div>
@@ -185,11 +185,11 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
                 </Link>
               )}
               <Link
-                to={loggedIn ? '/dashboard' : '/signup'}
+                to={loggedIn ? '/interview' : '/signup'}
                 className={styles.ctaBtn}
                 onClick={() => setOpen(false)}
               >
-                {loggedIn ? 'Dashboard →' : 'Sign Up Free →'}
+                {loggedIn ? 'Interview studio →' : 'Take AI Interview →'}
               </Link>
             </div>
           </motion.nav>
