@@ -84,8 +84,73 @@ const ROLE_QUESTIONS: Record<string, Question> = {
   },
 }
 
-export function buildQuestionSet(role: string): Question[] {
+export type ScoreContext = {
+  skills?: string[]
+  profileRole?: string
+  experienceLabel?: string
+}
+
+/** Map wizard experience labels onto interview levels. */
+export function mapExperienceToLevel(experience: string): (typeof LEVELS)[number] {
+  const e = experience.toLowerCase()
+  if (!e || e.includes('fresher') || e.includes('0 years') || e.includes('0 – 1')) {
+    return 'Fresher'
+  }
+  if (e.includes('1 – 2') || e.includes('2 – 3') || e.includes('1-2') || e.includes('2-3')) {
+    return '1–3 years'
+  }
+  if (e.includes('3 – 5') || e.includes('5 – 8') || e.includes('3-5') || e.includes('5-8')) {
+    return '3–6 years'
+  }
+  return '6+ years'
+}
+
+/** Best-effort match of free-text profile role to interview role chips. */
+export function mapProfileRoleToInterviewRole(profileRole: string): string {
+  const r = profileRole.toLowerCase()
+  if (!r) return ROLES[0]
+  if (r.includes('front') || r.includes('ui') || r.includes('react')) return 'Frontend Developer'
+  if (r.includes('full') || r.includes('mern') || r.includes('stack')) return 'Full Stack Engineer'
+  if (r.includes('back') || r.includes('node') || r.includes('java') || r.includes('api')) {
+    return 'Backend Developer'
+  }
+  if (r.includes('data') || r.includes('analyst') || r.includes('bi')) return 'Data Analyst'
+  if (r.includes('ml') || r.includes('machine') || r.includes('ai ') || r.startsWith('ai')) {
+    return 'AI / ML Engineer'
+  }
+  if (r.includes('product') || r.includes('pm')) return 'Product Manager'
+  const exact = ROLES.find((role) => role.toLowerCase() === r)
+  return exact ?? 'Full Stack Engineer'
+}
+
+function skillQuestion(skills: string[]): Question | null {
+  const top = skills.filter(Boolean).slice(0, 5)
+  if (top.length === 0) return null
+  const listed = top.join(', ')
+  return {
+    text: `You listed ${listed} on your profile. Pick one and walk me through a real project where you used it — what you built, your role, and the outcome.`,
+    category: 'Technical',
+    keywords: [
+      ...top.map((s) => s.toLowerCase()),
+      'project',
+      'built',
+      'used',
+      'result',
+      'impact',
+      'team',
+      'challenge',
+    ],
+    hint: 'Name the skill, the project, your concrete actions, and a measurable result.',
+  }
+}
+
+export function buildQuestionSet(role: string, skills: string[] = []): Question[] {
   const roleQ = ROLE_QUESTIONS[role] ?? ROLE_QUESTIONS['Full Stack Engineer']
+  const skillQ = skillQuestion(skills)
+  // Prefer skill-deep dive when profile has skills; keep 5 questions total.
+  if (skillQ) {
+    return [COMMON_QUESTIONS[0], skillQ, roleQ, COMMON_QUESTIONS[1], COMMON_QUESTIONS[2]]
+  }
   return [COMMON_QUESTIONS[0], roleQ, COMMON_QUESTIONS[1], COMMON_QUESTIONS[2], COMMON_QUESTIONS[3]]
 }
 
@@ -94,22 +159,29 @@ const STRUCTURE_SIGNALS = [
   'situation', 'task', 'action', 'result', 'so i', 'which led', 'in the end',
 ]
 
-function analyzeAnswer(question: Question, answer: string): AnswerAnalysis {
+function analyzeAnswer(
+  question: Question,
+  answer: string,
+  profileSkills: string[] = [],
+): AnswerAnalysis {
   const text = answer.trim()
   const lower = text.toLowerCase()
   const words = text.split(/\s+/).filter(Boolean)
   const wordCount = words.length
 
-  // Length: 0–35 pts. Ideal is 60–200 words.
+  // Length: 0–30 pts. Ideal is 60–200 words.
   let lengthScore = 0
-  if (wordCount >= 10) lengthScore = 10
-  if (wordCount >= 30) lengthScore = 20
-  if (wordCount >= 60) lengthScore = 35
-  if (wordCount > 260) lengthScore = 28
+  if (wordCount >= 10) lengthScore = 8
+  if (wordCount >= 30) lengthScore = 18
+  if (wordCount >= 60) lengthScore = 30
+  if (wordCount > 260) lengthScore = 24
 
-  // Keyword coverage: 0–40 pts.
-  const keywordsHit = question.keywords.filter((k) => lower.includes(k))
-  const keywordScore = Math.min(40, Math.round((keywordsHit.length / Math.min(question.keywords.length, 5)) * 40))
+  // Keyword coverage: 0–35 pts.
+  const keywordsHit = question.keywords.filter((k) => lower.includes(k.toLowerCase()))
+  const keywordScore = Math.min(
+    35,
+    Math.round((keywordsHit.length / Math.min(question.keywords.length, 5)) * 35),
+  )
 
   // Structure signals: 0–15 pts.
   const structureHits = STRUCTURE_SIGNALS.filter((s) => lower.includes(s)).length
@@ -117,24 +189,51 @@ function analyzeAnswer(question: Question, answer: string): AnswerAnalysis {
 
   // Specificity (numbers, named tools): 0–10 pts.
   const hasNumbers = /\d/.test(text)
-  const specificityScore = (hasNumbers ? 5 : 0) + (wordCount > 0 && /[A-Z][a-z]+[A-Z]|\b(react|node|python|sql|aws|figma|excel)\b/i.test(text) ? 5 : 0)
+  const specificityScore =
+    (hasNumbers ? 5 : 0) +
+    (wordCount > 0 &&
+    /[A-Z][a-z]+[A-Z]|\b(react|node|python|sql|aws|figma|excel|typescript|docker)\b/i.test(text)
+      ? 5
+      : 0)
 
-  const score = Math.min(100, lengthScore + keywordScore + structureScore + specificityScore)
+  // Profile skill alignment: 0–10 pts — reward mentioning skills you claimed.
+  const skillsHit = profileSkills.filter((s) => {
+    const token = s.trim().toLowerCase()
+    return token.length >= 2 && lower.includes(token)
+  })
+  const skillAlignScore = Math.min(10, skillsHit.length * 3)
+
+  const score = Math.min(
+    100,
+    lengthScore + keywordScore + structureScore + specificityScore + skillAlignScore,
+  )
 
   let feedback: string
   if (wordCount < 10) {
     feedback = 'Too brief — interviewers need detail to assess your thinking. Aim for 60–150 words.'
-  } else if (keywordsHit.length === 0) {
-    feedback = `Stayed too general. Bring in specifics like ${question.keywords.slice(0, 3).join(', ')}.`
+  } else if (keywordsHit.length === 0 && skillsHit.length === 0) {
+    feedback = `Stayed too general. Bring in specifics like ${question.keywords.slice(0, 3).join(', ')}${
+      profileSkills[0] ? ` or your skill ${profileSkills[0]}` : ''
+    }.`
   } else if (structureHits === 0) {
     feedback = 'Good content, but structure it: situation → action → result makes answers land better.'
   } else if (score >= 75) {
-    feedback = 'Strong answer — specific, structured, and relevant to the question.'
+    feedback =
+      skillsHit.length > 0
+        ? `Strong answer — you connected it to your profile skills (${skillsHit.slice(0, 2).join(', ')}).`
+        : 'Strong answer — specific, structured, and relevant to the question.'
   } else {
     feedback = 'Solid base. Add a concrete example with a measurable result to push this higher.'
   }
 
-  return { question: question.text, answer: text, score, wordCount, keywordsHit, feedback }
+  return {
+    question: question.text,
+    answer: text,
+    score,
+    wordCount,
+    keywordsHit: [...new Set([...keywordsHit, ...skillsHit])],
+    feedback,
+  }
 }
 
 export function scoreInterview(
@@ -142,8 +241,10 @@ export function scoreInterview(
   level: string,
   questions: Question[],
   answers: string[],
+  context: ScoreContext = {},
 ): InterviewResult {
-  const analyses = questions.map((q, i) => analyzeAnswer(q, answers[i] ?? ''))
+  const skills = context.skills ?? []
+  const analyses = questions.map((q, i) => analyzeAnswer(q, answers[i] ?? '', skills))
 
   const byCategory = new Map<string, number[]>()
   questions.forEach((q, i) => {
@@ -154,13 +255,23 @@ export function scoreInterview(
 
   const categories = ['Communication', 'Technical', 'Problem Solving', 'Experience'].map((label) => {
     const scores = byCategory.get(label)
-    const score = scores && scores.length > 0
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-      : Math.round(analyses.reduce((a, b) => a + b.score, 0) / analyses.length)
+    const score =
+      scores && scores.length > 0
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+        : Math.round(analyses.reduce((a, b) => a + b.score, 0) / analyses.length)
     return { label, score }
   })
 
-  const overall = Math.round(analyses.reduce((a, b) => a + b.score, 0) / analyses.length)
+  let overall = Math.round(analyses.reduce((a, b) => a + b.score, 0) / analyses.length)
+
+  // Small boost when answers reference claimed skills across the whole interview.
+  const joined = answers.join(' ').toLowerCase()
+  const skillsReferenced = skills.filter((s) => joined.includes(s.toLowerCase())).length
+  if (skills.length >= 3 && skillsReferenced >= 2) {
+    overall = Math.min(100, overall + 4)
+  } else if (skills.length >= 3 && skillsReferenced === 0) {
+    overall = Math.max(0, overall - 3)
+  }
 
   const strengths: string[] = []
   const improvements: string[] = []
@@ -172,6 +283,19 @@ export function scoreInterview(
   const totalKeywords = analyses.reduce((a, b) => a + b.keywordsHit.length, 0)
   if (totalKeywords >= 8) strengths.push('You use relevant, role-specific vocabulary.')
   else improvements.push('Use more role-specific terms and name real tools you have used.')
+
+  if (skillsReferenced >= 2) {
+    strengths.push(
+      `You backed up profile skills in answers (${skills
+        .filter((s) => joined.includes(s.toLowerCase()))
+        .slice(0, 3)
+        .join(', ')}).`,
+    )
+  } else if (skills.length > 0) {
+    improvements.push(
+      `Mention skills from your profile (${skills.slice(0, 3).join(', ')}) with real examples.`,
+    )
+  }
 
   const best = [...categories].sort((a, b) => b.score - a.score)[0]
   const worst = [...categories].sort((a, b) => a.score - b.score)[0]

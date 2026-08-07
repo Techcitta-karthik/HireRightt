@@ -196,6 +196,7 @@ export function DashboardPage() {
               <div className={styles.quick}>
                 <Link to="/interview">AI interview studio</Link>
                 <Link to="/jobs">Ranked job matches</Link>
+                <Link to="/admin">Admin ATS dashboard</Link>
                 <Link to="/profile">Talent scorecard</Link>
                 <Link to="/onboarding">Profile details</Link>
               </div>

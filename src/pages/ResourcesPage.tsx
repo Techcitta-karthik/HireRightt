@@ -10,7 +10,7 @@ export function ResourcesPage() {
         </>
       }
       subtitle="Quick guidance so you walk into Ava’s studio ready — camera, mic, and clear spoken answers."
-      primaryCta={{ label: 'Enter interview studio', to: '/signup' }}
+      primaryCta={{ label: 'Get Started', to: '/signup' }}
       secondaryCta={{ label: 'How it works', to: '/how-it-works' }}
       sections={[
         {

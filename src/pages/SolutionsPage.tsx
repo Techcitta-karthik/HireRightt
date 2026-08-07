@@ -10,7 +10,7 @@ export function SolutionsPage() {
         </>
       }
       subtitle="HIRERIGHT helps candidates become interview-certified and discover roles ranked by real AI interview performance."
-      primaryCta={{ label: 'Start AI Interview', to: '/signup' }}
+      primaryCta={{ label: 'Get Started', to: '/signup' }}
       secondaryCta={{ label: 'How it works', to: '/how-it-works' }}
       sections={[
         {

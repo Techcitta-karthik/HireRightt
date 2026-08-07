@@ -26,7 +26,7 @@ export function MarketingPage({
   title,
   subtitle,
   sections = [],
-  primaryCta = { label: 'Take AI Interview', to: '/signup' },
+  primaryCta = { label: 'Get Started', to: '/signup' },
   secondaryCta = { label: 'How It Works', to: '/how-it-works' },
   children,
 }: MarketingPageProps) {

@@ -10,7 +10,7 @@ export function WhyPage() {
         </>
       }
       subtitle="We built an AI interview studio so candidates prove skill live, and opportunities open based on performance — fair, fast, and structured."
-      primaryCta={{ label: 'Take AI Interview', to: '/signup' }}
+      primaryCta={{ label: 'Get Started', to: '/signup' }}
       secondaryCta={{ label: 'For candidates', to: '/job-seekers' }}
       sections={[
         {

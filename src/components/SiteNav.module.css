@@ -171,6 +171,27 @@
   background: #e8e8e8;
 }
 
+.signOutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid #f3d9c4;
+  background: #fff;
+  color: #d9490c;
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.signOutBtn:hover {
+  background: #fff7ed;
+  border-color: #f5a06b;
+}
+
 .menuBtn {
   display: none;
   align-items: center;

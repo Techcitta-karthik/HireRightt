@@ -8,8 +8,9 @@ import { SolutionsPage } from './pages/SolutionsPage'
 import { ResourcesPage } from './pages/ResourcesPage'
 import { AboutPage } from './pages/AboutPage'
 import { HowItWorksPage } from './pages/HowItWorksPage'
-import { LoginPage, SettingsPage, SignupPage } from './pages/AuthPages'
+import { LoginPage, LogoutPage, SettingsPage, SignupPage } from './pages/AuthPages'
 import { DashboardPage, JobsPage, ProfilePage } from './pages/AppPages'
+import { AdminDashboard } from './pages/AdminDashboard'
 import { InterviewPage } from './pages/InterviewPage'
 import { RequireAuth } from './components/RequireAuth'
 import { pageTransition } from './motion/variants'
@@ -37,6 +38,7 @@ function AnimatedRoutes() {
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/logout" element={<LogoutPage />} />
           <Route
             path="/onboarding"
             element={
@@ -82,6 +84,14 @@ function AnimatedRoutes() {
             element={
               <RequireAuth>
                 <SettingsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth>
+                <AdminDashboard />
               </RequireAuth>
             }
           />

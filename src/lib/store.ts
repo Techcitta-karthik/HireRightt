@@ -11,6 +11,8 @@ export type User = {
 /** Profile without File objects — safe for localStorage. */
 export type SavedProfile = Omit<ProfileFormData, 'resumeFile'> & {
   resumeName: string | null
+  /** Raw extracted resume text for Ava's resume-accurate questions. */
+  resumeText?: string
   updatedAt: string
   completedSteps: number
 }
@@ -33,6 +35,17 @@ export type InterviewResult = {
   strengths: string[]
   improvements: string[]
   answers: AnswerAnalysis[]
+  resumeFitScore?: number
+  agent?: string
+  integrity?: {
+    faceViolations: number
+    singlePersonOk: boolean
+    maxFacesSeen: number
+    banned?: boolean
+    banReason?: string
+    sideLookWarnings?: number
+    tooFarWarnings?: number
+  }
 }
 
 export type Application = {
@@ -96,6 +109,7 @@ export function saveUser(input: Omit<User, 'id' | 'createdAt'> & { createdAt?: s
   users.push(user)
   writeUsers(users)
   localStorage.setItem(SESSION_KEY, user.email)
+  window.dispatchEvent(new Event('hireright-auth'))
   return user
 }
 
@@ -115,11 +129,13 @@ export function login(email: string, password: string): User | null {
   )
   if (!user) return null
   localStorage.setItem(SESSION_KEY, user.email)
+  window.dispatchEvent(new Event('hireright-auth'))
   return user
 }
 
 export function logout() {
   localStorage.removeItem(SESSION_KEY)
+  window.dispatchEvent(new Event('hireright-auth'))
 }
 
 export function updateUserName(name: string): User | null {
@@ -132,6 +148,97 @@ export function updateUserName(name: string): User | null {
   )
   writeUsers(users)
   return users.find((entry) => entry.email === user.email) ?? null
+}
+
+export function updateUserPassword(
+  currentPassword: string,
+  nextPassword: string,
+): { ok: true } | { ok: false; error: string } {
+  const user = getUser()
+  if (!user) return { ok: false, error: 'Not signed in.' }
+  if (user.password !== currentPassword) {
+    return { ok: false, error: 'Current password is incorrect.' }
+  }
+  if (nextPassword.length < 6) {
+    return { ok: false, error: 'New password must be at least 6 characters.' }
+  }
+  const users = readUsers().map((entry) =>
+    entry.email === user.email ? { ...entry, password: nextPassword } : entry,
+  )
+  writeUsers(users)
+  return { ok: true }
+}
+
+export function updateUserEmail(
+  nextEmail: string,
+  password: string,
+): { ok: true; email: string } | { ok: false; error: string } {
+  const user = getUser()
+  if (!user) return { ok: false, error: 'Not signed in.' }
+  if (user.password !== password) {
+    return { ok: false, error: 'Password is incorrect.' }
+  }
+  const email = nextEmail.trim().toLowerCase()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: 'Enter a valid email address.' }
+  }
+  if (readUsers().some((u) => u.email === email && u.email !== user.email)) {
+    return { ok: false, error: 'That email is already in use.' }
+  }
+  const users = readUsers().map((entry) =>
+    entry.email === user.email ? { ...entry, email } : entry,
+  )
+  writeUsers(users)
+  localStorage.setItem(SESSION_KEY, email)
+  // Migrate profile key if present
+  const oldKey = `${PROFILE_KEY}.${user.email}`
+  const newKey = `${PROFILE_KEY}.${email}`
+  const profileRaw = localStorage.getItem(oldKey)
+  if (profileRaw) {
+    localStorage.setItem(newKey, profileRaw)
+    localStorage.removeItem(oldKey)
+  }
+  window.dispatchEvent(new Event('hireright-auth'))
+  return { ok: true, email }
+}
+
+export type AccountPrefs = {
+  emailMatchAlerts: boolean
+  interviewReminders: boolean
+  productTips: boolean
+  profileVisibleToEmployers: boolean
+  shareScoreOnApplications: boolean
+  showOnlineStatus: boolean
+}
+
+const PREFS_KEY = 'hireright.prefs'
+
+const DEFAULT_PREFS: AccountPrefs = {
+  emailMatchAlerts: true,
+  interviewReminders: true,
+  productTips: false,
+  profileVisibleToEmployers: true,
+  shareScoreOnApplications: true,
+  showOnlineStatus: false,
+}
+
+export function getAccountPrefs(): AccountPrefs {
+  const user = getUser()
+  if (!user) return { ...DEFAULT_PREFS }
+  try {
+    const raw = localStorage.getItem(`${PREFS_KEY}.${user.email}`)
+    if (!raw) return { ...DEFAULT_PREFS }
+    return { ...DEFAULT_PREFS, ...(JSON.parse(raw) as Partial<AccountPrefs>) }
+  } catch {
+    return { ...DEFAULT_PREFS }
+  }
+}
+
+export function saveAccountPrefs(prefs: AccountPrefs): AccountPrefs {
+  const user = getUser()
+  if (!user) return prefs
+  localStorage.setItem(`${PREFS_KEY}.${user.email}`, JSON.stringify(prefs))
+  return prefs
 }
 
 export function profileKey(email?: string) {
@@ -163,6 +270,7 @@ export function saveProfile(data: ProfileFormData, completedSteps = 0): SavedPro
     salaryExpectation: data.salaryExpectation,
     interviewNotes: data.interviewNotes,
     resumeName: data.resumeFile?.name ?? getProfile()?.resumeName ?? null,
+    resumeText: data.resumeText || getProfile()?.resumeText || '',
     updatedAt: new Date().toISOString(),
     completedSteps: Math.max(completedSteps, getProfile()?.completedSteps ?? 0),
   }

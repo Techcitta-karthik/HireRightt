@@ -14,7 +14,7 @@ interface AiInterviewStepProps {
   ) => void
 }
 
-export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
+export function AiInterviewStep({ data, onChange }: AiInterviewStepProps) {
   const navigate = useNavigate()
   const name = firstName()
   const existing = getInterviewResult()
@@ -24,8 +24,9 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
       'interviewNotes',
       existing
         ? `Retake from profile wizard · previous score ${existing.overall}.`
-        : 'Entered HireRight AI Interview Studio from profile wizard.',
+        : `Profile ready (${data.skills.length} skills, role: ${data.currentRole || 'not set'}). Entering AI Interview Studio.`,
     )
+    sessionStorage.setItem('hireright.returnToWizard', '1')
     navigate('/interview')
   }
 
@@ -51,15 +52,15 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
             </svg>
           </motion.div>
           <div className={styles.bannerText}>
-            <p className={styles.bannerEyebrow}>Ready, {name}</p>
+            <p className={styles.bannerEyebrow}>Great progress, {name}</p>
             <h3>
               {existing
-                ? `Your score is ${existing.overall} — retake anytime`
-                : 'Next: live AI video interview with Ava'}
+                ? `You scored ${existing.overall} — retake to improve`
+                : 'Your profile is ready — take the AI interview'}
             </h3>
             <p>
-              Camera on, speak your answers, get scored instantly — then unlock ranked job
-              matches. This is the core of HIRERIGHT.
+              Ava will ask about your experience using the skills and role you just added.
+              Speak your answers on camera to get a talent score and unlock matches.
             </p>
           </div>
         </div>
@@ -81,14 +82,14 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
       </MotionItem>
 
       <MotionItem as="section" className={styles.card}>
-        <h4 className={styles.sectionTitle}>What happens in the studio</h4>
+        <h4 className={styles.sectionTitle}>What Ava will use from your profile</h4>
         <div className={styles.detailsGrid}>
           <div className={styles.detailsList}>
             {[
-              ['Mode', 'Live AI video interview'],
-              ['Interviewer', 'Ava · HireRight'],
-              ['Format', 'Spoken answers · 5 questions'],
-              ['Outcome', 'Instant talent score + unlocked matches'],
+              ['Role', data.currentRole || 'Select on interview lobby'],
+              ['Experience', data.totalExperience || 'Not set yet'],
+              ['Skills', data.skills.length ? data.skills.slice(0, 6).join(', ') : 'Add skills in step 2'],
+              ['Location', data.currentLocation || 'Not set yet'],
             ].map(([label, value]) => (
               <div key={label} className={styles.detailItem}>
                 <span className={styles.detailIcon} aria-hidden="true">
@@ -104,11 +105,13 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
             ))}
           </div>
           <aside className={styles.nextCard}>
-            <h5>Tips before you join</h5>
+            <h5>Your path</h5>
             <ul>
-              <li>Quiet space and good lighting</li>
-              <li>Allow camera & microphone</li>
-              <li>Answer out loud — Ava listens and transcribes</li>
+              <li>1. About You + resume</li>
+              <li>2. Skills & experience</li>
+              <li>3. Performance highlights</li>
+              <li>4. AI video interview → score</li>
+              <li>5. Unlock matched roles</li>
             </ul>
           </aside>
         </div>
@@ -117,10 +120,10 @@ export function AiInterviewStep({ onChange }: AiInterviewStepProps) {
           <MotionButton
             type="button"
             className={styles.outlineBtn}
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/onboarding')}
             lift
           >
-            Skip to dashboard
+            Edit earlier steps
           </MotionButton>
           <MotionButton
             type="button"

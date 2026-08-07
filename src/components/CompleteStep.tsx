@@ -32,11 +32,15 @@ export function CompleteStep({ data, onEditStep }: CompleteStepProps) {
         </motion.div>
         <div>
           <p className={styles.congrats}>Congratulations, {name}!</p>
-          <h3>You&apos;re All Set!</h3>
+          <h3>
+            {interview
+              ? `Scored ${interview.overall} — you're ready`
+              : "Profile done — interview next"}
+          </h3>
           <p>
-            Your profile is complete and verified. You&apos;re now visible to top
-            employers and our AI is already finding the best opportunities for
-            you.
+            {interview
+              ? 'Your About You, Skills, and AI interview are complete. Matches are ranked using your talent score and the skills you listed.'
+              : "Finish Ava's AI interview so we can score your skills and unlock matched roles."}
           </p>
         </div>
         <motion.img

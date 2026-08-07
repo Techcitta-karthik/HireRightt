@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { easeOut } from '../motion/variants'
-import { firstName, isLoggedIn, logout } from '../lib/store'
+import { firstName, isLoggedIn } from '../lib/store'
 import styles from './SiteNav.module.css'
 
 const NAV = [
-  { to: '/interview', label: 'AI Interview' },
   { to: '/how-it-works', label: 'How It Works' },
   { to: '/job-seekers', label: 'For Candidates' },
   { to: '/jobs', label: 'Matches' },
-  { to: '/resources', label: 'Prep' },
+  { to: '/admin', label: 'Admin ATS' },
   { to: '/why', label: 'Why HIRERIGHT' },
 ]
 
@@ -21,20 +20,24 @@ type SiteNavProps = {
 export function SiteNav({ variant = 'light' }: SiteNavProps) {
   const dark = variant === 'dark'
   const navigate = useNavigate()
+  const location = useLocation()
   const [open, setOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [name, setName] = useState('there')
 
   useEffect(() => {
-    setLoggedIn(isLoggedIn())
-    setName(firstName())
-  }, [])
+    function syncAuth() {
+      setLoggedIn(isLoggedIn())
+      setName(firstName())
+    }
+    syncAuth()
+    window.addEventListener('hireright-auth', syncAuth)
+    return () => window.removeEventListener('hireright-auth', syncAuth)
+  }, [location.pathname])
 
   function handleLogout() {
-    logout()
-    setLoggedIn(false)
     setOpen(false)
-    navigate('/')
+    navigate('/logout')
   }
 
   return (
@@ -73,13 +76,17 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
             <Link to="/dashboard" className={styles.loginBtn}>
               Hi, {name}
             </Link>
+            <Link to="/settings" className={styles.loginBtn}>
+              Settings
+            </Link>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                to="/interview"
-                className={dark ? styles.ctaBtnDark : styles.ctaBtn}
+              <button
+                type="button"
+                className={dark ? styles.ctaBtnDark : styles.signOutBtn}
+                onClick={handleLogout}
               >
-                Interview studio
-              </Link>
+                Sign out
+              </button>
             </motion.div>
           </>
         ) : (
@@ -94,7 +101,7 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
                 to="/signup"
                 className={dark ? styles.ctaBtnDark : styles.ctaBtn}
               >
-                Take AI Interview
+                Get Started
                 <span aria-hidden="true">→</span>
               </Link>
             </motion.div>
@@ -168,29 +175,38 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
                 >
                   Profile
                 </NavLink>
+                <NavLink
+                  to="/settings"
+                  onClick={() => setOpen(false)}
+                  className={styles.mobileLink}
+                >
+                  Settings
+                </NavLink>
               </>
             )}
             <div className={styles.mobileActions}>
               {loggedIn ? (
-                <button type="button" className={styles.loginBtn} onClick={handleLogout}>
+                <button type="button" className={styles.signOutBtn} onClick={handleLogout}>
                   Sign out
                 </button>
               ) : (
-                <Link
-                  to="/login"
-                  className={styles.loginBtn}
-                  onClick={() => setOpen(false)}
-                >
-                  Login
-                </Link>
+                <>
+                  <Link
+                    to="/login"
+                    className={styles.loginBtn}
+                    onClick={() => setOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className={styles.ctaBtn}
+                    onClick={() => setOpen(false)}
+                  >
+                    Get Started →
+                  </Link>
+                </>
               )}
-              <Link
-                to={loggedIn ? '/interview' : '/signup'}
-                className={styles.ctaBtn}
-                onClick={() => setOpen(false)}
-              >
-                {loggedIn ? 'Interview studio →' : 'Take AI Interview →'}
-              </Link>
             </div>
           </motion.nav>
         )}

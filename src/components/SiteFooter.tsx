@@ -3,9 +3,9 @@ import styles from './SiteFooter.module.css'
 
 const COLUMNS = [
   {
-    title: 'AI Interview',
+    title: 'Get started',
     links: [
-      { label: 'Take AI Interview', to: '/signup' },
+      { label: 'Get Started', to: '/signup' },
       { label: 'Interview Studio', to: '/interview' },
       { label: 'How It Works', to: '/how-it-works' },
       { label: 'Interview Prep', to: '/resources' },
@@ -25,6 +25,7 @@ const COLUMNS = [
     title: 'Company',
     links: [
       { label: 'About Us', to: '/about' },
+      { label: 'Admin ATS', to: '/admin' },
       { label: 'Resources', to: '/resources' },
       { label: 'Privacy', to: '/why' },
     ],

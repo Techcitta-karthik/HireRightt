@@ -9,28 +9,28 @@ export function HowItWorksPage() {
       kicker="HOW IT WORKS"
       title={
         <>
-          Interview first. <em>Get scored.</em> Unlock roles.
+          Build your profile. <em>Interview with Ava.</em> Get scored.
         </>
       }
-      subtitle="HIRERIGHT works like CloudHire and Micro1 — prove yourself in a live AI video interview, then match to opportunities with a real score."
-      primaryCta={{ label: 'Take AI Interview', to: '/signup' }}
+      subtitle="Sign up, complete About You and Skills, then take a live AI video interview. Ava asks resume-accurate questions, verifies one person on camera, and unlocks ranked matches from your talent score."
+      primaryCta={{ label: 'Get Started', to: '/signup' }}
       secondaryCta={{ label: 'See the studio', to: '/interview' }}
       sections={[
         {
-          title: '1. Create your account',
-          body: 'Sign up free. Optional short profile helps Ava tailor questions to your role.',
+          title: '1. Create your account & profile',
+          body: 'Sign up, upload your resume, and fill About You, Skills, and Performance so Ava can interview you accurately.',
         },
         {
-          title: '2. Enter the interview studio',
-          body: 'Enable camera and mic. Meet Ava — she asks out loud; you answer by speaking.',
+          title: '2. Meet Ava in the interview studio',
+          body: 'Enable camera and mic. Face tracking checks that only you are in frame. Ava asks live, resume-aware questions out loud.',
         },
         {
-          title: '3. Get your talent score',
-          body: 'Instant breakdown across communication, technical depth, problem solving, and experience.',
+          title: '3. Get your talent & resume-fit score',
+          body: 'Instant breakdown across communication, technical depth, problem solving, experience, and how well answers match your resume.',
         },
         {
           title: '4. Unlock ranked matches',
-          body: 'Browse roles ranked by your interview score and apply with proof of skill — not just a resume.',
+          body: 'Browse roles ranked by your interview score and apply with proof of skill — not just a static CV.',
         },
       ]}
     >
@@ -49,13 +49,13 @@ export function HowItWorksPage() {
         />
         <div className={styles.launchCopy}>
           <h2>
-            Ready to <em>interview</em> with Ava?
+            Ready to <em>get started</em>?
           </h2>
           <p>
-            Join the video room in minutes. Your score unlocks matched roles on the dashboard.
+            Build your profile, interview with Ava, and unlock matched roles with a real score.
           </p>
           <Link to="/signup" className={styles.primary}>
-            Start AI Interview →
+            Get Started →
           </Link>
         </div>
       </motion.section>

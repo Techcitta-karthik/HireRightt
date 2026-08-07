@@ -50,6 +50,8 @@ export interface ProfileFormData {
   workMode: string
   salaryExpectation: string
   interviewNotes: string
+  /** Raw resume text for Ava's resume-accurate AI interview. */
+  resumeText: string
 }
 
 export const STEPS = [
@@ -278,4 +280,5 @@ export const initialFormData: ProfileFormData = {
   workMode: '',
   salaryExpectation: '',
   interviewNotes: '',
+  resumeText: '',
 }

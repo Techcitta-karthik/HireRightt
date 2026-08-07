@@ -27,6 +27,8 @@ export type ResumeExtract = Partial<
   >
 > & {
   fullName?: string
+  /** Full extracted text used by Ava for resume-accurate questions. */
+  resumeText?: string
 }
 
 async function extractPdfText(file: File): Promise<string> {
@@ -312,6 +314,7 @@ export function parseResumeText(raw: string): ResumeExtract {
   if (experienceSummary) extract.experienceSummary = experienceSummary
   if (workExperiences.length) extract.workExperiences = workExperiences
   if (achievements.length) extract.achievements = achievements
+  extract.resumeText = clip(joined, 8000)
 
   return extract
 }
@@ -321,5 +324,7 @@ export async function parseResumeFile(file: File): Promise<ResumeExtract> {
   if (!text.trim()) {
     throw new Error('Could not read text from this file. Try another PDF or DOCX.')
   }
-  return parseResumeText(text)
+  const extract = parseResumeText(text)
+  if (!extract.resumeText) extract.resumeText = text.slice(0, 8000)
+  return extract
 }

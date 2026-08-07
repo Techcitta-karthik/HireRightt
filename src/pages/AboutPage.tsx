@@ -10,7 +10,7 @@ export function AboutPage() {
         </>
       }
       subtitle="HIRERIGHT exists so job seekers can prove ability on camera and move forward with a score employers can trust."
-      primaryCta={{ label: 'Take AI Interview', to: '/signup' }}
+      primaryCta={{ label: 'Get Started', to: '/signup' }}
       secondaryCta={{ label: 'Why HIRERIGHT', to: '/why' }}
       sections={[
         {

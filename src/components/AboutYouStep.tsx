@@ -48,6 +48,7 @@ export function AboutYouStep({
       patch.workExperiences = extract.workExperiences
     }
     if (extract.achievements?.length) patch.achievements = extract.achievements
+    if (extract.resumeText) patch.resumeText = extract.resumeText
 
     if (Object.keys(patch).length) onPatch(patch)
 

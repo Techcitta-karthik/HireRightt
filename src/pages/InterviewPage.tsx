@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   LEVELS,
   ROLES,
-  buildQuestionSet,
-  scoreInterview,
+  mapExperienceToLevel,
+  mapProfileRoleToInterviewRole,
   type Question,
 } from '../lib/interviewEngine'
 import {
@@ -16,11 +16,22 @@ import {
   speakText,
 } from '../lib/speech'
 import {
+  FaceTracker,
+  type FaceTrackStatus,
+} from '../lib/faceTracker'
+import {
+  pingInterviewIntegrity,
+  scoreInterviewRemote,
+  startInterviewSession,
+  type IntegritySnapshot,
+} from '../lib/interviewAgentClient'
+import { InterviewRecorder } from '../lib/interviewRecorder'
+import {
   firstName,
+  getProfile,
   saveInterviewResult,
   type InterviewResult,
 } from '../lib/store'
-import { apiHealth, apiSaveInterview } from '../lib/api'
 import { easeOut } from '../motion/variants'
 import styles from './InterviewPage.module.css'
 
@@ -29,10 +40,10 @@ type Stage = 'setup' | 'interview' | 'analyzing' | 'results'
 const QUESTION_SECONDS = 180
 
 const LOBBY_TIPS = [
-  'Sit in a quiet, well-lit space',
-  'Look at the camera when you answer',
+  'Only you in frame — extra people bans the interview',
+  'Face the camera (not the side) the whole time',
+  'Sit close enough that your face is clearly visible',
   'Speak clearly — Ava listens and transcribes live',
-  'You have up to 3 minutes per question',
 ]
 
 function Waveform({ active }: { active: boolean }) {
@@ -47,9 +58,20 @@ function Waveform({ active }: { active: boolean }) {
 
 export function InterviewPage() {
   const navigate = useNavigate()
+  const profile = useMemo(() => getProfile(), [])
+  const profileSkills = profile?.skills ?? []
+  const fromWizard = useMemo(
+    () => sessionStorage.getItem('hireright.returnToWizard') === '1',
+    [],
+  )
+
   const [stage, setStage] = useState<Stage>('setup')
-  const [role, setRole] = useState<string>(ROLES[0])
-  const [level, setLevel] = useState<string>(LEVELS[1])
+  const [role, setRole] = useState<string>(() =>
+    mapProfileRoleToInterviewRole(profile?.currentRole ?? ''),
+  )
+  const [level, setLevel] = useState<string>(() =>
+    mapExperienceToLevel(profile?.totalExperience ?? ''),
+  )
   const [questions, setQuestions] = useState<Question[]>([])
   const [current, setCurrent] = useState(0)
   const [draft, setDraft] = useState('')
@@ -65,6 +87,36 @@ export function InterviewPage() {
   const [showTypeFallback, setShowTypeFallback] = useState(false)
   const [mediaBusy, setMediaBusy] = useState(false)
   const [checklist, setChecklist] = useState([false, false, false])
+  const [starting, setStarting] = useState(false)
+  const [agentLabel, setAgentLabel] = useState('Ava · resume agent')
+  const [faceStatus, setFaceStatus] = useState<FaceTrackStatus>({
+    faceCount: 0,
+    ok: false,
+    label: 'Waiting for camera…',
+    severity: 'warn',
+    issue: 'no_face',
+    faceAreaRatio: 0,
+    yaw: 0,
+    lookingForward: false,
+  })
+  const [interviewBanned, setInterviewBanned] = useState(false)
+  const [banMessage, setBanMessage] = useState('')
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordingNote, setRecordingNote] = useState('')
+  const [recordingUrl, setRecordingUrl] = useState<string | null>(null)
+  const sessionIdRef = useRef<string | null>(null)
+  const integrityRef = useRef<IntegritySnapshot>({
+    faceViolations: 0,
+    singlePersonOk: true,
+    maxFacesSeen: 1,
+    sideLookWarnings: 0,
+    tooFarWarnings: 0,
+  })
+  const faceTrackerRef = useRef<FaceTracker | null>(null)
+  const multiBanRef = useRef(0)
+  const currentRef = useRef(0)
+  const recorderRef = useRef(new InterviewRecorder())
+  const recordingBlobUrlRef = useRef<string | null>(null)
 
   const answersRef = useRef<string[]>([])
   const finishingRef = useRef(false)
@@ -89,6 +141,10 @@ export function InterviewPage() {
   }, [draft])
 
   useEffect(() => {
+    currentRef.current = current
+  }, [current])
+
+  useEffect(() => {
     micOnRef.current = micOn
   }, [micOn])
 
@@ -96,12 +152,93 @@ export function InterviewPage() {
     stageRef.current = stage
   }, [stage])
 
+  // Continuous face tracking in lobby + full interview room
+  useEffect(() => {
+    if (skipCamera || (!streamReady && stage === 'setup')) return
+    if (stage === 'analyzing' || stage === 'results') return
+    const tracker = new FaceTracker()
+    faceTrackerRef.current = tracker
+    let alive = true
+    const id = window.setInterval(() => {
+      void (async () => {
+        if (!alive || interviewBanned) return
+        const video =
+          stageRef.current === 'interview' ? roomVideoRef.current : lobbyVideoRef.current
+        const status = await tracker.detect(video)
+        if (!alive) return
+        setFaceStatus(status)
+
+        integrityRef.current.maxFacesSeen = Math.max(
+          integrityRef.current.maxFacesSeen,
+          status.faceCount,
+        )
+
+        if (status.issue === 'looking_away') {
+          integrityRef.current.sideLookWarnings =
+            (integrityRef.current.sideLookWarnings || 0) + 1
+        }
+        if (status.issue === 'too_far') {
+          integrityRef.current.tooFarWarnings =
+            (integrityRef.current.tooFarWarnings || 0) + 1
+        }
+
+        if (status.issue === 'multi_person' || status.severity === 'ban') {
+          integrityRef.current.faceViolations += 1
+          integrityRef.current.singlePersonOk = false
+          multiBanRef.current += 1
+          void pingInterviewIntegrity(sessionIdRef.current, status.faceCount)
+
+          // ~2 seconds of multi-person (interval 350ms × 6) → ban live interview
+          if (stageRef.current === 'interview' && multiBanRef.current >= 6) {
+            const reason =
+              'Interview banned: more than one person was detected on camera. Only the candidate may be in frame.'
+            integrityRef.current.banned = true
+            integrityRef.current.banReason = reason
+            setInterviewBanned(true)
+            setBanMessage(reason)
+            stopAllSpeech()
+            finishingRef.current = true
+            const next = [...answersRef.current]
+            next[currentRef.current] = draftRef.current.trim()
+            answersRef.current = next
+            finish(next, true, reason)
+          }
+        } else {
+          multiBanRef.current = Math.max(0, multiBanRef.current - 1)
+        }
+
+        if (
+          status.severity === 'block' &&
+          status.issue === 'no_face' &&
+          stageRef.current === 'interview'
+        ) {
+          integrityRef.current.faceViolations += 1
+          void pingInterviewIntegrity(sessionIdRef.current, 0)
+        }
+      })()
+    }, 350)
+    return () => {
+      alive = false
+      window.clearInterval(id)
+      tracker.dispose()
+      faceTrackerRef.current = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamReady, skipCamera, stage, interviewBanned])
+
   function attachStream(video: HTMLVideoElement | null) {
     if (!video || !streamRef.current) return
-    if (video.srcObject !== streamRef.current) {
-      video.srcObject = streamRef.current
-    }
+    video.srcObject = streamRef.current
+    video.muted = true
+    video.playsInline = true
     void video.play().catch(() => undefined)
+  }
+
+  function bindRoomVideo(el: HTMLVideoElement | null) {
+    roomVideoRef.current = el
+    if (el && streamRef.current && stageRef.current === 'interview') {
+      attachStream(el)
+    }
   }
 
   function stopTracks() {
@@ -138,8 +275,20 @@ export function InterviewPage() {
 
   useEffect(() => {
     if (stage === 'setup') attachStream(lobbyVideoRef.current)
-    if (stage === 'interview') attachStream(roomVideoRef.current)
-  }, [stage, streamReady])
+    if (stage === 'interview') {
+      // Retry attach — video node mounts after stage switch
+      const tryAttach = () => attachStream(roomVideoRef.current)
+      tryAttach()
+      const t1 = window.setTimeout(tryAttach, 80)
+      const t2 = window.setTimeout(tryAttach, 250)
+      const t3 = window.setTimeout(tryAttach, 600)
+      return () => {
+        window.clearTimeout(t1)
+        window.clearTimeout(t2)
+        window.clearTimeout(t3)
+      }
+    }
+  }, [stage, streamReady, camOn])
 
   async function enableDevices() {
     setMediaBusy(true)
@@ -301,18 +450,68 @@ export function InterviewPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, current])
 
-  function startInterview() {
+  async function startInterview() {
     if (!streamReady && !skipCamera) return
+    if (skipCamera) {
+      setDeviceError('Camera is required for proctored interviews. Enable camera & stay alone in frame.')
+      return
+    }
+    if (faceStatus.issue === 'multi_person' || faceStatus.severity === 'ban') {
+      setDeviceError('More than one person detected — clear the frame to only you before joining.')
+      return
+    }
+    if (faceStatus.severity === 'block' || faceStatus.faceCount !== 1) {
+      setDeviceError('Face check: sit where Ava can see your face (move closer if you are far).')
+      return
+    }
+    if (faceStatus.issue === 'looking_away' && !faceStatus.lookingForward) {
+      setDeviceError('Face the camera straight-on before joining.')
+      return
+    }
+    setStarting(true)
     finishingRef.current = false
+    setInterviewBanned(false)
+    setBanMessage('')
+    multiBanRef.current = 0
     answersRef.current = []
+    integrityRef.current = {
+      faceViolations: 0,
+      singlePersonOk: true,
+      maxFacesSeen: Math.max(1, faceStatus.faceCount),
+      sideLookWarnings: 0,
+      tooFarWarnings: 0,
+      banned: false,
+    }
     stopAllSpeech()
-    setQuestions(buildQuestionSet(role))
-    setCurrent(0)
-    setDraft('')
-    setResult(null)
-    setShowTypeFallback(!speechSupported)
-    setStage('interview')
-    window.setTimeout(() => attachStream(roomVideoRef.current), 50)
+    try {
+      const started = await startInterviewSession(role, level, profile)
+      sessionIdRef.current = started.sessionId
+      setAgentLabel('Ava · resume interview (local)')
+      setQuestions(started.questions)
+      setCurrent(0)
+      setDraft('')
+      setResult(null)
+      setRecordingNote('')
+      setRecordingUrl(null)
+      setShowTypeFallback(!speechSupported)
+      setStage('interview')
+
+      // Start local webcam recording (saved on finish)
+      if (streamRef.current) {
+        const ok = recorderRef.current.start(streamRef.current)
+        setIsRecording(ok)
+        if (!ok) {
+          setRecordingNote('Recording unavailable in this browser — answers still score.')
+        }
+      }
+
+      window.setTimeout(() => attachStream(roomVideoRef.current), 50)
+      window.setTimeout(() => attachStream(roomVideoRef.current), 300)
+    } catch (err) {
+      setDeviceError(err instanceof Error ? err.message : 'Could not start interview agent.')
+    } finally {
+      setStarting(false)
+    }
   }
 
   function endInterviewEarly() {
@@ -322,11 +521,24 @@ export function InterviewPage() {
     next[current] = draftRef.current.trim()
     answersRef.current = next
     finishingRef.current = true
-    finish(next)
+    finish(next, false)
   }
 
   function submitAnswer() {
     if (finishingRef.current || stage !== 'interview' || questions.length === 0) {
+      return
+    }
+    if (interviewBanned) return
+    if (faceStatus.issue === 'multi_person' || faceStatus.severity === 'ban') {
+      setDeviceError('Multiple people detected — interview cannot continue.')
+      return
+    }
+    if (faceStatus.severity === 'block') {
+      setDeviceError('Keep your face clearly in frame to submit.')
+      return
+    }
+    if (faceStatus.issue === 'looking_away' && Math.abs(faceStatus.yaw) >= 0.48) {
+      setDeviceError('Turn to face the camera, then submit your answer.')
       return
     }
     listenAfterTtsRef.current = false
@@ -339,34 +551,110 @@ export function InterviewPage() {
 
     if (current >= questions.length - 1) {
       finishingRef.current = true
-      finish(next)
+      finish(next, false)
       return
     }
 
     setCurrent((c) => c + 1)
     setDraft('')
+    setDeviceError('')
   }
 
-  function finish(finalAnswers: string[]) {
+  function finish(finalAnswers: string[], banned: boolean, banReason?: string) {
     setStage('analyzing')
+    setIsRecording(false)
+    const reason =
+      banReason ||
+      banMessage ||
+      integrityRef.current.banReason ||
+      'Interview banned: more than one person was detected on camera.'
+    if (banned) {
+      integrityRef.current.banned = true
+      integrityRef.current.banReason = reason
+      integrityRef.current.singlePersonOk = false
+    }
     window.setTimeout(() => {
       void (async () => {
-        const scored = scoreInterview(role, level, questions, finalAnswers)
-        saveInterviewResult(scored)
+        const integrity = { ...integrityRef.current }
+        let recordingNoteLocal = ''
+
         try {
-          if (await apiHealth()) await apiSaveInterview(scored)
+          const clip = await recorderRef.current.stop()
+          if (clip) {
+            const saved = await recorderRef.current.saveToIndexedDb({
+              blob: clip.blob,
+              durationMs: clip.durationMs,
+              role,
+              level,
+              candidateName: firstName(),
+            })
+            const fileName = `hireright-interview-${saved.id}.webm`
+            recorderRef.current.download(clip.blob, fileName)
+            if (recordingBlobUrlRef.current) {
+              URL.revokeObjectURL(recordingBlobUrlRef.current)
+            }
+            recordingBlobUrlRef.current = URL.createObjectURL(clip.blob)
+            setRecordingUrl(recordingBlobUrlRef.current)
+            recordingNoteLocal = `Recording saved (${Math.round(clip.blob.size / 1024)} KB) · ${fileName}`
+          } else {
+            recordingNoteLocal = 'Recording not captured — answers were still scored locally.'
+          }
         } catch {
-          // local save is enough
+          recordingNoteLocal = 'Could not save recording locally.'
         }
+        setRecordingNote(recordingNoteLocal)
+
+        let scored = await scoreInterviewRemote({
+          sessionId: sessionIdRef.current,
+          role,
+          level,
+          questions,
+          answers: finalAnswers,
+          profile,
+          integrity,
+        })
+        if (integrity.banned) {
+          scored = {
+            ...scored,
+            overall: 0,
+            improvements: [
+              integrity.banReason || reason,
+              ...(scored.improvements || []).slice(0, 4),
+            ],
+            strengths: ['Integrity rules were enforced for a fair interview.'],
+            integrity: {
+              faceViolations: integrity.faceViolations,
+              singlePersonOk: false,
+              maxFacesSeen: integrity.maxFacesSeen,
+              banned: true,
+              banReason: integrity.banReason || reason,
+              sideLookWarnings: integrity.sideLookWarnings,
+              tooFarWarnings: integrity.tooFarWarnings,
+            },
+          }
+        }
+        saveInterviewResult(scored)
         setResult(scored)
         setStage('results')
       })()
-    }, 2800)
+    }, 1200)
   }
 
   function retake() {
     finishingRef.current = false
     answersRef.current = []
+    sessionIdRef.current = null
+    multiBanRef.current = 0
+    setInterviewBanned(false)
+    setBanMessage('')
+    setIsRecording(false)
+    setRecordingNote('')
+    void recorderRef.current.stop()
+    if (recordingBlobUrlRef.current) {
+      URL.revokeObjectURL(recordingBlobUrlRef.current)
+      recordingBlobUrlRef.current = null
+    }
+    setRecordingUrl(null)
     stopAllSpeech()
     setQuestions([])
     setCurrent(0)
@@ -374,6 +662,8 @@ export function InterviewPage() {
     setResult(null)
     setSecondsLeft(QUESTION_SECONDS)
     setChecklist([false, false, false])
+    setDeviceError('')
+    setSkipCamera(false)
     setStage('setup')
     if (streamRef.current) {
       setStreamReady(true)
@@ -388,8 +678,23 @@ export function InterviewPage() {
   }, [secondsLeft])
 
   const wordCount = draft.trim() ? draft.trim().split(/\s+/).length : 0
+  const faceBlocks =
+    !skipCamera &&
+    (faceStatus.severity === 'block' ||
+      faceStatus.severity === 'ban' ||
+      faceStatus.issue === 'multi_person' ||
+      (faceStatus.issue === 'looking_away' && Math.abs(faceStatus.yaw) >= 0.48))
+  const faceWarnOnly =
+    !skipCamera && faceStatus.severity === 'warn' && !faceBlocks
   const canStart =
-    (streamReady || skipCamera) && checklist.every(Boolean)
+    streamReady &&
+    !skipCamera &&
+    checklist.every(Boolean) &&
+    !starting &&
+    !faceBlocks &&
+    faceStatus.faceCount === 1
+  const canSubmit =
+    Boolean(draft.trim()) && !aiSpeaking && !faceBlocks && !interviewBanned
 
   return (
     <div className={styles.page}>
@@ -406,6 +711,25 @@ export function InterviewPage() {
             <span className={styles.livePill}>
               <i /> Recording
             </span>
+            <span className={styles.agentPill}>{agentLabel}</span>
+            {isRecording && (
+              <span className={styles.recPill}>
+                <i /> REC
+              </span>
+            )}
+            {!skipCamera && (
+              <span
+                className={`${styles.faceBadgeInline} ${
+                  faceStatus.severity === 'ok'
+                    ? styles.faceOk
+                    : faceStatus.severity === 'warn'
+                      ? styles.faceWarn
+                      : styles.faceBlock
+                }`}
+              >
+                {faceStatus.label}
+              </span>
+            )}
             <span>
               Question {current + 1} of {questions.length}
             </span>
@@ -486,18 +810,24 @@ export function InterviewPage() {
                   >
                     {mediaBusy ? 'Connecting…' : streamReady ? 'Recheck devices' : 'Allow camera & mic'}
                   </button>
-                  <button
-                    type="button"
-                    className={styles.textBtn}
-                    onClick={() => {
-                      setSkipCamera(true)
-                      setDeviceError('')
-                    }}
-                  >
-                    Continue without camera
-                  </button>
                 </div>
+                <p className={styles.joinHint}>
+                  Camera is required. Face tracking runs for the full interview — one person, facing forward.
+                </p>
                 {deviceError && <p className={styles.deviceError}>{deviceError}</p>}
+                <div
+                  className={`${styles.faceBadge} ${
+                    faceStatus.severity === 'ok'
+                      ? styles.faceOk
+                      : faceStatus.severity === 'warn'
+                        ? styles.faceWarn
+                        : styles.faceBlock
+                  }`}
+                  role="status"
+                >
+                  <span className={styles.faceDot} aria-hidden="true" />
+                  {faceStatus.label}
+                </div>
               </div>
 
               <div className={styles.lobbySide}>
@@ -547,6 +877,33 @@ export function InterviewPage() {
                   </div>
                 </div>
 
+                {profileSkills.length > 0 || profile?.resumeText ? (
+                  <div className={styles.tips}>
+                    <h4>From your resume</h4>
+                    <ul>
+                      {profileSkills.length > 0 && (
+                        <li>
+                          Skills: {profileSkills.slice(0, 6).join(', ')}
+                          {profileSkills.length > 6 ? '…' : ''}
+                        </li>
+                      )}
+                      <li>
+                        Ava asks local questions from your uploaded resume / profile — no API.
+                      </li>
+                      <li>Your webcam is recorded and saved on your device when you finish.</li>
+                    </ul>
+                  </div>
+                ) : (
+                  <div className={styles.tips}>
+                    <h4>Upload a resume first</h4>
+                    <ul>
+                      <li>
+                        Go to onboarding and upload your resume so Ava can ask accurate questions.
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
                 <div className={styles.tips}>
                   <h4>Before you join</h4>
                   <ul>
@@ -558,8 +915,8 @@ export function InterviewPage() {
 
                 <div className={styles.checkList}>
                   {[
-                    'I am in a quiet place',
-                    'My camera & mic are ready',
+                    'I am alone in a quiet place',
+                    'My face is visible and facing the camera',
                     'I will answer out loud',
                   ].map((label, i) => (
                     <label key={label} className={styles.checkItem}>
@@ -580,16 +937,24 @@ export function InterviewPage() {
                 <motion.button
                   type="button"
                   className={styles.joinBtn}
-                  onClick={startInterview}
+                  onClick={() => void startInterview()}
                   disabled={!canStart}
                   whileHover={canStart ? { scale: 1.02 } : undefined}
                   whileTap={canStart ? { scale: 0.98 } : undefined}
                 >
-                  Enter interview room
+                  {starting ? 'Ava is preparing questions…' : 'Enter interview room'}
                 </motion.button>
                 {!canStart && (
                   <p className={styles.joinHint}>
-                    Complete the checklist{!streamReady && !skipCamera ? ' and enable devices' : ''} to join.
+                    {faceBlocks
+                      ? faceStatus.issue === 'multi_person'
+                        ? 'Only one person may be in the camera — clear others to join.'
+                        : faceStatus.issue === 'looking_away'
+                          ? 'Face the camera straight-on before joining.'
+                          : faceStatus.issue === 'no_face'
+                            ? 'Move into view (closer if you are far) so your face is detected.'
+                            : 'Fix the face check to join.'
+                      : `Complete the checklist${!streamReady ? ' and enable camera' : ''} to join.`}
                   </p>
                 )}
               </div>
@@ -605,68 +970,53 @@ export function InterviewPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className={styles.callStage}>
-              {/* Main: AI interviewer (CloudHire-style facing host) */}
+            {(faceBlocks || faceWarnOnly || interviewBanned) && (
               <div
-                className={`${styles.mainTile} ${aiSpeaking ? styles.speakingTile : ''}`}
+                className={`${styles.proctorBanner} ${
+                  faceStatus.severity === 'ban' ||
+                  faceStatus.issue === 'multi_person' ||
+                  interviewBanned
+                    ? styles.proctorBan
+                    : faceStatus.severity === 'block'
+                      ? styles.proctorBlock
+                      : styles.proctorWarn
+                }`}
+                role="alert"
               >
-                <div className={styles.mainBg} aria-hidden="true" />
-                <div className={styles.interviewer}>
-                  <div className={styles.portraitWrap}>
-                    <motion.div
-                      className={styles.portraitRing}
-                      animate={
-                        aiSpeaking
-                          ? { scale: [1, 1.06, 1], opacity: [0.5, 1, 0.5] }
-                          : { scale: 1, opacity: 0.35 }
-                      }
-                      transition={
-                        aiSpeaking
-                          ? { duration: 1, repeat: Infinity, ease: 'easeInOut' }
-                          : { duration: 0.25 }
-                      }
-                    />
-                    <div className={styles.portrait}>
-                      <div className={styles.avaFaceLg}>
-                        <span className={styles.avaEye} />
-                        <span className={styles.avaEye} />
-                        <motion.span
-                          className={styles.avaMouth}
-                          animate={
-                            aiSpeaking
-                              ? { scaleY: [1, 1.6, 0.8, 1.4, 1], opacity: 1 }
-                              : { scaleY: 1, opacity: 0.85 }
-                          }
-                          transition={
-                            aiSpeaking
-                              ? { duration: 0.45, repeat: Infinity }
-                              : { duration: 0.2 }
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.hostMeta}>
-                    <h2>Ava</h2>
-                    <p>AI Interviewer</p>
-                    <Waveform active={aiSpeaking} />
-                    <span className={styles.hostState}>
-                      {aiSpeaking
-                        ? 'Asking question…'
-                        : listening
-                          ? 'Listening to your answer…'
-                          : 'Ready'}
-                    </span>
-                  </div>
-                </div>
+                <strong>
+                  {interviewBanned
+                    ? 'Interview banned'
+                    : faceStatus.issue === 'multi_person'
+                      ? 'Multiple people detected'
+                      : faceStatus.issue === 'looking_away'
+                        ? 'Look at the camera'
+                        : faceStatus.issue === 'too_far'
+                          ? 'Move closer'
+                          : faceStatus.issue === 'no_face'
+                            ? 'Face not detected'
+                            : 'Proctoring alert'}
+                </strong>
+                <span>{interviewBanned ? banMessage : faceStatus.label}</span>
+              </div>
+            )}
 
-                <div className={styles.ccBox}>
-                  <span className={styles.ccTag}>Captions</span>
-                  <p>{question.text}</p>
-                  {!aiSpeaking && (
-                    <small>{question.hint}</small>
-                  )}
-                </div>
+            <div className={styles.callStage}>
+              {/* Main: your webcam (recorded live) */}
+              <div className={`${styles.mainTile} ${styles.youMain}`}>
+                {streamReady && camOn ? (
+                  <video
+                    ref={bindRoomVideo}
+                    className={styles.youVideo}
+                    autoPlay
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <div className={styles.youFallback}>
+                    <span>{name.slice(0, 1).toUpperCase()}</span>
+                    <p>Camera off — turn it on to continue</p>
+                  </div>
+                )}
 
                 <div className={styles.qProgress}>
                   <div className={styles.progressTrack}>
@@ -679,30 +1029,49 @@ export function InterviewPage() {
                   </div>
                   <span>
                     {question.category} · Q{current + 1}/{questions.length}
+                    {isRecording ? ' · Recording' : ''}
                   </span>
+                </div>
+
+                <div className={styles.ccBox}>
+                  <span className={styles.ccTag}>Ava asks</span>
+                  <p>{question.text}</p>
+                  {!aiSpeaking && <small>{question.hint}</small>}
+                </div>
+
+                <div className={styles.youLabel}>
+                  <span>You · live</span>
+                  {listening && <em>Speaking</em>}
+                  {isRecording && <em className={styles.recEm}>REC</em>}
                 </div>
               </div>
 
-              {/* PiP: candidate */}
-              <div className={styles.pip}>
-                {streamReady && camOn ? (
-                  <video
-                    ref={roomVideoRef}
-                    className={styles.pipVideo}
-                    autoPlay
-                    muted
-                    playsInline
-                  />
-                ) : (
-                  <div className={styles.pipFallback}>
-                    <span>{name.slice(0, 1).toUpperCase()}</span>
+              {/* PiP: Ava */}
+              <div className={`${styles.pip} ${aiSpeaking ? styles.speakingTile : ''}`}>
+                <div className={styles.avaPipInner}>
+                  <div className={styles.avaFaceLg}>
+                    <span className={styles.avaEye} />
+                    <span className={styles.avaEye} />
+                    <motion.span
+                      className={styles.avaMouth}
+                      animate={
+                        aiSpeaking
+                          ? { scaleY: [1, 1.6, 0.8, 1.4, 1], opacity: 1 }
+                          : { scaleY: 1, opacity: 0.85 }
+                      }
+                      transition={
+                        aiSpeaking
+                          ? { duration: 0.45, repeat: Infinity }
+                          : { duration: 0.2 }
+                      }
+                    />
                   </div>
-                )}
-                <div className={styles.pipLabel}>
-                  <span>You</span>
-                  {listening && <em>Live</em>}
+                  <div className={styles.pipLabel}>
+                    <span>Ava</span>
+                    <em>{aiSpeaking ? 'Asking' : listening ? 'Listening' : 'Ready'}</em>
+                  </div>
+                  <Waveform active={aiSpeaking} />
                 </div>
-                <Waveform active={listening && !aiSpeaking} />
               </div>
             </div>
 
@@ -798,11 +1167,15 @@ export function InterviewPage() {
                 type="button"
                 className={styles.nextBtn}
                 onClick={() => submitAnswer()}
-                disabled={!draft.trim() || aiSpeaking}
+                disabled={!canSubmit}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                {current === questions.length - 1 ? 'Submit & finish' : 'Next question'}
+                {faceBlocks
+                  ? 'Fix face check'
+                  : current === questions.length - 1
+                    ? 'Submit & finish'
+                    : 'Next question'}
               </motion.button>
 
               <button type="button" className={styles.endBtn} onClick={endInterviewEarly}>
@@ -827,7 +1200,17 @@ export function InterviewPage() {
                 transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
               />
               <h2>Scoring your interview</h2>
-              <p>Ava is reviewing communication, structure, and role fit.</p>
+              <p>Ava is scoring communication, resume fit, and role accuracy.</p>
+              <ul>
+                {[
+                  'Matching answers to your resume',
+                  'Scoring structure & specificity',
+                  'Checking single-person integrity',
+                  'Building your talent report',
+                ].map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
               <div className={styles.analyzeSteps}>
                 {[
                   'Syncing video transcript',
@@ -856,13 +1239,24 @@ export function InterviewPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: easeOut }}
           >
-            <p className={styles.eyebrowLight}>Interview report</p>
+            <p className={styles.eyebrowLight}>
+              {result.integrity?.banned ? 'Interview banned' : 'Interview report'}
+            </p>
             <h1>
-              Your score with <em>Ava</em>
+              {result.integrity?.banned ? (
+                <>
+                  Session <em>ended</em> for integrity
+                </>
+              ) : (
+                <>
+                  Your score with <em>Ava</em>
+                </>
+              )}
             </h1>
             <p className={styles.subLight}>
               {result.role} · {result.level} ·{' '}
               {new Date(result.date).toLocaleDateString()}
+              {result.agent ? ` · ${result.agent}` : ''}
             </p>
 
             <div className={styles.scoreGrid}>
@@ -888,6 +1282,35 @@ export function InterviewPage() {
                       ? 'Solid — tighten a few answers'
                       : 'Keep practicing with Ava'}
                 </p>
+                {typeof result.resumeFitScore === 'number' && (
+                  <p className={styles.scoreMeta}>
+                    Resume fit {result.resumeFitScore}/100
+                  </p>
+                )}
+                {result.integrity && (
+                  <p className={styles.scoreMeta}>
+                    {result.integrity.banned
+                      ? result.integrity.banReason || 'Banned: multiple people on camera'
+                      : result.integrity.singlePersonOk
+                        ? 'Face integrity: single person verified'
+                        : `${result.integrity.faceViolations} face violation(s)`}
+                    {result.integrity.sideLookWarnings
+                      ? ` · ${result.integrity.sideLookWarnings} side-look warning(s)`
+                      : ''}
+                    {result.integrity.tooFarWarnings
+                      ? ` · ${result.integrity.tooFarWarnings} distance warning(s)`
+                      : ''}
+                  </p>
+                )}
+                {recordingNote && <p className={styles.scoreMeta}>{recordingNote}</p>}
+                {recordingUrl && (
+                  <video
+                    className={styles.recordingPreview}
+                    src={recordingUrl}
+                    controls
+                    playsInline
+                  />
+                )}
               </div>
 
               <div className={styles.categoryCard}>
@@ -958,17 +1381,25 @@ export function InterviewPage() {
               <motion.button
                 type="button"
                 className={styles.joinBtn}
-                onClick={() => navigate('/jobs')}
+                onClick={() => {
+                  sessionStorage.removeItem('hireright.returnToWizard')
+                  if (fromWizard) {
+                    sessionStorage.setItem('hireright.wizardStep', '5')
+                    navigate('/onboarding')
+                  } else {
+                    navigate('/jobs')
+                  }
+                }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Unlock matched roles
+                {fromWizard ? 'Continue — see your score summary' : 'Unlock matched roles'}
               </motion.button>
               <button type="button" className={styles.secondaryBtn} onClick={retake}>
                 Retake with Ava
               </button>
-              <Link to="/dashboard" className={styles.secondaryBtn}>
-                Open dashboard
+              <Link to="/jobs" className={styles.secondaryBtn}>
+                Browse matched roles
               </Link>
             </div>
           </motion.section>

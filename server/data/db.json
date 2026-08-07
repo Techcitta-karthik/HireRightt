@@ -6,6 +6,20 @@
       "email": "dr.mukheshrao12@gmail.com",
       "passwordHash": "2e816b544fdf14f7$9c50dcca5cc5dd84e18e7568eb27201fc86e1ba65d3620897c40a4170a7ce718",
       "createdAt": "2026-08-05T09:51:45.637Z"
+    },
+    {
+      "id": "980efa62f98d5f9b",
+      "name": "er",
+      "email": "dr.mukheshrao@gmail.com",
+      "passwordHash": "4ff70d9a6cc3300b$75abf5741c4c96212d02ad1b3730e3979f62ae24021303f39ddf38758454c69c",
+      "createdAt": "2026-08-06T10:59:13.835Z"
+    },
+    {
+      "id": "8754390b45ef75ec",
+      "name": "Test User",
+      "email": "test.py@hireright.local",
+      "passwordHash": "1f98d146f802f972$b2f8106440f3c308534807950875ed87de0bd6817e2abf8f39798a41884e2d2b",
+      "createdAt": "2026-08-07T04:20:41.856Z"
     }
   ],
   "profiles": {
@@ -25,19 +39,18 @@
         "SQL",
         "Git",
         "REST APIs",
-        "Java",
-        "AI / ML"
+        "Java"
       ],
       "experienceSummary": "I'm a Software Developer",
       "workExperiences": [
         {
-          "id": "fe977419-e370-4119-ab47-022ff57b543c",
+          "id": "ab449828-ef0d-4871-8250-86ad0ad4826e",
           "jobTitle": "Software Developer",
           "company": "Company",
           "employmentType": "Full-time",
           "startDate": "",
           "endDate": "",
-          "currentlyWorking": true,
+          "currentlyWorking": false,
           "location": "",
           "responsibilities": ""
         }
@@ -80,8 +93,82 @@
       "salaryExpectation": "",
       "interviewNotes": "",
       "resumeName": "robert_wayne.pdf",
-      "updatedAt": "2026-08-05T10:31:41.990Z",
+      "updatedAt": "2026-08-06T06:01:00.042Z",
       "completedSteps": 4
+    },
+    "dr.mukheshrao@gmail.com": {
+      "whoAreYou": "I'm a Software Developer",
+      "whatDrivesYou": "I'm driven by building high-quality products with Python, JavaScript, React.js, and growing through meaningful impact.",
+      "keyStrengths": "Python, JavaScript, React.js, AWS, SQL, Git",
+      "currentRole": "Software Developer",
+      "totalExperience": "2 – 3 Years",
+      "currentLocation": "Hyderabad",
+      "noticePeriod": "15 days",
+      "skills": [
+        "Python",
+        "JavaScript",
+        "React.js",
+        "AWS",
+        "SQL",
+        "Git",
+        "REST APIs",
+        "Java"
+      ],
+      "experienceSummary": "I'm a Software Developer",
+      "workExperiences": [
+        {
+          "id": "6a9f1734-f994-4b4e-929c-f0a417c12f02",
+          "jobTitle": "Software Developer",
+          "company": "Company",
+          "employmentType": "Full-time",
+          "startDate": "",
+          "endDate": "",
+          "currentlyWorking": false,
+          "location": "",
+          "responsibilities": ""
+        }
+      ],
+      "achievements": [
+        "Robert Wayne LinkedIn — GitHub — Portfolio Professional Summary Passionate Software Developer experienced in building web applications, AI-powered tools, computer vision projects,…"
+      ],
+      "metrics": [
+        {
+          "id": "metric-1",
+          "metric": "Increased Application Speed",
+          "contribution": "Optimized database queries & caching",
+          "impact": "Improved by 35%",
+          "timePeriod": "Jan 2024 - Dec 2024"
+        },
+        {
+          "id": "metric-2",
+          "metric": "Reduced Bug Reports",
+          "contribution": "Introduced automated testing suite",
+          "impact": "Decreased by 40%",
+          "timePeriod": "Jan 2024 - Dec 2024"
+        }
+      ],
+      "awards": [
+        ""
+      ],
+      "certifications": [
+        {
+          "id": "d41e43a4-9a92-4d16-8402-8344bea3fca3",
+          "name": "",
+          "organization": "",
+          "dateEarned": "",
+          "credentialId": ""
+        }
+      ],
+      "selfRating": 0,
+      "preferredRoles": [],
+      "preferredLocations": [],
+      "workMode": "",
+      "salaryExpectation": "",
+      "interviewNotes": "",
+      "resumeName": "robert_wayne.pdf",
+      "resumeText": "Robert Wayne LinkedIn — GitHub — Portfolio Professional Summary Passionate Software Developer experienced in building web applications, AI-powered tools, computer vision projects, and desktop applications. Enjoy solving real-world problems through software while continuously learning modern technologies and creating intuitive user experiences. Technical Skills Languages: Python, Java, C, JavaScript Frontend: React.js, HTML5, CSS3 Backend: FastAPI, REST APIs Databases: MySQL, SQL Cloud: AWS, Microsoft Azure Developer Tools: Git, GitHub, Linux, Bash Design: Figma, WordPress, Wix AI & Computer Vision: OpenCV, Computer Vision, Voice Recognition, AI Fundamentals Security: Cybersecurity Fundamentals Projects Air Canvas Python — OpenCV • Built a gesture-controlled drawing application using computer vision and real-time hand tracking. • Implemented webcam-based interaction with OpenCV for intuitive virtual drawing. Voice-to-Text Web Application React — Web Speech API • Developed a speech recognition web application that converts spoken words into text. • Built a responsive interface with real-time transcription capabilities. Dot Matrix Display Python — OpenCV • Created an application that converts photos and videos into animated dot matrix visualizations. • Applied image processing techniques for smooth real-time rendering. Minecraft Flappy Bird Python — Pygame • Developed a Minecraft-themed Flappy Bird clone with animations, collision detection, and scoring. • Designed reusable gameplay logic using Python and Pygame. Instagram-style Media Viewer React • Built a responsive media browsing application inspired by modern social platforms. • Improved rendering performance for smoother user interactions. Music Player Application React • Developed a responsive music player featuring playlist management and playback controls. • Focused on reusable React components and intuitive user interface design. Certifications • Microsoft Certified: Security, Compliance, and Identity Fundamentals (SC-900) • Google Cybersecurity Professional Certificate • Machine Learning Fundamentals",
+      "updatedAt": "2026-08-06T11:00:00.550Z",
+      "completedSteps": 3
     }
   },
   "interviews": {
@@ -160,5 +247,6 @@
       ]
     }
   },
-  "applications": {}
+  "applications": {},
+  "interviewSessions": {}
 }

@@ -10,7 +10,7 @@ export function JobSeekersPage() {
         </>
       }
       subtitle="Stand out with a live AI video interview. Ava scores how you communicate and think — then unlocks roles matched to that proof."
-      primaryCta={{ label: 'Take AI Interview', to: '/signup' }}
+      primaryCta={{ label: 'Get Started', to: '/signup' }}
       secondaryCta={{ label: 'How it works', to: '/how-it-works' }}
       sections={[
         {

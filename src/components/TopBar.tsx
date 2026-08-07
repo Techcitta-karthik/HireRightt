@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { firstName, getUser, logout } from '../lib/store'
+import { firstName, getUser } from '../lib/store'
 import { easeOut } from '../motion/variants'
 import styles from './TopBar.module.css'
 
@@ -34,8 +34,7 @@ export function TopBar({ userName }: TopBarProps) {
 
   function signOut() {
     setMenuOpen(false)
-    logout()
-    navigate('/login')
+    navigate('/logout')
   }
 
   const initials = (getUser()?.name ?? name)

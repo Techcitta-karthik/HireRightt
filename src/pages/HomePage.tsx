@@ -250,7 +250,7 @@ export function HomePage() {
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                   <Link to="/signup" className={styles.primaryBtn}>
                     <Icon name="bolt" />
-                    Take AI Interview
+                    Get Started
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
@@ -443,7 +443,7 @@ export function HomePage() {
                 whileTap={{ scale: 0.98 }}
               >
                 <Link to="/signup" className={styles.primaryBtn}>
-                  Start AI Interview
+                  Get Started
                   <span aria-hidden="true">→</span>
                 </Link>
               </motion.div>

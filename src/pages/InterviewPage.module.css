@@ -325,6 +325,118 @@
   font-size: 0.84rem;
 }
 
+.faceBadge {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.faceBadgeInline {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faceDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.faceOk {
+  color: #067647;
+  background: #ecfdf3;
+  border-color: #abefc6;
+}
+
+.faceWarn {
+  color: #b54708;
+  background: #fffaeb;
+  border-color: #fedf89;
+}
+
+.faceBlock {
+  color: #b42318;
+  background: #fef3f2;
+  border-color: #fecdca;
+}
+
+.proctorBanner {
+  position: sticky;
+  top: 64px;
+  z-index: 15;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0 clamp(12px, 3vw, 28px);
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+}
+
+.proctorBanner strong {
+  font-weight: 800;
+}
+
+.proctorWarn {
+  color: #b54708;
+  background: #fffaeb;
+  border-color: #fedf89;
+}
+
+.proctorBlock {
+  color: #b42318;
+  background: #fef3f2;
+  border-color: #fecdca;
+}
+
+.proctorBan {
+  color: #fff;
+  background: linear-gradient(135deg, #b42318, #912018);
+  border-color: #912018;
+}
+
+.agentPill {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff0e4;
+  border: 1px solid #ffdcc2;
+  color: #c2410c;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.scoreMeta {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: #5c6577;
+}
+
+.recordingPreview {
+  width: 100%;
+  margin-top: 14px;
+  border-radius: 14px;
+  border: 1px solid #f0ebe2;
+  background: #111827;
+  max-height: 240px;
+}
+
 .avaCard {
   display: flex;
   align-items: center;
@@ -583,6 +695,120 @@
   align-items: center;
   justify-content: center;
   padding: 28px 24px 96px;
+  overflow: hidden;
+}
+
+.youMain {
+  padding: 0;
+  background: #111827;
+}
+
+.youVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  background: #111827;
+}
+
+.youFallback {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  color: #fff;
+  min-height: 420px;
+}
+
+.youFallback span {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #ff7d26, #f0510e);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+}
+
+.youFallback p {
+  margin: 0;
+  color: #d1d5db;
+  font-size: 0.9rem;
+}
+
+.youLabel {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.72);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.youLabel em {
+  font-style: normal;
+  color: #6ee7b7;
+}
+
+.recEm {
+  color: #fda4af !important;
+}
+
+.recPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.recPill i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: recBlink 1s ease-in-out infinite;
+}
+
+@keyframes recBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.avaPipInner {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, #fff4ea, #ffe0c7);
+  position: relative;
+}
+
+.avaPipInner .avaFaceLg {
+  width: 72px;
+  height: 72px;
 }
 
 .speakingTile {
@@ -694,9 +920,9 @@
   z-index: 2;
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   border: 1px solid #ffd3b3;
-  box-shadow: 0 10px 28px rgba(23, 29, 45, 0.08);
+  box-shadow: 0 10px 28px rgba(23, 29, 45, 0.18);
   backdrop-filter: blur(10px);
 }
 
@@ -739,8 +965,9 @@
 
 .qProgress span {
   font-size: 0.76rem;
-  color: #8a92a4;
+  color: #f3f4f6;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .progressTrack {

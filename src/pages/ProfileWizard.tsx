@@ -39,12 +39,13 @@ const STEP_TITLES: Record<WizardStep, { title: string; subtitle: string }> = {
       'Share your achievements and contributions that demonstrate your impact.',
   },
   4: {
-    title: 'AI Interview',
-    subtitle: 'Your interview is confirmed. Here are all your details and next steps.',
+    title: 'Ready for your AI interview',
+    subtitle:
+      'Ava will ask about the role and skills you just added — then score you live on camera.',
   },
   5: {
     title: 'All Set!',
-    subtitle: 'Everything is complete. Explore opportunities and go to your dashboard.',
+    subtitle: 'Your profile and talent score are ready. Explore matched roles next.',
   },
 }
 
@@ -78,6 +79,7 @@ export function ProfileWizard() {
       workMode: saved.workMode,
       salaryExpectation: saved.salaryExpectation,
       interviewNotes: saved.interviewNotes,
+      resumeText: saved.resumeText || '',
       resumeFile: null,
     }
   })
@@ -88,6 +90,12 @@ export function ProfileWizard() {
     const saved = getProfile()
     if (saved?.completedSteps) {
       setCompletedThrough(saved.completedSteps)
+    }
+    // After AI interview, land on All Set (step 5).
+    if (sessionStorage.getItem('hireright.wizardStep') === '5') {
+      sessionStorage.removeItem('hireright.wizardStep')
+      setStep(5)
+      setCompletedThrough((prev) => Math.max(prev, 4))
     }
   }, [])
 
@@ -133,16 +141,26 @@ export function ProfileWizard() {
     const nextCompleted = Math.max(completedThrough, step)
     await persist(
       step === 5
-        ? 'Profile submitted successfully!'
-        : `Step ${step} saved. Moving forward…`,
+        ? 'Profile complete — explore your matches!'
+        : step === 4
+          ? 'Profile saved. Opening AI interview…'
+          : `Step ${step} saved. Moving forward…`,
       nextCompleted,
     )
     setCompletedThrough(nextCompleted)
+
+    // After Skills/Performance path: step 4 sends you into the live AI interview.
+    if (step === 4) {
+      sessionStorage.setItem('hireright.returnToWizard', '1')
+      navigate('/interview')
+      return
+    }
+
     if (step < 5) {
       setStep((prev) => (prev + 1) as WizardStep)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
-      navigate('/dashboard')
+      navigate('/jobs')
     }
   }
 
@@ -282,9 +300,11 @@ export function ProfileWizard() {
               >
                 {saving
                   ? 'Saving…'
-                  : step === 5
-                    ? 'Finish & Go to Dashboard'
-                    : 'Save & Continue'}
+                  : step === 4
+                    ? 'Save & Start AI Interview'
+                    : step === 5
+                      ? 'Explore matched roles'
+                      : 'Save & Continue'}
                 <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
                   <path
                     d="M4 10H16M16 10L11 5M16 10L11 15"

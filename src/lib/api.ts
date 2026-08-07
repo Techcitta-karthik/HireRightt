@@ -66,3 +66,27 @@ export async function apiSaveInterview(interview: unknown) {
     body: JSON.stringify(interview),
   })
 }
+
+export async function apiLogout() {
+  try {
+    await request('/api/logout', { method: 'POST' })
+  } catch {
+    // ignore
+  }
+  setApiToken(null)
+}
+
+export type ApiHealthInfo = {
+  ok: boolean
+  llm?: boolean
+  version?: string
+  features?: Record<string, boolean>
+}
+
+export async function apiHealthInfo(): Promise<ApiHealthInfo | null> {
+  try {
+    return (await request('/api/health')) as ApiHealthInfo
+  } catch {
+    return null
+  }
+}
