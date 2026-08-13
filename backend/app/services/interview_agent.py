@@ -6,6 +6,7 @@ Mirrors the frontend/local agent so scoring stays consistent server-side.
 from __future__ import annotations
 
 import re
+from datetime import UTC, datetime
 from typing import Any
 
 STOP = {
@@ -131,21 +132,23 @@ def _extract_tokens(resume_text: str, known_skills: list[str]) -> list[str]:
 
 
 def _extract_projects(resume_text: str) -> list[str]:
-    lines = [l.strip() for l in re.split(r"\n|[•●▪‣]", resume_text or "")]
-    lines = [l for l in lines if 28 < len(l) < 220]
+    lines = [line.strip() for line in re.split(r"\n|[•●▪‣]", resume_text or "")]
+    lines = [line for line in lines if 28 < len(line) < 220]
     projectish = [
-        l
-        for l in lines
+        line
+        for line in lines
         if re.search(
             r"\b(built|developed|designed|implemented|created|led|improved|reduced|increased|migrated|deployed|launched)\b",
-            l,
+            line,
             re.I,
         )
     ]
     return _unique(projectish)[:5]
 
 
-def build_questions(role: str, level: str, profile: dict[str, Any] | None, name: str = "there") -> list[dict[str, Any]]:
+def build_questions(
+    role: str, level: str, profile: dict[str, Any] | None, name: str = "there"
+) -> list[dict[str, Any]]:
     ctx = summarize_profile(profile, name=name)
     resume = ctx["resumeSnippet"]
     skills = _extract_tokens(resume, ctx["skills"])
@@ -167,7 +170,14 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
             ),
             "category": "Communication",
             "keywords": _unique(
-                ["experience", "project", "skill", "built", target_role.lower(), *[s.lower() for s in skills[:4]]]
+                [
+                    "experience",
+                    "project",
+                    "skill",
+                    "built",
+                    target_role.lower(),
+                    *[s.lower() for s in skills[:4]],
+                ]
             ),
             "hint": "Background → top skills → one concrete win from your resume.",
             "focus": "intro",
@@ -179,11 +189,19 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
             {
                 "text": (
                     f"Your resume highlights {', '.join(skills[:3])}. "
-                    f"Walk me through a real project where you used {skills[0]} — what you built, your role, and the result."
+                    f"Walk me through a real project where you used {skills[0]} — "
+                    "what you built, your role, and the result."
                 ),
                 "category": "Technical",
                 "keywords": _unique(
-                    [skills[0].lower(), *( [skills[1].lower()] if len(skills) > 1 else [] ), "project", "built", "result", "impact"]
+                    [
+                        skills[0].lower(),
+                        *([skills[1].lower()] if len(skills) > 1 else []),
+                        "project",
+                        "built",
+                        "result",
+                        "impact",
+                    ]
                 ),
                 "hint": "Name the skill, the project, your actions, and a metric.",
                 "focus": "skill-depth",
@@ -192,7 +210,10 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
     else:
         questions.append(
             {
-                "text": f"What is your strongest technical skill for a {role} role, and how have you applied it in a real project?",
+                "text": (
+                    f"What is your strongest technical skill for a {role} role, "
+                    "and how have you applied it in a real project?"
+                ),
                 "category": "Technical",
                 "keywords": ["skill", "project", "built", "result", role.lower()],
                 "hint": "Pick one skill and give a production example.",
@@ -204,7 +225,10 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
         words = [w for w in re.split(r"\W+", projects[0].lower()) if len(w) > 4 and w not in STOP][:5]
         questions.append(
             {
-                "text": f"On your resume you mention: “{projects[0][:150]}”. What was the hardest part, and how did you solve it?",
+                "text": (
+                    f"On your resume you mention: “{projects[0][:150]}”. "
+                    "What was the hardest part, and how did you solve it?"
+                ),
                 "category": "Problem Solving",
                 "keywords": _unique(["problem", "solution", "approach", "result", "challenge", *words]),
                 "hint": "STAR: situation → task → action → result.",
@@ -214,7 +238,9 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
     elif jobs:
         questions.append(
             {
-                "text": f"Looking at {jobs[0].split(':')[0]}, what was the toughest problem you owned end-to-end?",
+                "text": (
+                    f"Looking at {jobs[0].split(':')[0]}, what was the toughest problem you owned end-to-end?"
+                ),
                 "category": "Problem Solving",
                 "keywords": _unique(["problem", "solution", "approach", "result", "owned", "impact"]),
                 "hint": "Be specific about your ownership and the outcome.",
@@ -224,7 +250,9 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
     else:
         questions.append(
             {
-                "text": "Describe a challenging problem from your experience and how you solved it step by step.",
+                "text": (
+                    "Describe a challenging problem from your experience and how you solved it step by step."
+                ),
                 "category": "Problem Solving",
                 "keywords": ["problem", "solution", "approach", "result", "impact"],
                 "hint": "Use STAR and include a measurable result.",
@@ -235,7 +263,10 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
     if achievements:
         questions.append(
             {
-                "text": f"You listed this achievement: “{achievements[0][:140]}”. How did you personally drive that result?",
+                "text": (
+                    f"You listed this achievement: “{achievements[0][:140]}”. "
+                    "How did you personally drive that result?"
+                ),
                 "category": "Experience",
                 "keywords": ["result", "impact", "led", "improved", "metric"],
                 "hint": "Your contribution vs the team, plus a metric.",
@@ -245,7 +276,10 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
     elif len(skills) > 1:
         questions.append(
             {
-                "text": f"Compare your depth in {skills[0]} versus {skills[1]}. Give an example that proves the difference.",
+                "text": (
+                    f"Compare your depth in {skills[0]} versus {skills[1]}. "
+                    "Give an example that proves the difference."
+                ),
                 "category": "Experience",
                 "keywords": _unique([skills[0].lower(), skills[1].lower(), "example", "depth", "project"]),
                 "hint": "Contrast two resume skills with proof.",
@@ -255,7 +289,10 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
     else:
         questions.append(
             {
-                "text": "Tell me about a time you delivered under a tight deadline. What did you prioritize and what shipped?",
+                "text": (
+                    "Tell me about a time you delivered under a tight deadline. "
+                    "What did you prioritize and what shipped?"
+                ),
                 "category": "Experience",
                 "keywords": ["deadline", "priority", "deliver", "shipped", "plan"],
                 "hint": "Priorities, trade-offs, and the outcome.",
@@ -266,12 +303,14 @@ def build_questions(role: str, level: str, profile: dict[str, Any] | None, name:
     questions.append(
         {
             "text": (
-                f"Based on your resume, how would you apply {skills[0]} in the first 90 days as a {role}, and what would you learn next?"
+                f"Based on your resume, how would you apply {skills[0]} in the first 90 days "
+                f"as a {role}, and what would you learn next?"
                 if skills
-                else f"Where do you want to grow as a {role} over the next two years, based on your experience so far?"
+                else f"Where do you want to grow as a {role} over the next two years, "
+                "based on your experience so far?"
             ),
             "category": "Communication",
-            "keywords": _unique(["grow", "learn", "goal", "plan", *( [skills[0].lower()] if skills else [] )]),
+            "keywords": _unique(["grow", "learn", "goal", "plan", *([skills[0].lower()] if skills else [])]),
             "hint": "Tie growth to skills already on your resume.",
             "focus": "growth",
         }
@@ -362,7 +401,7 @@ def score_session(
     ]
 
     by_cat: dict[str, list[int]] = {}
-    for q, a in zip(questions, analyses):
+    for q, a in zip(questions, analyses, strict=True):
         by_cat.setdefault(q.get("category", "Technical"), []).append(a["score"])
 
     categories = []
@@ -418,15 +457,13 @@ def score_session(
     return {
         "role": role,
         "level": level,
-        "date": __import__("datetime").datetime.utcnow().isoformat() + "Z",
+        "date": datetime.now(UTC).isoformat(),
         "overall": overall,
         "resumeFitScore": resume_fit_score,
         "categories": categories,
         "strengths": _unique(strengths)[:6],
         "improvements": _unique(improvements)[:6],
-        "answers": [
-            {k: v for k, v in a.items() if k != "resumeSkillsHit"} for a in analyses
-        ],
+        "answers": [{k: v for k, v in a.items() if k != "resumeSkillsHit"} for a in analyses],
         "integrity": {
             "faceViolations": int(integrity.get("faceViolations") or 0),
             "singlePersonOk": integrity.get("singlePersonOk") is not False,

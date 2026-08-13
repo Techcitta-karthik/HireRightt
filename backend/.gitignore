@@ -8,3 +8,12 @@ data/*.db
 data/*.db-journal
 .mypy_cache/
 .ruff_cache/
+*.db
+*.db-shm
+*.db-wal
+.env
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.pytest_tmp/
