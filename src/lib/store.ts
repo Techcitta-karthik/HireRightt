@@ -4,7 +4,6 @@ export type User = {
   id: string
   name: string
   email: string
-  password: string
   createdAt: string
 }
 
@@ -75,15 +74,25 @@ function readUsers(): User[] {
       // Migrate legacy single-user key if present.
       const legacy = localStorage.getItem('hireright.user')
       if (legacy) {
-        const user = JSON.parse(legacy) as User
-        if (!user.id) user.id = uid()
+        const legacyUser = JSON.parse(legacy) as User & { password?: string }
+        const user: User = {
+          id: legacyUser.id || uid(),
+          name: legacyUser.name,
+          email: legacyUser.email,
+          createdAt: legacyUser.createdAt || new Date().toISOString(),
+        }
         writeUsers([user])
         localStorage.removeItem('hireright.user')
         return [user]
       }
       return []
     }
-    return JSON.parse(raw) as User[]
+    return (JSON.parse(raw) as Array<User & { password?: string }>).map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+    }))
   } catch {
     return []
   }
@@ -93,21 +102,26 @@ function writeUsers(users: User[]) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users))
 }
 
-export function saveUser(input: Omit<User, 'id' | 'createdAt'> & { createdAt?: string }): User {
+export function saveUser(input: Omit<User, 'createdAt'> & { createdAt?: string }): User {
   const users = readUsers()
   const email = input.email.trim().toLowerCase()
-  if (users.some((u) => u.email === email)) {
-    throw new Error('An account with this email already exists.')
-  }
+  const previous = users.find((entry) => entry.id === input.id)
   const user: User = {
-    id: uid(),
+    id: input.id,
     name: input.name.trim(),
     email,
-    password: input.password,
     createdAt: input.createdAt ?? new Date().toISOString(),
   }
-  users.push(user)
-  writeUsers(users)
+  writeUsers([...users.filter((entry) => entry.id !== user.id && entry.email !== email), user])
+  if (previous && previous.email !== email) {
+    const previousProfileKey = `${PROFILE_KEY}.${previous.email}`
+    const nextProfileKey = `${PROFILE_KEY}.${email}`
+    const profile = localStorage.getItem(previousProfileKey)
+    if (profile) {
+      localStorage.setItem(nextProfileKey, profile)
+      localStorage.removeItem(previousProfileKey)
+    }
+  }
   localStorage.setItem(SESSION_KEY, user.email)
   window.dispatchEvent(new Event('hireright-auth'))
   return user
@@ -121,16 +135,6 @@ export function getUser(): User | null {
 
 export function isLoggedIn(): boolean {
   return Boolean(getUser())
-}
-
-export function login(email: string, password: string): User | null {
-  const user = readUsers().find(
-    (u) => u.email === email.trim().toLowerCase() && u.password === password,
-  )
-  if (!user) return null
-  localStorage.setItem(SESSION_KEY, user.email)
-  window.dispatchEvent(new Event('hireright-auth'))
-  return user
 }
 
 export function logout() {
@@ -148,58 +152,6 @@ export function updateUserName(name: string): User | null {
   )
   writeUsers(users)
   return users.find((entry) => entry.email === user.email) ?? null
-}
-
-export function updateUserPassword(
-  currentPassword: string,
-  nextPassword: string,
-): { ok: true } | { ok: false; error: string } {
-  const user = getUser()
-  if (!user) return { ok: false, error: 'Not signed in.' }
-  if (user.password !== currentPassword) {
-    return { ok: false, error: 'Current password is incorrect.' }
-  }
-  if (nextPassword.length < 6) {
-    return { ok: false, error: 'New password must be at least 6 characters.' }
-  }
-  const users = readUsers().map((entry) =>
-    entry.email === user.email ? { ...entry, password: nextPassword } : entry,
-  )
-  writeUsers(users)
-  return { ok: true }
-}
-
-export function updateUserEmail(
-  nextEmail: string,
-  password: string,
-): { ok: true; email: string } | { ok: false; error: string } {
-  const user = getUser()
-  if (!user) return { ok: false, error: 'Not signed in.' }
-  if (user.password !== password) {
-    return { ok: false, error: 'Password is incorrect.' }
-  }
-  const email = nextEmail.trim().toLowerCase()
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { ok: false, error: 'Enter a valid email address.' }
-  }
-  if (readUsers().some((u) => u.email === email && u.email !== user.email)) {
-    return { ok: false, error: 'That email is already in use.' }
-  }
-  const users = readUsers().map((entry) =>
-    entry.email === user.email ? { ...entry, email } : entry,
-  )
-  writeUsers(users)
-  localStorage.setItem(SESSION_KEY, email)
-  // Migrate profile key if present
-  const oldKey = `${PROFILE_KEY}.${user.email}`
-  const newKey = `${PROFILE_KEY}.${email}`
-  const profileRaw = localStorage.getItem(oldKey)
-  if (profileRaw) {
-    localStorage.setItem(newKey, profileRaw)
-    localStorage.removeItem(oldKey)
-  }
-  window.dispatchEvent(new Event('hireright-auth'))
-  return { ok: true, email }
 }
 
 export type AccountPrefs = {

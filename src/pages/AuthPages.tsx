@@ -10,14 +10,11 @@ import {
   getProfile,
   getUser,
   isLoggedIn,
-  login,
   logout,
   saveAccountPrefs,
   saveUser,
-  updateUserEmail,
-  updateUserPassword,
 } from '../lib/store'
-import { apiHealth, apiLogin, apiSignup } from '../lib/api'
+import { apiHealth, apiLogin, apiLogout, apiSignup, apiUpdateAccount } from '../lib/api'
 import styles from './AuthPages.module.css'
 
 export function SignupPage() {
@@ -38,8 +35,8 @@ export function SignupPage() {
       setError('Enter a valid email address.')
       return
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      setError('Password must be 8+ characters and include a letter and number.')
       return
     }
     if (password !== confirm) {
@@ -48,14 +45,9 @@ export function SignupPage() {
     }
     setError('')
     try {
-      if (await apiHealth()) {
-        await apiSignup(name.trim(), email.trim().toLowerCase(), password)
-      }
-      saveUser({
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        password,
-      })
+      if (!(await apiHealth())) throw new Error('The HireRight service is unavailable. Try again shortly.')
+      const user = await apiSignup(name.trim(), email.trim().toLowerCase(), password)
+      saveUser(user)
       navigate('/onboarding')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create account.')
@@ -107,7 +99,7 @@ export function SignupPage() {
                 <input
                   type="password"
                   value={password}
-                  placeholder="6+ characters"
+                  placeholder="8+ characters"
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="new-password"
                 />
@@ -151,17 +143,13 @@ export function LoginPage() {
       setError('Enter your email and password to continue.')
       return
     }
-    const user = login(email.trim().toLowerCase(), password)
-    if (!user) {
-      setError('Email or password is incorrect. Sign up if you are new.')
-      return
-    }
     try {
-      if (await apiHealth()) {
-        await apiLogin(email.trim().toLowerCase(), password)
-      }
-    } catch {
-      // Local login succeeded; API sync is optional.
+      if (!(await apiHealth())) throw new Error('The HireRight service is unavailable. Try again shortly.')
+      const user = await apiLogin(email.trim().toLowerCase(), password)
+      saveUser(user)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not sign in.')
+      return
     }
     setError('')
     const from = (location.state as { from?: string } | null)?.from
@@ -263,7 +251,7 @@ export function SettingsPage() {
     window.setTimeout(() => setMessage(''), 2800)
   }
 
-  function saveSecurity(event: FormEvent) {
+  async function saveSecurity(event: FormEvent) {
     event.preventDefault()
     setError('')
     setMessage('')
@@ -273,27 +261,23 @@ export function SettingsPage() {
       return
     }
 
-    if (email.trim().toLowerCase() !== (user?.email ?? '')) {
-      const result = updateUserEmail(email, currentPassword)
-      if (!result.ok) {
-        setError(result.error)
-        return
-      }
-      setUser(getUser())
+    if (newPassword !== confirmPassword) {
+      setError('New password and confirmation do not match.')
+      return
     }
-
-    if (newPassword || confirmPassword) {
-      if (newPassword !== confirmPassword) {
-        setError('New password and confirmation do not match.')
-        return
-      }
-      const result = updateUserPassword(currentPassword, newPassword)
-      if (!result.ok) {
-        setError(result.error)
-        return
-      }
+    try {
+      const updated = await apiUpdateAccount({
+        currentPassword,
+        email: email.trim().toLowerCase(),
+        ...(newPassword ? { newPassword } : {}),
+      })
+      saveUser(updated)
+      setUser(getUser())
       setNewPassword('')
       setConfirmPassword('')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update account security.')
+      return
     }
 
     setCurrentPassword('')
@@ -506,7 +490,8 @@ export function LogoutPage() {
     }
   }, [])
 
-  function confirmSignOut() {
+  async function confirmSignOut() {
+    await apiLogout()
     logout()
     setSignedOut(true)
   }
