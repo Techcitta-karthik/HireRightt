@@ -12,12 +12,12 @@ type Section = {
 }
 
 type MarketingPageProps = {
-  kicker: string
+  kicker: ReactNode
   title: ReactNode
-  subtitle: string
+  subtitle: ReactNode
   sections?: Section[]
-  primaryCta?: { label: string; to: string }
-  secondaryCta?: { label: string; to: string }
+  primaryCta?: { label: ReactNode; to: string }
+  secondaryCta?: { label: ReactNode; to: string }
   children?: ReactNode
 }
 

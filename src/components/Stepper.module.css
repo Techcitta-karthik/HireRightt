@@ -34,7 +34,7 @@
   margin: 0 8px;
   background-image: linear-gradient(
     to right,
-    var(--gray-300) 40%,
+    rgba(56, 189, 248, 0.25) 40%,
     transparent 40%
   );
   background-size: 8px 2px;
@@ -44,7 +44,7 @@
 
 .connectorActive {
   background-image: none;
-  background: linear-gradient(90deg, var(--purple-600), var(--purple-400, #fb923c));
+  background: #ff2a38;
 }
 
 .step {
@@ -76,15 +76,10 @@
   place-items: center;
   font-size: 0.84rem;
   font-weight: 700;
-  border: 2px solid var(--gray-300);
-  color: var(--gray-400);
-  background: var(--white);
-  transition:
-    background 0.25s var(--ease),
-    border-color 0.25s var(--ease),
-    color 0.25s var(--ease),
-    box-shadow 0.25s var(--ease),
-    transform 0.25s var(--ease);
+  border: 2px solid rgba(56, 189, 248, 0.25);
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.8);
+  transition: all 0.25s ease;
 }
 
 .circle svg {
@@ -102,41 +97,41 @@
 .label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--gray-500);
+  color: #cbd5e1;
   transition: color 0.2s ease;
   line-height: 1.25;
 }
 
 .sublabel {
   font-size: 0.66rem;
-  color: var(--gray-400);
+  color: #64748b;
   line-height: 1.3;
 }
 
 .active .circle {
-  background: linear-gradient(135deg, #fb923c 0%, #ff6b6b 100%);
-  border-color: transparent;
-  color: var(--white);
-  box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.18);
+  background: #ff2a38;
+  border-color: #ff2a38;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 42, 56, 0.25);
   transform: scale(1.05);
 }
 
 .active .label {
-  color: var(--purple-700);
+  color: #ffffff;
 }
 
 .active .sublabel {
-  color: var(--gray-500);
+  color: #38bdf8;
 }
 
 .done .circle {
-  background: #10b981;
-  border-color: #10b981;
-  color: var(--white);
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #ffffff;
 }
 
 .done .label {
-  color: var(--gray-700);
+  color: #e2e8f0;
 }
 
 @media (max-width: 900px) {

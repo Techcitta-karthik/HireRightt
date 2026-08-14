@@ -1,25 +1,18 @@
-# HireRight
+# HireRighttt
 
-React candidate experience and recruiter ATS with a multi-tenant Python/FastAPI backend.
+Profile-building wizard for **HIRERIGHT<sup>TT</sup>** — a multi-step React experience for talent onboarding.
 
-## Run locally
+## Scripts
 
-```powershell
+```bash
 npm install
-pip install -r backend\requirements-dev.txt
-cd backend
-python -m alembic upgrade head
-python run.py
-```
-
-In a second terminal:
-
-```powershell
 npm run dev
 ```
 
-- Frontend: `http://localhost:5173`
-- API: `http://localhost:8787`
-- API docs: `http://localhost:8787/docs`
+Open [http://localhost:5173](http://localhost:5173).
 
-For the backend architecture, configuration, security model, endpoints, migrations, Docker/PostgreSQL setup, and tests, see [backend/README.md](./backend/README.md).
+## Stack
+
+- React 19 + TypeScript
+- Vite
+- CSS Modules

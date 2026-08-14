@@ -85,7 +85,7 @@ const PROCESS_STEPS = [
 const TESTIMONIALS = [
   {
     quote:
-      'HRERIGHTTT has transformed our hiring process. The AI matching is incredibly accurate and saves us hours of manual screening.',
+      'HIRERIGHTTT has transformed our hiring process. The AI matching is incredibly accurate and saves us hours of manual screening.',
     name: 'Sneha Iyer',
     role: 'Head of Talent Acquisition',
     company: 'Cognizant',
@@ -112,63 +112,7 @@ const TESTIMONIALS = [
   },
 ]
 
-const INTEGRATIONS = [
-  {
-    name: 'Slack',
-    desc: 'Team Communication',
-    iconColor: '#E01E5A',
-    iconSvg: (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M6 15a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0 1.5a2.5 2.5 0 0 1-2.5-2.5V14H6v2.5zM15 6a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zm-1.5 0a2.5 2.5 0 0 1-2.5 2.5H10V6h3.5zM18 9a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zm0-1.5a2.5 2.5 0 0 1 2.5 2.5V10H18V7.5zM9 18a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0zm1.5 0a2.5 2.5 0 0 1 2.5-2.5H14V18h-3.5z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Google Workspace',
-    desc: 'Productivity Suite',
-    iconColor: '#4285F4',
-    iconSvg: (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 5c-3.87 0-7 3.13-7 7s3.13 7 7 7c3.48 0 6.36-2.54 6.9-5.87h-6.9v-2.26h9.32c.1.53.18 1.08.18 1.63 0 5.25-3.58 9.5-9.5 9.5-5.52 0-10-4.48-10-10S6.48 2 12 2c2.7 0 5.15 1.07 6.98 2.82L16.4 7.4C15.28 6.32 13.73 5 12 5z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Microsoft 365',
-    desc: 'Productivity Suite',
-    iconColor: '#F25022',
-    iconSvg: (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 3h8.5v8.5H3V3zm9.5 0H21v8.5h-8.5V3zM3 12.5h8.5V21H3v-8.5zm9.5 0H21V21h-8.5v-8.5z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Zapier',
-    desc: 'Automation',
-    iconColor: '#FF4A00',
-    iconSvg: (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Calendly',
-    desc: 'Scheduling',
-    iconColor: '#006BFF',
-    iconSvg: (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'See all',
-    desc: 'Integrations',
-    isSeeAll: true,
-  },
-]
+
 
 const RESOURCES_ARTICLES = [
   {
@@ -302,13 +246,27 @@ export function HomePage() {
                   className={styles.heroPersonImg}
                 />
 
-                {/* FTY.png image for Fast & Secure, Trusted by, Your Privacy */}
+                {/* Floating Badges: Fast.png, Trusted.png, privacy.png */}
                 <motion.img
-                  src="/FTY.png"
-                  alt="Fast & Secure, Trusted by, Your Privacy"
-                  className={styles.ftyFloatingImg}
+                  src="/Fast.png"
+                  alt="Fast & Secure"
+                  className={styles.floatingBadgeFast}
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.img
+                  src="/Trusted.png"
+                  alt="Trusted by Employers"
+                  className={styles.floatingBadgeTrusted}
                   animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+                />
+                <motion.img
+                  src="/privacy.png"
+                  alt="Your Privacy Protected"
+                  className={styles.floatingBadgePrivacy}
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
                 />
               </motion.div>
             </div>
@@ -327,7 +285,7 @@ export function HomePage() {
                       <img
                         src={company.logo}
                         alt={company.name}
-                        className={styles.companyLogoImg}
+                        className={`${styles.companyLogoImg} ${styles['logo_' + company.name.toLowerCase()] || ''}`}
                       />
                     </div>
                     {index < TRUSTED_COMPANIES.length - 1 && (
@@ -427,8 +385,8 @@ export function HomePage() {
                   Build stronger teams.
                 </h2>
                 <p>
-                  Join thousands of recruiters who save hours every week with
-                  HRERIGHTTT.
+                  Join thousands of recruiters who save hours every week with{' '}
+                  HIRERIGHT<sup>TT</sup>.
                 </p>
                 <Link to="/signup" className={styles.bannerBtn}>
                   Explore Platform →
@@ -515,7 +473,7 @@ export function HomePage() {
             <div className={styles.sectionHeader}>
               <motion.h2 variants={fadeUp}>A smarter way to hire</motion.h2>
               <motion.p variants={fadeUp}>
-                From job posting to offer, HRERIGHTTT simplifies every step.
+                From job posting to offer, HIRERIGHT<sup>TT</sup> simplifies every step.
               </motion.p>
             </div>
 
@@ -581,7 +539,7 @@ export function HomePage() {
             <div className={styles.sectionHeader}>
               <motion.h2 variants={fadeUp}>Loved by recruiters worldwide</motion.h2>
               <motion.p variants={fadeUp}>
-                Here's what our customers say about HRERIGHTTT
+                Here's what our customers say about HIRERIGHT<sup>TT</sup>
               </motion.p>
             </div>
 
@@ -624,57 +582,7 @@ export function HomePage() {
             </div>
           </motion.section>
 
-          {/* INTEGRATIONS SECTION */}
-          <motion.section
-            className={styles.integrationsSection}
-            initial="hidden"
-            whileInView="show"
-            viewport={viewOnce}
-            variants={staggerContainer}
-          >
-            <div className={styles.sectionHeader}>
-              <motion.h2 variants={fadeUp}>
-                Seamlessly integrate with your favorite tools
-              </motion.h2>
-            </div>
 
-            <div className={styles.integrationsRow}>
-              {INTEGRATIONS.map((tool) => (
-                <motion.div
-                  key={tool.name}
-                  className={styles.integrationCard}
-                  variants={fadeUp}
-                  whileHover={{ y: -3 }}
-                >
-                  {tool.isSeeAll ? (
-                    <div className={styles.seeAllBox}>
-                      <span className={styles.seeAllIcon}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="3" width="7" height="7" />
-                          <rect x="14" y="3" width="7" height="7" />
-                          <rect x="14" y="14" width="7" height="7" />
-                          <rect x="3" y="14" width="7" height="7" />
-                        </svg>
-                      </span>
-                      <h3>See all</h3>
-                      <p>Integrations</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div
-                        className={styles.integIcon}
-                        style={{ color: tool.iconColor }}
-                      >
-                        {tool.iconSvg}
-                      </div>
-                      <h3>{tool.name}</h3>
-                      <p>{tool.desc}</p>
-                    </>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.section>
 
           {/* RESOURCES SECTION */}
           <motion.section
@@ -759,7 +667,7 @@ export function HomePage() {
               <div className={styles.ctaBannerText}>
                 <h2>Ready to hire the right talent?</h2>
                 <p>
-                  Join thousands of recruitment teams using HRERIGHTTT to build
+                  Join thousands of recruitment teams using HIRERIGHT<sup>TT</sup> to build
                   high-performing teams.
                 </p>
               </div>

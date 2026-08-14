@@ -6,11 +6,10 @@ import { firstName, isLoggedIn } from '../lib/store'
 import styles from './SiteNav.module.css'
 
 const NAV = [
-  { to: '/how-it-works', label: 'How It Works' },
-  { to: '/job-seekers', label: 'For Candidates' },
-  { to: '/jobs', label: 'Matches' },
-  { to: '/admin', label: 'Admin ATS' },
-  { to: '/why', label: 'Why HIRERIGHT' },
+  { to: '/how-it-works', label: 'How It Works', hasDropdown: false },
+  { to: '/resources', label: 'Resources', hasDropdown: true },
+  { to: '/pricing', label: 'Pricing', hasDropdown: false },
+  { to: '/about', label: 'About', hasDropdown: false },
 ]
 
 type SiteNavProps = {
@@ -48,24 +47,29 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
       transition={{ duration: 0.45, ease: easeOut }}
     >
       <Link to="/" className={styles.brand} onClick={() => setOpen(false)}>
-        <h1>
-          HIRERIGHT<sup>TTT</sup>
+        <span className={styles.logoBadge}>
+          <span>HR</span>
+        </span>
+        <h1 className={styles.logoText}>
+          HIRERIGHT<sup className={styles.supTt}>TT</sup>
         </h1>
-        <p>
-          TALENT <span>TO</span> TALENT
-        </p>
       </Link>
 
       <nav className={styles.navLinks} aria-label="Primary">
         {NAV.map((item) => (
           <NavLink
-            key={item.to}
+            key={item.label}
             to={item.to}
             className={({ isActive }) =>
               isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
             }
           >
-            {item.label}
+            <span>{item.label}</span>
+            {item.hasDropdown && (
+              <svg className={styles.chevron} viewBox="0 0 16 16" fill="none">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
           </NavLink>
         ))}
       </nav>
@@ -73,16 +77,16 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
       <div className={styles.navActions}>
         {loggedIn ? (
           <>
-            <Link to="/dashboard" className={styles.loginBtn}>
+            <Link to="/dashboard" className={styles.textBtn}>
               Hi, {name}
             </Link>
-            <Link to="/settings" className={styles.loginBtn}>
+            <Link to="/settings" className={styles.textBtn}>
               Settings
             </Link>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <button
                 type="button"
-                className={dark ? styles.ctaBtnDark : styles.signOutBtn}
+                className={styles.signOutBtn}
                 onClick={handleLogout}
               >
                 Sign out
@@ -91,17 +95,15 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
           </>
         ) : (
           <>
-            {!dark && (
-              <Link to="/login" className={styles.loginBtn}>
-                Login
-              </Link>
-            )}
+            <Link to="/login" className={styles.textBtn}>
+              Log in
+            </Link>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Link
                 to="/signup"
                 className={dark ? styles.ctaBtnDark : styles.ctaBtn}
               >
-                Get Started
+                Book a Demo
                 <span aria-hidden="true">→</span>
               </Link>
             </motion.div>

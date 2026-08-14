@@ -86,7 +86,7 @@ export function AdminDashboard() {
         <div className={styles.brand}>
           <span className={styles.logoMark}>HR</span>
           <div>
-            <strong>HIRERIGHT</strong>
+            <strong>HIRERIGHT<sup>TT</sup></strong>
             <small>Admin ATS · OpenATS</small>
           </div>
         </div>
@@ -108,8 +108,10 @@ export function AdminDashboard() {
         <div className={styles.sideFoot}>
           <div className={styles.engineCard}>
             <span className={styles.liveDot} />
-            AI Matcher Engine v4.2
-            <small>Heuristic + interview scores live</small>
+            <div>
+              <strong>Ava AI Studio v2.4</strong>
+              <small>Real-time scoring synced</small>
+            </div>
           </div>
           <Link to="/dashboard" className={styles.backLink}>
             ← Candidate app
@@ -164,8 +166,8 @@ export function AdminDashboard() {
                     <span className={styles.bannerPill}>Enterprise AI Matcher Active</span>
                     <h2>Recruiter operations & AI talent pipeline</h2>
                     <p>
-                      Monitor applications, AI match scores, HireRight interview scores, and
-                      pipeline progression — adapted from OpenATS for HIRERIGHT.
+                      Monitor applications, AI match scores, HIRERIGHT<sup>TT</sup> interview scores, and
+                      pipeline progression — adapted from OpenATS for HIRERIGHT<sup>TT</sup>.
                     </p>
                   </div>
                   <div className={styles.bannerActions}>

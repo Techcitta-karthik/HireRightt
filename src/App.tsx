@@ -7,7 +7,6 @@ import { WhyPage } from './pages/WhyPage'
 import { SolutionsPage } from './pages/SolutionsPage'
 import { ResourcesPage } from './pages/ResourcesPage'
 import { AboutPage } from './pages/AboutPage'
-import { HowItWorksPage } from './pages/HowItWorksPage'
 import { LoginPage, LogoutPage, SettingsPage, SignupPage } from './pages/AuthPages'
 import { DashboardPage, JobsPage, ProfilePage } from './pages/AppPages'
 import { AdminDashboard } from './pages/AdminDashboard'
@@ -30,12 +29,12 @@ function AnimatedRoutes() {
       >
         <Routes location={location}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/how-it-works" element={<SolutionsPage />} />
+          <Route path="/solutions" element={<SolutionsPage />} />
           <Route path="/job-seekers" element={<JobSeekersPage />} />
           <Route path="/why" element={<WhyPage />} />
-          <Route path="/solutions" element={<SolutionsPage />} />
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/logout" element={<LogoutPage />} />

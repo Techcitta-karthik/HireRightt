@@ -3,7 +3,7 @@ import { MarketingPage } from '../components/MarketingPage'
 export function WhyPage() {
   return (
     <MarketingPage
-      kicker="WHY HIRERIGHT"
+      kicker={<>WHY HIRERIGHT<sup>TT</sup></>}
       title={
         <>
           Hiring should start with a <em>conversation</em> — not a PDF.

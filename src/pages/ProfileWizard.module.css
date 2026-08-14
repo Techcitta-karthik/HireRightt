@@ -1,7 +1,11 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background: var(--gray-50);
+  background:
+    radial-gradient(900px 500px at 85% -5%, rgba(56, 189, 248, 0.15), transparent 65%),
+    radial-gradient(700px 420px at -10% 20%, rgba(37, 99, 235, 0.18), transparent 60%),
+    linear-gradient(180deg, #070a12 0%, #0b0f19 42%, #0f172a 100%);
+  color: #f8fafc;
 }
 
 .main {
@@ -17,14 +21,14 @@
   font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--gray-900);
+  color: #ffffff;
   line-height: 1.2;
 }
 
 .pageHeader p {
   margin-top: 6px;
   font-size: 0.92rem;
-  color: var(--gray-500);
+  color: #cbd5e1;
   max-width: 560px;
 }
 
@@ -60,14 +64,14 @@
   gap: 8px;
   height: 46px;
   padding: 0 20px;
-  border-radius: 12px;
-  border: 1.5px solid var(--gray-300);
-  background: var(--white);
-  color: var(--gray-700);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(15, 23, 42, 0.6);
+  color: #ffffff;
   font-size: 0.9rem;
   font-weight: 700;
   justify-self: start;
-  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .backBtn svg {
@@ -76,9 +80,8 @@
 }
 
 .backBtn:hover {
-  border-color: var(--orange);
-  color: var(--brand-700);
-  background: var(--brand-50);
+  border-color: #ffffff;
+  background: rgba(30, 41, 59, 0.8);
   transform: translateY(-1px);
 }
 
@@ -88,7 +91,7 @@
   gap: 8px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: #38bdf8;
   justify-self: center;
   white-space: nowrap;
 }
@@ -97,8 +100,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--green-500);
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
   display: grid;
   place-items: center;
 }
@@ -123,43 +126,38 @@
   gap: 8px;
   height: 46px;
   padding: 0 22px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 700;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s var(--ease),
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .secondaryBtn {
-  border: 1.5px solid var(--purple-600);
-  color: var(--purple-700);
-  background: var(--white);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .secondaryBtn:hover:not(:disabled) {
-  background: var(--purple-50);
+  border-color: #38bdf8;
+  background: rgba(30, 41, 59, 0.8);
   transform: translateY(-1px);
 }
 
 .ghostBtn {
-  color: var(--gray-600);
+  color: #cbd5e1;
   background: transparent;
 }
 
 .ghostBtn:hover {
-  background: var(--gray-100);
-  color: var(--gray-800);
+  background: rgba(30, 41, 59, 0.6);
+  color: #ffffff;
 }
 
 .primaryBtn {
-  background: linear-gradient(135deg, #fb923c 0%, #ff6b6b 100%);
-  color: var(--white);
-  box-shadow: 0 10px 22px rgba(251, 146, 60, 0.28);
+  background: #ff2a38;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
 }
 
 .primaryBtn svg {
@@ -168,9 +166,9 @@
 }
 
 .primaryBtn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+  background: #e01f2d;
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(255, 107, 107, 0.36);
+  box-shadow: 0 8px 26px rgba(255, 42, 56, 0.5);
 }
 
 .primaryBtn:active:not(:disabled),

@@ -48,7 +48,7 @@ export function Sidebar({ step = 1 }: SidebarProps) {
         <Link to="/" className={styles.brand}>
           <h1 className={styles.logo}>
             HIRERIGHT
-            <sup className={styles.ttt}>TTT</sup>
+            <sup className={styles.ttt}>TT</sup>
           </h1>
           <p className={styles.tagline}>
             TALENT <span>TO</span> TALENT
@@ -237,7 +237,7 @@ export function Sidebar({ step = 1 }: SidebarProps) {
                 </motion.div>
 
                 <motion.div className={styles.why} variants={fadeUp}>
-                  <h3>Why HIRERIGHT</h3>
+                  <h3>Why HIRERIGHT<sup>TT</sup></h3>
                   <ul>
                     {WHY_ITEMS.map((item) => (
                       <motion.li key={item} whileHover={{ x: 4 }}>
@@ -293,8 +293,8 @@ export function Sidebar({ step = 1 }: SidebarProps) {
           </div>
           <div>
             <p className={styles.helpTitle}>Need help?</p>
-            <a href="mailto:care@HIRERIGHT.com" className={styles.helpLink}>
-              care@HIRERIGHT.com
+            <a href="mailto:care@hirerighttt.com" className={styles.helpLink}>
+              care@hirerighttt.com
             </a>
           </div>
         </motion.div>

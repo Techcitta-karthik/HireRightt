@@ -4,6 +4,7 @@ export type User = {
   id: string
   name: string
   email: string
+  password: string
   createdAt: string
 }
 
@@ -67,6 +68,14 @@ function uid() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+const DEFAULT_DEMO_USER: User = {
+  id: 'demo-user-1',
+  name: 'Arjun Sharma',
+  email: 'demo@hireright.com',
+  password: 'password123',
+  createdAt: new Date().toISOString(),
+}
+
 function readUsers(): User[] {
   try {
     const raw = localStorage.getItem(USERS_KEY)
@@ -74,27 +83,23 @@ function readUsers(): User[] {
       // Migrate legacy single-user key if present.
       const legacy = localStorage.getItem('hireright.user')
       if (legacy) {
-        const legacyUser = JSON.parse(legacy) as User & { password?: string }
-        const user: User = {
-          id: legacyUser.id || uid(),
-          name: legacyUser.name,
-          email: legacyUser.email,
-          createdAt: legacyUser.createdAt || new Date().toISOString(),
-        }
+        const user = JSON.parse(legacy) as User
+        if (!user.id) user.id = uid()
         writeUsers([user])
         localStorage.removeItem('hireright.user')
         return [user]
       }
-      return []
+      writeUsers([DEFAULT_DEMO_USER])
+      return [DEFAULT_DEMO_USER]
     }
-    return (JSON.parse(raw) as Array<User & { password?: string }>).map((user) => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-    }))
+    const users = JSON.parse(raw) as User[]
+    if (users.length === 0) {
+      writeUsers([DEFAULT_DEMO_USER])
+      return [DEFAULT_DEMO_USER]
+    }
+    return users
   } catch {
-    return []
+    return [DEFAULT_DEMO_USER]
   }
 }
 
@@ -102,26 +107,38 @@ function writeUsers(users: User[]) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users))
 }
 
-export function saveUser(input: Omit<User, 'createdAt'> & { createdAt?: string }): User {
+export function saveUser(
+  input: Omit<User, 'id' | 'createdAt'> & { createdAt?: string },
+  allowOverwrite = false,
+): User {
   const users = readUsers()
   const email = input.email.trim().toLowerCase()
-  const previous = users.find((entry) => entry.id === input.id)
+  const existingIdx = users.findIndex((u) => u.email === email)
+
+  if (existingIdx >= 0) {
+    if (!allowOverwrite) {
+      throw new Error('An account with this email already exists.')
+    }
+    users[existingIdx] = {
+      ...users[existingIdx],
+      name: input.name.trim() || users[existingIdx].name,
+      password: input.password || users[existingIdx].password,
+    }
+    writeUsers(users)
+    localStorage.setItem(SESSION_KEY, email)
+    window.dispatchEvent(new Event('hireright-auth'))
+    return users[existingIdx]
+  }
+
   const user: User = {
-    id: input.id,
+    id: uid(),
     name: input.name.trim(),
     email,
+    password: input.password,
     createdAt: input.createdAt ?? new Date().toISOString(),
   }
-  writeUsers([...users.filter((entry) => entry.id !== user.id && entry.email !== email), user])
-  if (previous && previous.email !== email) {
-    const previousProfileKey = `${PROFILE_KEY}.${previous.email}`
-    const nextProfileKey = `${PROFILE_KEY}.${email}`
-    const profile = localStorage.getItem(previousProfileKey)
-    if (profile) {
-      localStorage.setItem(nextProfileKey, profile)
-      localStorage.removeItem(previousProfileKey)
-    }
-  }
+  users.push(user)
+  writeUsers(users)
   localStorage.setItem(SESSION_KEY, user.email)
   window.dispatchEvent(new Event('hireright-auth'))
   return user
@@ -135,6 +152,16 @@ export function getUser(): User | null {
 
 export function isLoggedIn(): boolean {
   return Boolean(getUser())
+}
+
+export function login(email: string, password: string): User | null {
+  const user = readUsers().find(
+    (u) => u.email === email.trim().toLowerCase() && u.password === password,
+  )
+  if (!user) return null
+  localStorage.setItem(SESSION_KEY, user.email)
+  window.dispatchEvent(new Event('hireright-auth'))
+  return user
 }
 
 export function logout() {
@@ -152,6 +179,58 @@ export function updateUserName(name: string): User | null {
   )
   writeUsers(users)
   return users.find((entry) => entry.email === user.email) ?? null
+}
+
+export function updateUserPassword(
+  currentPassword: string,
+  nextPassword: string,
+): { ok: true } | { ok: false; error: string } {
+  const user = getUser()
+  if (!user) return { ok: false, error: 'Not signed in.' }
+  if (user.password !== currentPassword) {
+    return { ok: false, error: 'Current password is incorrect.' }
+  }
+  if (nextPassword.length < 6) {
+    return { ok: false, error: 'New password must be at least 6 characters.' }
+  }
+  const users = readUsers().map((entry) =>
+    entry.email === user.email ? { ...entry, password: nextPassword } : entry,
+  )
+  writeUsers(users)
+  return { ok: true }
+}
+
+export function updateUserEmail(
+  nextEmail: string,
+  password: string,
+): { ok: true; email: string } | { ok: false; error: string } {
+  const user = getUser()
+  if (!user) return { ok: false, error: 'Not signed in.' }
+  if (user.password !== password) {
+    return { ok: false, error: 'Password is incorrect.' }
+  }
+  const email = nextEmail.trim().toLowerCase()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: 'Enter a valid email address.' }
+  }
+  if (readUsers().some((u) => u.email === email && u.email !== user.email)) {
+    return { ok: false, error: 'That email is already in use.' }
+  }
+  const users = readUsers().map((entry) =>
+    entry.email === user.email ? { ...entry, email } : entry,
+  )
+  writeUsers(users)
+  localStorage.setItem(SESSION_KEY, email)
+  // Migrate profile key if present
+  const oldKey = `${PROFILE_KEY}.${user.email}`
+  const newKey = `${PROFILE_KEY}.${email}`
+  const profileRaw = localStorage.getItem(oldKey)
+  if (profileRaw) {
+    localStorage.setItem(newKey, profileRaw)
+    localStorage.removeItem(oldKey)
+  }
+  window.dispatchEvent(new Event('hireright-auth'))
+  return { ok: true, email }
 }
 
 export type AccountPrefs = {

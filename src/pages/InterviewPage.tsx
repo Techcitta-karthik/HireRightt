@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -228,18 +228,27 @@ export function InterviewPage() {
 
   function attachStream(video: HTMLVideoElement | null) {
     if (!video || !streamRef.current) return
-    video.srcObject = streamRef.current
-    video.muted = true
-    video.playsInline = true
-    void video.play().catch(() => undefined)
+    if (video.srcObject !== streamRef.current) {
+      video.srcObject = streamRef.current
+      video.muted = true
+      video.playsInline = true
+      void video.play().catch(() => undefined)
+    }
   }
 
-  function bindRoomVideo(el: HTMLVideoElement | null) {
+  const bindRoomVideo = useCallback((el: HTMLVideoElement | null) => {
     roomVideoRef.current = el
     if (el && streamRef.current && stageRef.current === 'interview') {
       attachStream(el)
     }
-  }
+  }, [])
+
+  const bindLobbyVideo = useCallback((el: HTMLVideoElement | null) => {
+    lobbyVideoRef.current = el
+    if (el && streamRef.current && stageRef.current === 'setup') {
+      attachStream(el)
+    }
+  }, [])
 
   function stopTracks() {
     streamRef.current?.getTracks().forEach((track) => track.stop())
@@ -400,7 +409,7 @@ export function InterviewPage() {
 
     const intro =
       current === 0
-        ? `Hi ${name}. I'm Ava, your HireRight interviewer. Let's begin. `
+        ? `Hi ${name}. I'm Ava, your HireRighttt interviewer. Let's begin. `
         : `Next question. `
 
     speakText(`${intro}${question.text}`, {
@@ -702,7 +711,7 @@ export function InterviewPage() {
         <div className={styles.appBrand}>
           <span className={styles.logoMark}>HR</span>
           <div>
-            <strong>HIRERIGHT</strong>
+            <strong>HIRERIGHT<sup>TT</sup></strong>
             <small>AI Interview Studio</small>
           </div>
         </div>
@@ -774,7 +783,7 @@ export function InterviewPage() {
                 <div className={styles.previewFrame}>
                   {streamReady && camOn ? (
                     <video
-                      ref={lobbyVideoRef}
+                      ref={bindLobbyVideo}
                       className={styles.previewVideo}
                       autoPlay
                       muted
@@ -841,7 +850,7 @@ export function InterviewPage() {
                   </div>
                   <div>
                     <h3>Ava</h3>
-                    <p>AI Interviewer · HireRight</p>
+                    <p>AI Interviewer · HIRERIGHT<sup>TT</sup></p>
                   </div>
                 </div>
 

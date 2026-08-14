@@ -9,9 +9,13 @@ export function AboutPage() {
           Talent to talent — through a <em>real AI interview.</em>
         </>
       }
-      subtitle="HIRERIGHT exists so job seekers can prove ability on camera and move forward with a score employers can trust."
+      subtitle={
+        <>
+          HIRERIGHT<sup>TT</sup> exists so job seekers can prove ability on camera and move forward with a score employers can trust.
+        </>
+      }
       primaryCta={{ label: 'Get Started', to: '/signup' }}
-      secondaryCta={{ label: 'Why HIRERIGHT', to: '/why' }}
+      secondaryCta={{ label: <>Why HIRERIGHT<sup>TT</sup></>, to: '/why' }}
       sections={[
         {
           title: 'Our mission',

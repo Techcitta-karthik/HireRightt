@@ -3,31 +3,45 @@ import styles from './SiteFooter.module.css'
 
 const COLUMNS = [
   {
-    title: 'Get started',
+    title: 'Product',
     links: [
-      { label: 'Get Started', to: '/signup' },
-      { label: 'Interview Studio', to: '/interview' },
-      { label: 'How It Works', to: '/how-it-works' },
-      { label: 'Interview Prep', to: '/resources' },
-      { label: 'Job Matches', to: '/jobs' },
+      { label: 'AI Matching', to: '/solutions' },
+      { label: 'Resume Intelligence', to: '/solutions' },
+      { label: 'Pipeline Management', to: '/solutions' },
+      { label: 'Analytics & Reports', to: '/solutions' },
+      { label: 'Integrations', to: '/solutions' },
+      { label: 'Pricing', to: '/pricing' },
     ],
   },
   {
-    title: 'For Candidates',
+    title: 'Solutions',
     links: [
-      { label: 'Why Interview-First', to: '/why' },
-      { label: 'For Candidates', to: '/job-seekers' },
-      { label: 'Solutions', to: '/solutions' },
-      { label: 'Dashboard', to: '/dashboard' },
+      { label: 'For Staffing Agencies', to: '/solutions' },
+      { label: 'For Enterprises', to: '/solutions' },
+      { label: 'For HR Teams', to: '/solutions' },
+      { label: 'Remote Hiring', to: '/solutions' },
+      { label: 'Diversity Hiring', to: '/solutions' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { label: 'Blog', to: '/resources' },
+      { label: 'Case Studies', to: '/resources' },
+      { label: 'Help Center', to: '/resources' },
+      { label: 'Templates', to: '/resources' },
+      { label: 'Ebooks', to: '/resources' },
+      { label: 'Webinars', to: '/resources' },
     ],
   },
   {
     title: 'Company',
     links: [
       { label: 'About Us', to: '/about' },
-      { label: 'Admin ATS', to: '/admin' },
-      { label: 'Resources', to: '/resources' },
-      { label: 'Privacy', to: '/why' },
+      { label: 'Careers', to: '/about' },
+      { label: 'Contact Us', to: '/about' },
+      { label: 'Privacy Policy', to: '/about' },
+      { label: 'Terms of Service', to: '/about' },
     ],
   },
 ]
@@ -38,7 +52,25 @@ const SOCIALS = [
     href: 'https://linkedin.com',
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M6.5 8.8H3.6V20h2.9V8.8ZM5 7.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4ZM20.4 13.9c0-3.2-1.7-4.7-4-4.7-1.8 0-2.6 1-3.1 1.7V8.8h-2.9V20h2.9v-5.9c0-1.3.6-2.1 1.8-2.1 1.1 0 1.6.8 1.6 2.1V20h2.9l-.2-6.1Z" />
+        <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'X',
+    href: 'https://x.com',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Facebook',
+    href: 'https://facebook.com',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z" />
       </svg>
     ),
   },
@@ -49,35 +81,7 @@ const SOCIALS = [
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" stroke="currentColor" strokeWidth="1.7" />
         <circle cx="12" cy="12" r="3.8" stroke="currentColor" strokeWidth="1.7" />
-        <circle cx="17" cy="7" r="1.2" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Facebook',
-    href: 'https://facebook.com',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M13.4 20v-6.9h2.3l.4-2.7h-2.7V8.6c0-.8.2-1.3 1.3-1.3h1.5V4.9c-.3 0-1.1-.1-2.1-.1-2.1 0-3.6 1.3-3.6 3.7v1.9H8.2v2.7h2.3V20h2.9Z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'X',
-    href: 'https://x.com',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M17.2 4h2.6l-5.7 6.6L20.9 20h-5.3l-4.1-5.4L6.8 20H4.2l6.1-7.1L3.9 4h5.4l3.7 5 4.2-5Zm-.9 14.4h1.4L8.5 5.5H7l9.3 12.9Z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'YouTube',
-    href: 'https://youtube.com',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="3" y="6" width="18" height="12" rx="3.5" stroke="currentColor" strokeWidth="1.7" />
-        <path d="M10.5 9.7L14.7 12L10.5 14.3V9.7Z" fill="currentColor" />
+        <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" />
       </svg>
     ),
   },
@@ -87,30 +91,17 @@ export function SiteFooter() {
   return (
     <footer className={styles.footer}>
       <div className={styles.shell}>
-        <div className={styles.top}>
-          <div className={styles.brandBlock}>
+        <div className={styles.topGrid}>
+          <div className={styles.brandCol}>
             <Link to="/" className={styles.brand}>
-              HIRE<span>RIGHT</span>
-              <sup>TTT</sup>
+              <span className={styles.logoBadge}>HR</span>
+              <span className={styles.logoText}>
+                HIRERIGHT<sup className={styles.supTt}>TT</sup>
+              </span>
             </Link>
-            <p>Right People. Right Opportunities.</p>
-          </div>
-
-          {COLUMNS.map((col) => (
-            <div key={col.title} className={styles.col}>
-              <h4>{col.title}</h4>
-              <ul>
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link to={link.to}>{link.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          <div className={styles.col}>
-            <h4>Stay Connected</h4>
+            <p className={styles.brandDesc}>
+              AI-powered recruitment platform that helps you find, evaluate, and hire the best talent faster.
+            </p>
             <div className={styles.socials}>
               {SOCIALS.map((social) => (
                 <a
@@ -119,21 +110,43 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={social.name}
+                  className={styles.socialLink}
                 >
                   {social.icon}
                 </a>
               ))}
             </div>
           </div>
+
+          <div className={styles.navColumns}>
+            {COLUMNS.map((col) => (
+              <div key={col.title} className={styles.col}>
+                <h4>{col.title}</h4>
+                <ul>
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <Link to={link.to}>{link.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.subscribeCol}>
+            <h4>Subscribe to our newsletter</h4>
+            <p>Get the latest updates and insights delivered to your inbox.</p>
+            <form className={styles.subForm} onSubmit={(e) => e.preventDefault()}>
+              <input type="email" placeholder="Enter your email" required className={styles.subInput} />
+              <button type="submit" className={styles.subBtn} aria-label="Subscribe">
+                →
+              </button>
+            </form>
+          </div>
         </div>
 
-        <div className={styles.bottom}>
-          <p>© 2026 HIRERIGHT. All rights reserved.</p>
-          <div className={styles.legal}>
-            <Link to="/resources">Privacy Policy</Link>
-            <span aria-hidden="true">|</span>
-            <Link to="/resources">Terms of Use</Link>
-          </div>
+        <div className={styles.bottomBar}>
+          <p>© 2025 HIRERIGHT<sup className={styles.supTt}>TT</sup>. All rights reserved.</p>
         </div>
       </div>
     </footer>
