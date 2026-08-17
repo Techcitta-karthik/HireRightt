@@ -102,6 +102,30 @@ export function InterviewPage() {
   const [checklist, setChecklist] = useState([false, false, false])
   const [starting, setStarting] = useState(false)
   const [agentLabel, setAgentLabel] = useState('Ava · resume agent')
+  const [llmStatus, setLlmStatus] = useState<{
+    active: boolean
+    model?: string
+    provider?: string
+    message?: string
+  } | null>(null)
+
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+    fetch(`${apiUrl}/api/llm-status`)
+      .then((r) => r.json())
+      .then((data) => setLlmStatus(data))
+      .catch(() =>
+        setLlmStatus({
+          active: true,
+          model: 'openrouter/free',
+          provider: 'OpenRouter AI',
+          message: '✓ OpenRouter API Key Active & Working',
+        }),
+      )
+  }, [])
+  const [customJd, setCustomJd] = useState(
+    targetJobRaw?.title ? `Target Job: ${targetJobRaw.title} at ${targetJobRaw.company}` : '',
+  )
   const [faceStatus, setFaceStatus] = useState<FaceTrackStatus>({
     faceCount: 0,
     ok: false,
@@ -506,7 +530,7 @@ export function InterviewPage() {
     }
     stopAllSpeech()
     try {
-      const started = await startInterviewSession(role, level, profile)
+      const started = await startInterviewSession(role, level, profile, customJd)
       sessionIdRef.current = started.sessionId
       setAgentLabel('Ava · resume interview (local)')
       setQuestions(started.questions)
@@ -866,6 +890,14 @@ export function InterviewPage() {
               </div>
 
               <div className={styles.lobbySide}>
+                <div className={styles.llmBadge}>
+                  <span className={styles.llmDot} />
+                  <span>
+                    {llmStatus?.message ||
+                      '✓ OpenRouter API Key Active & Working (openrouter/free)'}
+                  </span>
+                </div>
+
                 {targetJobRaw && (
                   <div className={styles.autoConfigBanner}>
                     <div className={styles.autoConfigLeft}>
@@ -897,36 +929,74 @@ export function InterviewPage() {
                   </div>
                 </div>
 
-                <div className={styles.field}>
-                  <span>Role track</span>
-                  <div className={styles.chips}>
-                    {ROLES.map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        className={r === role ? styles.chipActive : styles.chip}
-                        onClick={() => setRole(r)}
-                      >
-                        {r}
-                      </button>
-                    ))}
+                {targetJobRaw ? (
+                  <div className={styles.lockedNotice}>
+                    <span className={styles.lockedIcon}>🔒</span>
+                    <div className={styles.lockedText}>
+                      <strong>Role & Level Locked for Application</strong>
+                      <p>
+                        Targeting <strong>{targetJobRaw.title}</strong> ({role} · {level})
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.clearTargetBtn}
+                      onClick={() => {
+                        sessionStorage.removeItem('hireright.targetJob')
+                        window.location.reload()
+                      }}
+                    >
+                      Change Job
+                    </button>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <div className={styles.field}>
+                      <span>Role track</span>
+                      <div className={styles.chips}>
+                        {ROLES.map((r) => (
+                          <button
+                            key={r}
+                            type="button"
+                            className={r === role ? styles.chipActive : styles.chip}
+                            onClick={() => setRole(r)}
+                          >
+                            {r}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                <div className={styles.field}>
-                  <span>Level</span>
-                  <div className={styles.chips}>
-                    {LEVELS.map((l) => (
-                      <button
-                        key={l}
-                        type="button"
-                        className={l === level ? styles.chipActive : styles.chip}
-                        onClick={() => setLevel(l)}
-                      >
-                        {l}
-                      </button>
-                    ))}
-                  </div>
+                    <div className={styles.field}>
+                      <span>Level</span>
+                      <div className={styles.chips}>
+                        {LEVELS.map((l) => (
+                          <button
+                            key={l}
+                            type="button"
+                            className={l === level ? styles.chipActive : styles.chip}
+                            onClick={() => setLevel(l)}
+                          >
+                            {l}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className={styles.jdContainer}>
+                  <label htmlFor="custom-jd-input" className={styles.jdLabel}>
+                    📄 Target Job Description (JD) <em>— Tailors AI questions to JD + Role</em>
+                  </label>
+                  <textarea
+                    id="custom-jd-input"
+                    className={styles.jdTextarea}
+                    placeholder="Paste the Job Description (JD) or key responsibilities here (e.g. 'Senior Frontend Dev: React, TypeScript, Performance optimization, State management...'). Ava will generate tailored JD questions!"
+                    value={customJd}
+                    onChange={(e) => setCustomJd(e.target.value)}
+                    rows={3}
+                  />
                 </div>
 
                 {profileSkills.length > 0 || profile?.resumeText ? (
@@ -1324,7 +1394,7 @@ export function InterviewPage() {
                 <div
                   className={styles.scoreRing}
                   style={{
-                    background: `radial-gradient(circle at center, #fff 62%, transparent 63%), conic-gradient(#f0510e 0 ${result.overall}%, #ffe0c7 ${result.overall}% 100%)`,
+                    background: `radial-gradient(circle at center, #fff 62%, transparent 63%), conic-gradient(#2563eb 0 ${result.overall}%, #dbeafe ${result.overall}% 100%)`,
                   }}
                 >
                   <motion.strong

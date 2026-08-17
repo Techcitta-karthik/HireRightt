@@ -65,6 +65,7 @@ export function buildResumeInterviewQuestions(
   role: string,
   level: string,
   profile: SavedProfile | null,
+  jobDescription?: string,
 ): Question[] {
   const name = firstName() || getUser()?.name?.split(' ')[0] || 'there'
   const resumeText = profile?.resumeText || ''
@@ -75,7 +76,97 @@ export function buildResumeInterviewQuestions(
   const job = profile?.workExperiences?.find((w) => w.jobTitle || w.company)
   const targetRole = profile?.currentRole || role
 
+  const jdSnippet = (jobDescription || '').trim()
+  const jdKeywords = jdSnippet
+    ? unique(
+        jdSnippet
+          .split(/\W+/)
+          .filter((w) => w.length > 3 && !STOP.has(w.toLowerCase())),
+      ).slice(0, 8)
+    : []
+
   const questions: Question[] = []
+
+  if (jdSnippet) {
+    questions.push({
+      text: `${name}, considering the Job Description requirement for ${targetRole} (${level}), summarize your background in 90 seconds — how does your experience align with what this role needs?`,
+      category: 'Communication',
+      keywords: unique([
+        'experience',
+        'project',
+        'skill',
+        'role',
+        targetRole.toLowerCase(),
+        ...jdKeywords.slice(0, 4).map((k) => k.toLowerCase()),
+      ]),
+      hint: 'Connect your strongest skills directly to the key requirements of this JD.',
+    })
+
+    questions.push({
+      text: `The Job Description highlights specific technical competencies in ${jdKeywords.slice(0, 3).join(', ') || targetRole}. Describe a real project where you used these skills or similar tools to deliver a production system.`,
+      category: 'Technical',
+      keywords: unique([
+        targetRole.toLowerCase(),
+        ...jdKeywords.map((k) => k.toLowerCase()),
+        ...skills.map((s) => s.toLowerCase()),
+      ]),
+      hint: 'Name the tool/skill from the JD, the project context, and your technical solution.',
+    })
+
+    if (projects[0]) {
+      questions.push({
+        text: `Looking at your resume project: “${projects[0].slice(0, 140)}” — how did you solve technical challenges in that project that prepare you for the responsibilities in this JD?`,
+        category: 'Problem Solving',
+        keywords: unique([
+          'challenge',
+          'solution',
+          'impact',
+          'built',
+          ...skills.slice(0, 3).map((s) => s.toLowerCase()),
+        ]),
+        hint: 'Walk through situation → task → action → outcome.',
+      })
+    } else if (job) {
+      questions.push({
+        text: `In your role as ${job.jobTitle || 'Engineer'} at ${job.company || 'your previous team'}, what was a major problem you solved that demonstrates the expertise required for this JD?`,
+        category: 'Problem Solving',
+        keywords: ['problem', 'solution', 'result', 'impact', 'delivered'],
+        hint: 'Highlight problem solving and measurable business impact.',
+      })
+    } else {
+      questions.push({
+        text: `Describe a complex technical challenge related to ${targetRole} that you solved end-to-end. How does your solution match the standards of this Job Description?`,
+        category: 'Problem Solving',
+        keywords: ['challenge', 'solution', 'approach', 'built', 'result'],
+        hint: 'Use the STAR format: Situation, Task, Action, Result.',
+      })
+    }
+
+    if (achievements[0]) {
+      questions.push({
+        text: `You achieved: “${achievements[0].slice(0, 140)}”. How did you personally drive this outcome, and how will you replicate that success in this ${targetRole} position?`,
+        category: 'Experience',
+        keywords: ['result', 'driven', 'outcome', 'impact', 'delivered'],
+        hint: 'Quantify your contribution and connect it to the new role.',
+      })
+    } else {
+      questions.push({
+        text: `What is the most technical or high-impact project you have delivered, and how does it demonstrate your readiness for this ${level} ${targetRole} JD?`,
+        category: 'Experience',
+        keywords: ['impact', 'delivered', 'project', 'result', 'scale'],
+        hint: 'Focus on scale, technical depth, and tangible outcomes.',
+      })
+    }
+
+    questions.push({
+      text: `Based on this Job Description and your profile, what key area do you plan to master in your first 90 days as a ${targetRole}?`,
+      category: 'Communication',
+      keywords: ['grow', 'learn', 'first 90 days', 'impact', 'plan'],
+      hint: 'Show initiative, fast onboarding, and clear learning goals.',
+    })
+
+    return questions
+  }
 
   questions.push({
     text: resumeText

@@ -443,14 +443,14 @@
 .funnelTrack {
   height: 8px;
   border-radius: 999px;
-  background: #ffe9d6;
+  background: #dbeafe;
   overflow: hidden;
 }
 
 .funnelFill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ff7d26, #f0510e);
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
 }
 
 .sourceDot {
@@ -755,7 +755,7 @@
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #ff7d26, #f0510e);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;
   font-weight: 800;
   font-size: 0.8rem;

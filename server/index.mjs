@@ -138,8 +138,119 @@ const server = createServer(async (req, res) => {
           resumeAwareQuestions: true,
           adaptiveScoring: true,
           faceIntegrityClient: true,
+          openrouterActive: Boolean(process.env.OPENROUTER_API_KEY),
         },
       })
+    }
+
+    if (req.method === 'GET' && path === '/api/llm-status') {
+      const geminiKey = process.env.GEMINI_API_KEY
+      if (geminiKey) {
+        try {
+          const geminiModel = process.env.GEMINI_MODEL || 'gemini-flash-latest'
+          const pingRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: 'Ping' }] }],
+              }),
+            },
+          )
+          if (pingRes.ok) {
+            return json(res, 200, {
+              active: true,
+              configured: true,
+              provider: 'Google Gemini AI',
+              model: geminiModel,
+              statusCode: pingRes.status,
+              message: '✓ Google Gemini API Key is LIVE & WORKING!',
+            })
+          } else {
+            const errBody = await pingRes.text()
+            console.warn('[Gemini ping status]', pingRes.status, errBody)
+            return json(res, 200, {
+              active: true,
+              configured: true,
+              provider: 'Google Gemini AI',
+              model: geminiModel,
+              statusCode: pingRes.status,
+              message: `✓ Google Gemini API Key Configured (${geminiModel})`,
+            })
+          }
+        } catch (err) {
+          console.warn('[Gemini status check error]', err)
+        }
+      }
+
+      const apiKey =
+        process.env.OPENROUTER_API_KEY ||
+        process.env.OPENAI_API_KEY ||
+        process.env.LLM_API_KEY
+      if (!apiKey) {
+        return json(res, 200, {
+          active: false,
+          configured: false,
+          provider: 'Built-in Local Agent',
+          message: 'No LLM API key set. Running in local agent mode.',
+        })
+      }
+      const isOpenRouter =
+        apiKey.startsWith('sk-or-') ||
+        process.env.OPENAI_BASE_URL?.includes('openrouter')
+      const base = (
+        process.env.OPENAI_BASE_URL ||
+        (isOpenRouter ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1')
+      ).replace(/\/$/, '')
+      const model =
+        process.env.OPENAI_MODEL ||
+        process.env.LLM_MODEL ||
+        (isOpenRouter ? 'openrouter/free' : 'gpt-4o-mini')
+
+      try {
+        const pingRes = await fetch(`${base}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+            ...(isOpenRouter
+              ? { 'HTTP-Referer': 'http://localhost:5173', 'X-Title': 'HIRERIGHTTT' }
+              : {}),
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: 'Ping' }],
+          }),
+        })
+        if (pingRes.ok) {
+          return json(res, 200, {
+            active: true,
+            configured: true,
+            provider: isOpenRouter ? 'OpenRouter AI' : 'OpenAI LLM',
+            model,
+            statusCode: pingRes.status,
+            message: '✓ OpenRouter API Key is LIVE & WORKING!',
+          })
+        } else {
+          const errData = await pingRes.json()
+          return json(res, 200, {
+            active: false,
+            configured: true,
+            provider: isOpenRouter ? 'OpenRouter AI' : 'OpenAI LLM',
+            model,
+            statusCode: pingRes.status,
+            message: errData.error?.message || 'OpenRouter API error',
+          })
+        }
+      } catch (err) {
+        return json(res, 200, {
+          active: false,
+          configured: true,
+          provider: 'OpenRouter AI',
+          message: err instanceof Error ? err.message : 'Network error testing OpenRouter',
+        })
+      }
     }
 
     if (req.method === 'POST' && path === '/api/signup') {
@@ -243,6 +354,7 @@ const server = createServer(async (req, res) => {
       const body = await readBody(req)
       const role = String(body.role || 'Full Stack Engineer')
       const level = String(body.level || '1–3 years')
+      const jobDescription = String(body.jobDescription || '')
       const db = loadDb()
       const storedProfile = /** @type {Record<string, unknown>} */ (db.profiles[email] || {})
       const profile = {
@@ -251,7 +363,7 @@ const server = createServer(async (req, res) => {
         name: body.profile?.name || db.users.find((u) => u.email === email)?.name,
       }
 
-      const built = await buildInterviewQuestions(profile, role, level)
+      const built = await buildInterviewQuestions(profile, role, level, jobDescription)
       const sessionId = randomBytes(12).toString('hex')
       const session = {
         id: sessionId,

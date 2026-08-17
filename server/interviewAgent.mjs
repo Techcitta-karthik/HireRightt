@@ -218,38 +218,84 @@ export function generateLocalQuestions(ctx, role, level) {
  * @param {string} level
  * @returns {Promise<Question[] | null>}
  */
-export async function generateLlmQuestions(ctx, role, level) {
-  const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY
+/**
+ * Generic multi-provider LLM API caller (Gemini, OpenRouter, OpenAI).
+ * Logs exact token usage / burn count for every API request.
+ */
+export async function callLlmApi({ system, user }) {
+  const geminiKey = process.env.GEMINI_API_KEY
+  const openrouterKey = process.env.OPENROUTER_API_KEY
+  const openaiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY
+
+  // 1. Google Gemini API Key
+  if (geminiKey) {
+    try {
+      const geminiModel = process.env.GEMINI_MODEL || 'gemini-flash-latest'
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `${system}\n\nUser Input Data:\n${user}` }] }],
+          generationConfig: {
+            temperature: 0.3,
+            responseMimeType: 'application/json',
+          },
+        }),
+      })
+      if (!res.ok) {
+        console.warn('[LLM-Gemini] Error status:', res.status, await res.text())
+        return null
+      }
+      const data = await res.json()
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      const usage = data.usageMetadata || {}
+      const tokenUsage = {
+        promptTokens: usage.promptTokenCount || 0,
+        completionTokens: usage.candidatesTokenCount || 0,
+        totalTokens: usage.totalTokenCount || 0,
+      }
+      console.log(
+        `🔥 [LLM Token Burn] Provider: Google Gemini (${geminiModel}) | Prompt: ${tokenUsage.promptTokens} | Completion: ${tokenUsage.completionTokens} | Total Tokens Burned: ${tokenUsage.totalTokens}`,
+      )
+      return { text, tokenUsage, provider: 'Google Gemini AI', model: geminiModel }
+    } catch (err) {
+      console.warn('[LLM-Gemini] Network error:', err.message)
+    }
+  }
+
+  // 2. OpenRouter or OpenAI Key
+  const apiKey = openrouterKey || openaiKey
   if (!apiKey) return null
 
-  const base = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '')
-  const model = process.env.OPENAI_MODEL || process.env.LLM_MODEL || 'gpt-4o-mini'
+  const isOpenRouter =
+    apiKey.startsWith('sk-or-') ||
+    process.env.OPENAI_BASE_URL?.includes('openrouter')
+  const base = (
+    process.env.OPENAI_BASE_URL ||
+    (isOpenRouter ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1')
+  ).replace(/\/$/, '')
+  const model =
+    process.env.OPENAI_MODEL ||
+    process.env.LLM_MODEL ||
+    (isOpenRouter ? 'openrouter/free' : 'gpt-4o-mini')
 
-  const system = `You are Ava, HIRERIGHT's expert AI interviewer. Create exactly 5 interview questions tailored to THIS candidate's resume/profile. Questions must reference real skills, jobs, or achievements when available. Return ONLY valid JSON: {"questions":[{"text":"...","category":"Communication|Technical|Problem Solving|Experience","keywords":["..."],"hint":"..."}]}`
-
-  const user = JSON.stringify({
-    interviewRole: role,
-    level,
-    candidate: ctx,
-    rules: [
-      'Do not invent employers or skills not present in the profile.',
-      'At least 2 questions must explicitly reference listed skills or jobs.',
-      'Keep each question under 280 characters.',
-      'Categories must be one of the allowed values.',
-    ],
-  })
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  }
+  if (isOpenRouter) {
+    headers['HTTP-Referer'] = 'http://localhost:5173'
+    headers['X-Title'] = 'HIRERIGHTTT'
+  }
 
   try {
     const res = await fetch(`${base}/chat/completions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers,
       body: JSON.stringify({
         model,
-        temperature: 0.4,
-        response_format: { type: 'json_object' },
+        temperature: 0.3,
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: user },
@@ -257,26 +303,77 @@ export async function generateLlmQuestions(ctx, role, level) {
       }),
     })
     if (!res.ok) {
-      console.warn('[interview-agent] LLM questions failed:', res.status, await res.text())
+      console.warn('[LLM-OpenRouter] Error status:', res.status, await res.text())
       return null
     }
     const data = await res.json()
-    const content = data.choices?.[0]?.message?.content
-    if (!content) return null
-    const parsed = JSON.parse(content)
+    const text = data.choices?.[0]?.message?.content || ''
+    const usage = data.usage || {}
+    const tokenUsage = {
+      promptTokens: usage.prompt_tokens || 0,
+      completionTokens: usage.completion_tokens || 0,
+      totalTokens: usage.total_tokens || 0,
+    }
+    console.log(
+      `🔥 [LLM Token Burn] Provider: ${isOpenRouter ? 'OpenRouter AI' : 'OpenAI'} (${model}) | Prompt: ${tokenUsage.promptTokens} | Completion: ${tokenUsage.completionTokens} | Total Tokens Burned: ${tokenUsage.totalTokens}`,
+    )
+    return { text, tokenUsage, provider: isOpenRouter ? 'OpenRouter AI' : 'OpenAI', model }
+  } catch (err) {
+    console.warn('[LLM-Call] Error:', err.message)
+    return null
+  }
+}
+
+/**
+ * Generate LLM interview questions based on Job Description (JD), Role, & Candidate Profile.
+ * @param {ReturnType<typeof summarizeProfile>} ctx
+ * @param {string} role
+ * @param {string} level
+ * @param {string} [jobDescription]
+ */
+export async function generateLlmQuestions(ctx, role, level, jobDescription = '') {
+  const jdText = clean(jobDescription)
+  const system = `You are Ava, HIRERIGHT's expert AI interviewer. Generate exactly 5 interactive, highly relevant interview questions tailored to:
+1. Target Job Description (JD) (if provided)
+2. Target Role Track: ${role} (${level})
+3. Candidate Profile / Resume Skills and Experience
+
+Questions must cover:
+1. Communication: Introduce background and align experience to the JD & Role responsibilities.
+2. Technical Depth: Core technical requirements, frameworks, and tools listed in the JD/Role.
+3. Resume Project vs JD Challenge: Walk through a real project from candidate profile that matches JD needs.
+4. Problem Solving: Solve a technical or architecture problem relevant to the JD requirements.
+5. Experience & Delivery: Deadlines, technical leadership, or team outcomes for this position.
+
+Return ONLY valid JSON: {"questions":[{"text":"...","category":"Communication|Technical|Problem Solving|Experience","keywords":["..."],"hint":"..."}]}`
+
+  const user = JSON.stringify({
+    roleTrack: role,
+    experienceLevel: level,
+    jobDescription: jdText || 'Not specified (use role and candidate skills)',
+    candidateProfile: ctx,
+  })
+
+  const llmResult = await callLlmApi({ system, user })
+  if (!llmResult || !llmResult.text) return null
+
+  try {
+    const match = llmResult.text.match(/\{[\s\S]*\}/)
+    if (!match) return null
+    const parsed = JSON.parse(match[0])
     const list = Array.isArray(parsed.questions) ? parsed.questions : []
     const normalized = list
       .map((q) => ({
         text: clean(q.text),
         category: CATEGORIES.includes(q.category) ? q.category : 'Technical',
         keywords: unique((q.keywords || []).map((k) => clean(k).toLowerCase())).slice(0, 12),
-        hint: clean(q.hint) || 'Be specific and use a real example.',
+        hint: clean(q.hint) || 'Be specific and give a concrete example.',
         focus: 'llm',
       }))
       .filter((q) => q.text.length > 20)
     return normalized.length >= 3 ? normalized.slice(0, 5) : null
   } catch (err) {
-    console.warn('[interview-agent] LLM error:', err)
+    console.warn('[interview-agent] Error parsing LLM question JSON:', err)
     return null
   }
 }
@@ -285,14 +382,19 @@ export async function generateLlmQuestions(ctx, role, level) {
  * @param {ProfileContext} profile
  * @param {string} role
  * @param {string} level
+ * @param {string} [jobDescription]
  */
-export async function buildInterviewQuestions(profile, role, level) {
+export async function buildInterviewQuestions(profile, role, level, jobDescription = '') {
   const ctx = summarizeProfile(profile)
-  const llm = await generateLlmQuestions(ctx, role, level)
+  const llm = await generateLlmQuestions(ctx, role, level, jobDescription)
   if (llm) {
     return { questions: llm, agent: 'llm', context: ctx }
   }
-  return { questions: generateLocalQuestions(ctx, role, level), agent: 'hireright-agent', context: ctx }
+  return {
+    questions: generateLocalQuestions(ctx, role, level, jobDescription),
+    agent: 'hireright-agent',
+    context: ctx,
+  }
 }
 
 const STRUCTURE_SIGNALS = [
@@ -384,27 +486,45 @@ function analyzeAnswer(question, answer, ctx) {
  * @param {object} payload
  */
 async function refineWithLlm(payload) {
-  const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY
+  const apiKey =
+    process.env.OPENROUTER_API_KEY ||
+    process.env.OPENAI_API_KEY ||
+    process.env.LLM_API_KEY
   if (!apiKey) return null
-  const base = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '')
-  const model = process.env.OPENAI_MODEL || process.env.LLM_MODEL || 'gpt-4o-mini'
+
+  const isOpenRouter =
+    apiKey.startsWith('sk-or-') ||
+    process.env.OPENAI_BASE_URL?.includes('openrouter')
+  const base = (
+    process.env.OPENAI_BASE_URL ||
+    (isOpenRouter ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1')
+  ).replace(/\/$/, '')
+  const model =
+    process.env.OPENAI_MODEL ||
+    process.env.LLM_MODEL ||
+    (isOpenRouter ? 'openrouter/free' : 'gpt-4o-mini')
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  }
+  if (isOpenRouter) {
+    headers['HTTP-Referer'] = 'http://localhost:5173'
+    headers['X-Title'] = 'HIRERIGHTTT'
+  }
 
   try {
     const res = await fetch(`${base}/chat/completions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers,
       body: JSON.stringify({
         model,
         temperature: 0.2,
-        response_format: { type: 'json_object' },
         messages: [
           {
             role: 'system',
             content:
-              'You are Ava scoring a video interview for resume accuracy and communication. Return JSON: {"overallAdjust":-5to5,"strengths":["..."],"improvements":["..."],"resumeFitSummary":"..."}',
+              'You are Ava scoring a video interview for resume accuracy and communication. Return valid JSON only: {"overallAdjust":-5to5,"strengths":["..."],"improvements":["..."],"resumeFitSummary":"..."}',
           },
           { role: 'user', content: JSON.stringify(payload) },
         ],
@@ -412,7 +532,9 @@ async function refineWithLlm(payload) {
     })
     if (!res.ok) return null
     const data = await res.json()
-    return JSON.parse(data.choices?.[0]?.message?.content || 'null')
+    const text = data.choices?.[0]?.message?.content || ''
+    const match = text.match(/\{[\s\S]*\}/)
+    return match ? JSON.parse(match[0]) : null
   } catch {
     return null
   }
@@ -527,10 +649,19 @@ export async function scoreInterviewSession(input) {
       singlePersonOk: integrity.singlePersonOk !== false,
       maxFacesSeen: integrity.maxFacesSeen || 1,
     },
-    agent: process.env.OPENAI_API_KEY || process.env.LLM_API_KEY ? 'llm+hireright-agent' : 'hireright-agent',
+    agent:
+      process.env.OPENROUTER_API_KEY ||
+      process.env.OPENAI_API_KEY ||
+      process.env.LLM_API_KEY
+        ? 'openrouter+hireright-agent'
+        : 'hireright-agent',
   }
 }
 
 export function llmConfigured() {
-  return Boolean(process.env.OPENAI_API_KEY || process.env.LLM_API_KEY)
+  return Boolean(
+    process.env.OPENROUTER_API_KEY ||
+      process.env.OPENAI_API_KEY ||
+      process.env.LLM_API_KEY,
+  )
 }

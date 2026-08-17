@@ -34,16 +34,18 @@ export function buildLocalResumeQuestions(
   role: string,
   level: string,
   profile: SavedProfile | null,
+  jobDescription?: string,
 ): Question[] {
-  return buildResumeInterviewQuestions(role, level, profile)
+  return buildResumeInterviewQuestions(role, level, profile, jobDescription)
 }
 
 export async function startInterviewSession(
   role: string,
   level: string,
   profile: SavedProfile | null,
+  jobDescription?: string,
 ): Promise<InterviewStartResponse> {
-  const questions = buildResumeInterviewQuestions(role, level, profile)
+  const questions = buildResumeInterviewQuestions(role, level, profile, jobDescription)
   const sessionId = `local-${Date.now().toString(36)}`
   return {
     sessionId,
