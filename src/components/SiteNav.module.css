@@ -23,7 +23,7 @@
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: #ff2a38;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,7 +31,7 @@
   font-weight: 800;
   font-size: 0.82rem;
   letter-spacing: -0.02em;
-  box-shadow: 0 6px 16px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
 .logoText {
@@ -39,7 +39,7 @@
   font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: 0.02em;
-  color: #ffffff;
+  color: #0f172a;
   line-height: 1;
 }
 
@@ -51,7 +51,7 @@
   font-size: 0.58em;
   vertical-align: super;
   margin-left: 1px;
-  color: #ff2a38;
+  color: #2563eb;
   font-weight: 800;
 }
 
@@ -79,20 +79,20 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #cbd5e1;
+  color: #475569;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s ease;
   white-space: nowrap;
 }
 
 .dark .navLink {
-  color: #cbd5e1;
+  color: #e2e8f0;
 }
 
 .navLink:hover,
 .active {
-  color: #ff2a38;
+  color: #2563eb;
 }
 
 .chevron {
@@ -102,7 +102,7 @@
 }
 
 .textBtn {
-  color: #cbd5e1;
+  color: #475569;
   font-weight: 600;
   font-size: 0.92rem;
   text-decoration: none;
@@ -110,7 +110,7 @@
 }
 
 .textBtn:hover {
-  color: #ff2a38;
+  color: #2563eb;
 }
 
 .ctaBtn,
@@ -128,25 +128,25 @@
 }
 
 .ctaBtn {
-  background: #ff2a38;
+  background: #2563eb;
   color: #fff;
-  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
   transition: all 0.25s ease;
 }
 
 .ctaBtn:hover {
-  background: #e01f2d;
-  box-shadow: 0 8px 24px rgba(255, 42, 56, 0.5);
+  background: #1d4ed8;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.6);
   transform: translateY(-1px);
 }
 
 .ctaBtnDark {
-  background: #ffffff;
-  color: #0a0a0a;
+  background: #0f172a;
+  color: #ffffff;
 }
 
 .ctaBtnDark:hover {
-  background: #e8e8e8;
+  background: #1e293b;
 }
 
 .signOutBtn {
@@ -156,18 +156,19 @@
   height: 42px;
   padding: 0 20px;
   border-radius: 999px;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  background: rgba(15, 23, 42, 0.8);
-  color: #38bdf8;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
   font-weight: 600;
   font-size: 0.86rem;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .signOutBtn:hover {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: #38bdf8;
+  background: rgba(37, 99, 235, 0.05);
+  border-color: #2563eb;
+  color: #2563eb;
 }
 
 .menuBtn {
@@ -177,9 +178,9 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  background: #0f172a;
-  color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
 }
 
 .menuBtn svg {
@@ -198,9 +199,9 @@
   gap: 2px;
   padding: 14px;
   border-radius: 18px;
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  background: #0f172a;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
 }
 
 .mobileLink {
@@ -208,18 +209,18 @@
   border-radius: 12px;
   font-size: 0.94rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #334155;
   text-decoration: none;
 }
 
 .mobileLink:hover {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
 }
 
 .mobileActive {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
 }
 
 .mobileActions {

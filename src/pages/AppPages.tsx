@@ -1,8 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { SiteNav } from '../components/SiteNav'
 import { fadeUp, staggerContainer } from '../motion/variants'
+import {
+  mapExperienceToLevel,
+  mapProfileRoleToInterviewRole,
+} from '../lib/interviewEngine'
 import {
   MIN_APPLY_SCORE,
   applicationStats,
@@ -77,7 +81,7 @@ export function DashboardPage() {
                   <div
                     className={styles.progress}
                     style={{
-                      background: `radial-gradient(circle at center, #fff 58%, transparent 59%), conic-gradient(#f0510e 0 ${interview.overall}%, #ffe0c7 ${interview.overall}% 100%)`,
+                      background: `radial-gradient(circle at center, #fff 58%, transparent 59%), conic-gradient(#2563eb 0 ${interview.overall}%, #dbeafe ${interview.overall}% 100%)`,
                     }}
                   >
                     <strong>{interview.overall}</strong>
@@ -115,7 +119,7 @@ export function DashboardPage() {
               <div
                 className={styles.progress}
                 style={{
-                  background: `radial-gradient(circle at center, #fff 58%, transparent 59%), conic-gradient(#f0510e 0 ${strength}%, #ffe0c7 ${strength}% 100%)`,
+                  background: `radial-gradient(circle at center, #fff 58%, transparent 59%), conic-gradient(#2563eb 0 ${strength}%, #dbeafe ${strength}% 100%)`,
                 }}
               >
                 <strong>{strength}%</strong>
@@ -209,6 +213,7 @@ export function DashboardPage() {
 }
 
 export function JobsPage() {
+  const navigate = useNavigate()
   const [toast, setToast] = useState('')
   const interview = getInterviewResult()
   const unlocked = hasInterviewScore()
@@ -223,6 +228,21 @@ export function JobsPage() {
       setToast(err instanceof Error ? err.message : 'Could not apply.')
     }
     window.setTimeout(() => setToast(''), 2800)
+  }
+
+  function handleInterviewToApply(job: (typeof ranked)[number]) {
+    const targetRole = mapProfileRoleToInterviewRole(job.title)
+    const targetLevel = mapExperienceToLevel(job.title)
+    sessionStorage.setItem(
+      'hireright.targetJob',
+      JSON.stringify({
+        title: job.title,
+        company: job.company,
+        role: targetRole,
+        level: targetLevel,
+      }),
+    )
+    navigate('/interview')
   }
 
   return (
@@ -286,9 +306,13 @@ export function JobsPage() {
                 <div className={styles.jobRight}>
                   <b>{job.locked ? '—' : `${job.match}%`} Match</b>
                   {job.locked || !canApply ? (
-                    <Link to="/interview" className={styles.primary}>
+                    <button
+                      type="button"
+                      className={styles.primary}
+                      onClick={() => handleInterviewToApply(job)}
+                    >
                       Interview to apply
-                    </Link>
+                    </button>
                   ) : (
                     <button
                       type="button"

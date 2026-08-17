@@ -16,15 +16,15 @@
   gap: 8px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: #475569;
 }
 
 .shield {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--purple-50);
-  color: var(--purple-600);
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
   display: grid;
   place-items: center;
 }
@@ -46,7 +46,7 @@
   border-radius: 999px;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: #0f172a;
   transition: background 0.2s ease;
 }
 
@@ -64,9 +64,9 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--white);
-  background: linear-gradient(135deg, #fb923c 0%, #ff6b6b 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
   border: 2px solid var(--white);
-  box-shadow: 0 0 0 1.5px var(--purple-200);
+  box-shadow: 0 0 0 1.5px rgba(37, 99, 235, 0.25);
   flex-shrink: 0;
 }
 

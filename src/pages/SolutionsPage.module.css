@@ -1,7 +1,7 @@
 .page {
   min-height: 100vh;
-  background-color: #070914;
-  color: #f1f5f9;
+  background-color: #f8fafc;
+  color: #0f172a;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   overflow-x: hidden;
   position: relative;
@@ -26,7 +26,7 @@
   transform: translateX(-50%);
   width: 1000px;
   height: 700px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.35) 0%, rgba(249, 115, 22, 0.18) 40%, rgba(7, 9, 20, 0) 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.35) 0%, rgba(56, 189, 248, 0.18) 40%, rgba(7, 9, 20, 0) 70%);
   filter: blur(90px);
 }
 
@@ -46,7 +46,7 @@
   left: -120px;
   width: 750px;
   height: 750px;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.18) 0%, rgba(37, 99, 235, 0.15) 50%, rgba(7, 9, 20, 0) 75%);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(37, 99, 235, 0.15) 50%, rgba(7, 9, 20, 0) 75%);
   filter: blur(100px);
 }
 
@@ -88,22 +88,22 @@
   gap: 0.5rem;
   padding: 0.4rem 1rem;
   border-radius: 9999px;
-  background: rgba(249, 115, 22, 0.15);
-  border: 1px solid rgba(249, 115, 22, 0.4);
-  color: #ff6b2b;
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: 1.25rem;
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.25);
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.25);
 }
 
 .heroTitle {
   font-size: 3.35rem;
   line-height: 1.15;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.02em;
   margin-bottom: 1.25rem;
 }
@@ -115,17 +115,19 @@
 }
 
 .highlightText {
-  color: #ff6b2b;
-  background: linear-gradient(135deg, #ff8c42 0%, #ff5500 100%);
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 600;
+  color: #2563eb;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(255, 107, 43, 0.3);
 }
 
 .heroSubtitle {
   font-size: 1.05rem;
   line-height: 1.65;
-  color: #94a3b8;
+  color: #475569;
   margin-bottom: 2rem;
   max-width: 540px;
 }
@@ -143,12 +145,12 @@
   gap: 0.5rem;
   padding: 0.85rem 1.75rem;
   border-radius: 0.6rem;
-  background: linear-gradient(135deg, #ff6b2b 0%, #e04800 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: #ffffff;
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  box-shadow: 0 0 25px rgba(249, 115, 22, 0.5);
+  box-shadow: 0 0 25px rgba(37, 99, 235, 0.5);
   transition: all 0.25s ease;
   border: none;
   cursor: pointer;
@@ -156,7 +158,7 @@
 
 .btnPrimary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 35px rgba(249, 115, 22, 0.7);
+  box-shadow: 0 0 35px rgba(37, 99, 235, 0.7);
 }
 
 .btnSecondary {
@@ -563,8 +565,8 @@
   right: 0;
   height: 3px;
   border-radius: 3px;
-  background: linear-gradient(90deg, #ff5500, #ff8c42);
-  box-shadow: 0 0 12px #ff5500, 0 0 20px rgba(255, 85, 0, 0.8);
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  box-shadow: 0 0 12px #2563eb, 0 0 20px rgba(37, 99, 235, 0.8);
 }
 
 .solutionsGrid {
@@ -602,10 +604,10 @@
 
 .solutionCard:hover {
   transform: translateY(-5px);
-  border-color: rgba(255, 107, 43, 0.6);
+  border-color: rgba(56, 189, 248, 0.6);
   box-shadow: 
     0 16px 40px rgba(0, 0, 0, 0.5), 
-    0 0 30px rgba(255, 107, 43, 0.25);
+    0 0 30px rgba(37, 99, 235, 0.25);
 }
 
 /* NEON GLOWING CIRCULAR ICONS */
@@ -621,9 +623,9 @@
 }
 
 .iconOrange { 
-  background: linear-gradient(135deg, #ff5500 0%, #ff8c42 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: #ffffff; 
-  box-shadow: 0 0 20px rgba(255, 85, 0, 0.85), 0 0 40px rgba(255, 85, 0, 0.4);
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.85), 0 0 40px rgba(37, 99, 235, 0.4);
 }
 
 .iconPurple { 

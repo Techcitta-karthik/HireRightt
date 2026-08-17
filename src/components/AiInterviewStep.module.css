@@ -5,11 +5,11 @@
 }
 
 .card {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
   padding: 18px 20px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
   animation: fade-up 0.35s var(--ease) both;
 }
 
@@ -54,13 +54,13 @@
   font-size: 1.65rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--gray-900);
+  color: #0f172a;
 }
 
 .bannerText p:last-child {
   margin-top: 4px;
   font-size: 0.88rem;
-  color: var(--gray-600);
+  color: #475569;
 }
 
 .botWrap {
@@ -72,10 +72,10 @@
   width: 92px;
   height: 92px;
   border-radius: 20px;
-  background: linear-gradient(145deg, #ede9fe, #ddd6fe);
+  background: linear-gradient(145deg, #eff6ff, #dbeafe);
   display: grid;
   place-items: center;
-  color: var(--purple-700);
+  color: #2563eb;
 }
 
 .bot svg {
@@ -86,13 +86,13 @@
 .sectionTitle {
   font-size: 1.08rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #0f172a;
 }
 
 .subtitle {
   margin-top: 4px;
   font-size: 0.84rem;
-  color: var(--gray-500);
+  color: #64748b;
 }
 
 .detailsGrid {
@@ -118,10 +118,10 @@
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: var(--purple-50);
+  background: rgba(37, 99, 235, 0.1);
   display: grid;
   place-items: center;
-  color: var(--purple-600);
+  color: #2563eb;
 }
 
 .detailIcon svg {
@@ -131,36 +131,36 @@
 
 .detailLabel {
   font-size: 0.74rem;
-  color: var(--gray-500);
+  color: #64748b;
 }
 
 .detailValue {
   font-size: 0.84rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: #0f172a;
 }
 
 .badge {
   margin-left: 6px;
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--purple-700);
-  background: var(--purple-100);
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
   padding: 2px 6px;
   border-radius: 999px;
 }
 
 .nextCard {
-  border: 1px solid var(--gray-200);
+  border: 1px solid rgba(37, 99, 235, 0.25);
   border-radius: 12px;
-  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
   padding: 14px;
 }
 
 .nextCard h5 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #0f172a;
 }
 
 .nextCard ul {
@@ -173,7 +173,7 @@
 
 .nextCard li {
   font-size: 0.82rem;
-  color: var(--gray-700);
+  color: #334155;
 }
 
 .detailActions {
@@ -194,25 +194,168 @@
 }
 
 .outlineBtn {
-  border: 1.5px solid var(--purple-600);
-  color: var(--purple-700);
-  background: var(--white);
+  border: 1.5px solid #cbd5e1;
+  color: #334155;
+  background: #ffffff;
 }
 
 .outlineBtn:hover {
   transform: translateY(-1px);
-  background: var(--purple-50);
+  border-color: #2563eb;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.05);
 }
 
 .primaryBtn {
-  background: linear-gradient(135deg, #fb923c 0%, #ff6b6b 100%);
-  color: var(--white);
+  background: #2563eb;
+  color: #ffffff;
 }
 
 .primaryBtn:hover,
 .whatsappBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(251, 146, 60, 0.25);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+}
+
+.scheduleBox {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1.5px solid #2563eb;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fade-up 0.2s ease-out;
+}
+
+.scheduleHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scheduleHead h4 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.presetBtn,
+.presetBtnActive {
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.presetBtn {
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+}
+
+.presetBtn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.presetBtnActive {
+  border: 1.5px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+.customDateTime {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.customDateTime label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.dateInput {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.86rem;
+  color: #0f172a;
+  outline: none;
+}
+
+.dateInput:focus {
+  border-color: #2563eb;
+}
+
+.scheduledBanner {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0fdf4, #e0f2fe);
+  border: 1px solid #bbf7d0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scheduledTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scheduledBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.scheduledNote {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.rescheduleLink {
+  border: none;
+  background: none;
+  color: #2563eb;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.scheduleActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
 }
 
 .confirmGrid {
@@ -223,7 +366,7 @@
 }
 
 .confirmCard {
-  border: 1px solid var(--gray-200);
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 12px;
   background: #fff;
@@ -238,6 +381,7 @@
 .confirmHead p {
   font-size: 0.86rem;
   font-weight: 700;
+  color: #0f172a;
 }
 
 .sent {
@@ -251,7 +395,7 @@
 
 .messageBox {
   margin: 8px 0 10px;
-  border: 1px solid var(--gray-200);
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 10px;
   background: #f8fafc;
@@ -260,7 +404,7 @@
 
 .messageBox p {
   font-size: 0.78rem;
-  color: var(--gray-700);
+  color: #334155;
   line-height: 1.45;
 }
 
@@ -279,7 +423,7 @@
 }
 
 .reminderItem {
-  border: 1px solid var(--gray-200);
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   background: #fff;
   padding: 10px;
@@ -294,21 +438,21 @@
   height: 10px;
   margin-top: 5px;
   border-radius: 50%;
-  background: #d1d5db;
+  background: #cbd5e1;
   flex-shrink: 0;
 }
 
 .reminderItem p {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--gray-800);
+  color: #0f172a;
 }
 
 .reminderItem span {
   display: block;
   margin-top: 2px;
   font-size: 0.74rem;
-  color: var(--gray-500);
+  color: #64748b;
 }
 
 .reminderActive {
@@ -325,7 +469,8 @@
   grid-template-columns: auto 1fr;
   gap: 12px;
   align-items: center;
-  background: linear-gradient(135deg, #fff7ed, #f5f3ff);
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1px solid rgba(37, 99, 235, 0.25);
 }
 
 .finalIcon {
@@ -336,7 +481,7 @@
   place-items: center;
   background: #fff;
   color: #f59e0b;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
 .finalIcon svg {
@@ -347,24 +492,24 @@
 .finalCard h4 {
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--gray-900);
+  color: #0f172a;
 }
 
 .finalCard h4 span {
-  color: var(--purple-700);
+  color: #2563eb;
 }
 
 .finalCard p {
   margin-top: 4px;
   font-size: 0.84rem;
-  color: var(--gray-700);
+  color: #334155;
 }
 
 .finalCard small {
   display: block;
   margin-top: 4px;
   font-size: 0.76rem;
-  color: var(--gray-500);
+  color: #64748b;
 }
 
 .status {

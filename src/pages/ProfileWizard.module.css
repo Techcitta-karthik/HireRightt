@@ -1,11 +1,8 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background:
-    radial-gradient(900px 500px at 85% -5%, rgba(56, 189, 248, 0.15), transparent 65%),
-    radial-gradient(700px 420px at -10% 20%, rgba(37, 99, 235, 0.18), transparent 60%),
-    linear-gradient(180deg, #070a12 0%, #0b0f19 42%, #0f172a 100%);
-  color: #f8fafc;
+  background: #f8fafc;
+  color: #0f172a;
 }
 
 .main {
@@ -21,14 +18,14 @@
   font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #ffffff;
+  color: #0f172a;
   line-height: 1.2;
 }
 
 .pageHeader p {
   margin-top: 6px;
   font-size: 0.92rem;
-  color: #cbd5e1;
+  color: #475569;
   max-width: 560px;
 }
 
@@ -133,31 +130,33 @@
 }
 
 .secondaryBtn {
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  color: #38bdf8;
-  background: rgba(15, 23, 42, 0.6);
+  border: 1.5px solid #cbd5e1;
+  color: #334155;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 .secondaryBtn:hover:not(:disabled) {
-  border-color: #38bdf8;
-  background: rgba(30, 41, 59, 0.8);
+  border-color: #2563eb;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.06);
   transform: translateY(-1px);
 }
 
 .ghostBtn {
-  color: #cbd5e1;
+  color: #475569;
   background: transparent;
 }
 
 .ghostBtn:hover {
-  background: rgba(30, 41, 59, 0.6);
-  color: #ffffff;
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
 .primaryBtn {
-  background: #ff2a38;
+  background: #2563eb;
   color: #ffffff;
-  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .primaryBtn svg {
@@ -166,9 +165,9 @@
 }
 
 .primaryBtn:hover:not(:disabled) {
-  background: #e01f2d;
+  background: #1d4ed8;
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(255, 42, 56, 0.5);
+  box-shadow: 0 8px 26px rgba(37, 99, 235, 0.6);
 }
 
 .primaryBtn:active:not(:disabled),

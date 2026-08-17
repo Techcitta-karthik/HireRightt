@@ -44,7 +44,7 @@
 
 .connectorActive {
   background-image: none;
-  background: #ff2a38;
+  background: #2563eb;
 }
 
 .step {
@@ -65,7 +65,7 @@
 
 .step:disabled {
   cursor: default;
-  opacity: 0.72;
+  opacity: 1;
 }
 
 .circle {
@@ -76,9 +76,9 @@
   place-items: center;
   font-size: 0.84rem;
   font-weight: 700;
-  border: 2px solid rgba(56, 189, 248, 0.25);
-  color: #94a3b8;
-  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #cbd5e1;
+  color: #475569;
+  background: #f1f5f9;
   transition: all 0.25s ease;
 }
 
@@ -97,7 +97,7 @@
 .label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #cbd5e1;
+  color: #475569;
   transition: color 0.2s ease;
   line-height: 1.25;
 }
@@ -109,19 +109,20 @@
 }
 
 .active .circle {
-  background: #ff2a38;
-  border-color: #ff2a38;
+  background: #2563eb;
+  border-color: #2563eb;
   color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(255, 42, 56, 0.25);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
   transform: scale(1.05);
 }
 
 .active .label {
-  color: #ffffff;
+  color: #2563eb;
+  font-weight: 800;
 }
 
 .active .sublabel {
-  color: #38bdf8;
+  color: #2563eb;
 }
 
 .done .circle {
@@ -131,7 +132,7 @@
 }
 
 .done .label {
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
 @media (max-width: 900px) {

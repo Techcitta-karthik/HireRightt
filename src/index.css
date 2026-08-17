@@ -1,12 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap');
+
 :root {
   --space-dark-950: #070a12;
-  --space-dark-900: #0b0f19;
-  --space-dark-850: #10172a;
+  --space-dark-900: #0b1120;
+  --space-dark-850: #0f172a;
   --space-dark-800: #1e293b;
+  
+  --space-blue-800: #1e40af;
   --space-blue-700: #1d4ed8;
   --space-blue-600: #2563eb;
   --space-blue-500: #3b82f6;
   --space-blue-400: #60a5fa;
+  --space-blue-300: #93c5fd;
   --space-cyan-400: #38bdf8;
   --space-cyan-300: #7dd3fc;
   
@@ -20,10 +25,10 @@
   --purple-700: #1e40af;
   --purple-800: #1e3a8a;
   --navy-900: #070a12;
-  --navy-850: #0b0f19;
-  --navy-800: #10172a;
-  --gray-50: #0b0f19;
-  --gray-100: #10172a;
+  --navy-850: #0b1120;
+  --navy-800: #0f172a;
+  --gray-50: #0b1120;
+  --gray-100: #0f172a;
   --gray-200: #1e293b;
   --gray-300: #334155;
   --gray-400: #64748b;
@@ -32,14 +37,19 @@
   --gray-700: #e2e8f0;
   --gray-800: #f1f5f9;
   --gray-900: #ffffff;
+  
   --green-500: #22c55e;
   --green-600: #16a34a;
-  --red-500: #ff2a38;
-  --red-600: #e01f2d;
-  --orange-500: #ff2a38;
-  --orange-600: #e01f2d;
-  --orange-100: rgba(255, 42, 56, 0.15);
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --orange-500: #2563eb;
+  --orange-600: #1d4ed8;
+  --orange-100: rgba(37, 99, 235, 0.15);
+  
   --white: #ffffff;
+  --space-blue-gradient: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+  --space-glow: 0 8px 30px rgba(37, 99, 235, 0.35);
+  
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4);
@@ -49,6 +59,7 @@
   --radius-xl: 20px;
   --font: 'DM Sans', system-ui, sans-serif;
   --font-display: 'DM Sans', system-ui, sans-serif;
+  --font-serif: 'STIX Two Text', Georgia, Cambria, 'Times New Roman', Times, serif;
   --sidebar-width: 340px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -69,7 +80,7 @@ textarea,
 select,
 h1, h2, h3, h4, h5, h6,
 p, a, span, label, div {
-  font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 html {
@@ -85,8 +96,8 @@ body,
 
 body {
   font-family: var(--font);
-  color: #f8fafc;
-  background: #0b0f19;
+  color: #0f172a;
+  background-color: #f8fafc;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;

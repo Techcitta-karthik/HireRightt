@@ -1,10 +1,7 @@
 .page {
   min-height: 100vh;
-  background:
-    radial-gradient(900px 500px at 85% -5%, rgba(56, 189, 248, 0.15), transparent 65%),
-    radial-gradient(700px 420px at -10% 20%, rgba(37, 99, 235, 0.18), transparent 60%),
-    linear-gradient(180deg, #070a12 0%, #0b0f19 42%, #0f172a 100%);
-  color: #f8fafc;
+  background: #f8fafc;
+  color: #0f172a;
   font-family: var(--font);
 }
 
@@ -32,12 +29,12 @@
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .head p {
   margin-top: 6px;
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .headActions {
@@ -55,23 +52,21 @@
   margin-bottom: 20px;
   padding: 18px 20px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 42, 56, 0.35);
-  background:
-    radial-gradient(400px 200px at 90% 0%, rgba(255, 42, 56, 0.15), transparent 65%),
-    rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
 .unlockBanner strong {
   display: block;
   font-family: var(--font-display);
   font-size: 1.05rem;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .unlockBanner p {
   margin: 4px 0 0;
-  color: #cbd5e1;
+  color: #475569;
   font-size: 0.9rem;
   max-width: 520px;
 }
@@ -82,8 +77,8 @@
 
 .jobLocked {
   opacity: 0.92;
-  background: rgba(15, 23, 42, 0.65) !important;
-  border-color: rgba(255, 42, 56, 0.25) !important;
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
 }
 
 .lockTag {
@@ -91,9 +86,9 @@
   margin-top: 8px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(255, 42, 56, 0.15);
-  border: 1px solid rgba(255, 42, 56, 0.3);
-  color: #ff2a38;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  color: #2563eb;
   font-size: 0.72rem;
   font-weight: 700;
 }
@@ -109,13 +104,13 @@
   margin: 0 0 8px;
   font-size: 0.92rem;
   font-family: var(--font-display);
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .insightSplit ul {
   margin: 0;
   padding-left: 18px;
-  color: #cbd5e1;
+  color: #475569;
   font-size: 0.88rem;
   display: flex;
   flex-direction: column;
@@ -145,28 +140,29 @@
 }
 
 .primary {
-  background: #ff2a38;
+  background: #2563eb;
   color: #fff;
-  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
   transition: all 0.25s ease;
 }
 
 .primary:hover {
-  background: #e01f2d;
-  box-shadow: 0 8px 26px rgba(255, 42, 56, 0.5);
+  background: #1d4ed8;
+  box-shadow: 0 8px 26px rgba(37, 99, 235, 0.5);
   transform: translateY(-1px);
 }
 
 .secondary {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  background: #ffffff;
   transition: all 0.2s ease;
 }
 
 .secondary:hover {
-  border-color: #ffffff;
-  background: rgba(30, 41, 59, 0.8);
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #f8fafc;
 }
 
 .dashGrid {
@@ -176,17 +172,17 @@
 }
 
 .card {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 20px;
   padding: 22px;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
   transition: all 0.25s ease;
 }
 
 .card:hover {
-  border-color: rgba(255, 42, 56, 0.4);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border-color: #2563eb;
+  box-shadow: 0 14px 36px rgba(37, 99, 235, 0.12);
 }
 
 .card h2 {
@@ -194,7 +190,7 @@
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .progress {
@@ -205,12 +201,12 @@
   display: grid;
   place-items: center;
   background:
-    radial-gradient(circle at center, #0b0f19 58%, transparent 59%),
-    conic-gradient(#ff2a38 0 85%, rgba(255, 42, 56, 0.2) 85% 100%);
+    radial-gradient(circle at center, #ffffff 58%, transparent 59%),
+    conic-gradient(#2563eb 0 85%, rgba(37, 99, 235, 0.15) 85% 100%);
 }
 
 .progress strong {
-  color: #ff2a38;
+  color: #2563eb;
   font-size: 1.4rem;
   font-weight: 800;
   font-family: var(--font-display);
@@ -219,20 +215,21 @@
 .strong {
   text-align: center;
   font-weight: 700;
-  color: #22c55e;
+  font-size: 0.92rem;
+  color: #0f172a;
 }
 
 .muted {
   margin-top: 6px;
-  text-align: center;
-  color: #94a3b8;
+  color: #475569;
   font-size: 0.86rem;
+  line-height: 1.45;
 }
 
 .link {
   display: inline-block;
   margin-top: 14px;
-  color: #ff2a38;
+  color: #2563eb;
   font-weight: 600;
   text-decoration: none;
 }
@@ -250,22 +247,22 @@
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .matchList strong {
   display: block;
-  color: #ffffff;
+  color: #0f172a;
   font-size: 0.92rem;
 }
 
 .matchList span {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.8rem;
 }
 
 .matchList b {
-  color: #ff2a38;
+  color: #2563eb;
   white-space: nowrap;
 }
 
@@ -277,8 +274,8 @@
 }
 
 .stats div {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
   padding: 14px 10px;
   text-align: center;
@@ -288,12 +285,12 @@
   display: block;
   font-family: var(--font-display);
   font-size: 1.2rem;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .stats span {
   font-size: 0.75rem;
-  color: #cbd5e1;
+  color: #64748b;
 }
 
 .quick {
@@ -304,19 +301,19 @@
 }
 
 .quick a {
-  color: #e2e8f0;
+  color: #334155;
   font-weight: 600;
   text-decoration: none;
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
 .quick a:hover {
-  border-color: #ff2a38;
-  color: #ff2a38;
+  border-color: #2563eb;
+  color: #2563eb;
 }
 
 .jobList {
@@ -330,30 +327,30 @@
   justify-content: space-between;
   gap: 16px;
   align-items: center;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 20px;
   padding: 18px 22px;
   flex-wrap: wrap;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
   transition: all 0.25s ease;
 }
 
 .jobCard:hover {
-  border-color: rgba(255, 42, 56, 0.4);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border-color: #2563eb;
+  box-shadow: 0 14px 36px rgba(37, 99, 235, 0.12);
 }
 
 .jobCard h2 {
   font-family: var(--font-display);
   font-size: 1.05rem;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .jobCard p {
   margin-top: 4px;
-  color: #cbd5e1;
+  color: #475569;
   font-size: 0.88rem;
 }
 
@@ -365,7 +362,7 @@
 }
 
 .jobRight b {
-  color: #ff2a38;
+  color: #2563eb;
   font-weight: 800;
 }
 
@@ -373,9 +370,9 @@
   margin: 0 0 14px;
   padding: 12px 16px;
   border-radius: 12px;
-  background: rgba(255, 42, 56, 0.15);
-  border: 1px solid rgba(255, 42, 56, 0.3);
-  color: #ff2a38;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  color: #2563eb;
   font-weight: 600;
   font-size: 0.9rem;
 }

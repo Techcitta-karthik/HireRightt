@@ -1,9 +1,9 @@
 .card {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
   padding: 22px 24px;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
   animation: fade-up 0.45s var(--ease) both;
   display: flex;
   flex-direction: column;
@@ -23,7 +23,7 @@
 .header h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.01em;
 }
 
@@ -33,12 +33,12 @@
   gap: 6px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #38bdf8;
+  color: #2563eb;
   transition: color 0.2s ease;
 }
 
 .whyLink:hover {
-  color: #60a5fa;
+  color: #1d4ed8;
 }
 
 .infoIcon {
@@ -57,9 +57,9 @@
   margin: -6px 0 16px;
   padding: 12px 14px;
   border-radius: var(--radius-sm);
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  color: #cbd5e1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
   font-size: 0.84rem;
   line-height: 1.5;
   animation: fade-up 0.25s var(--ease);
@@ -88,7 +88,7 @@
   position: absolute;
   inset: 8px -8px -8px 8px;
   border-radius: 10px;
-  background: rgba(255, 42, 56, 0.25);
+  background: rgba(37, 99, 235, 0.15);
   opacity: 0.7;
   transform: rotate(8deg);
 }
@@ -97,8 +97,8 @@
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  background: #ff2a38;
-  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
+  background: #2563eb;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,7 +116,7 @@
   display: block;
   height: 4px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .docLines span:nth-child(2) {
@@ -136,12 +136,12 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #0b0f19;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  color: #38bdf8;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #2563eb;
   display: grid;
   place-items: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
 }
 
 .uploadBadge svg {
@@ -150,9 +150,9 @@
 }
 
 .dropzone {
-  border: 1.5px dashed rgba(56, 189, 248, 0.35);
+  border: 1.5px dashed #cbd5e1;
   border-radius: var(--radius-md);
-  background: rgba(30, 41, 59, 0.4);
+  background: #f8fafc;
   min-height: 168px;
   display: flex;
   flex-direction: column;
@@ -166,9 +166,9 @@
 
 .dropzone:hover,
 .dragging {
-  border-color: #ff2a38;
-  background: rgba(255, 42, 56, 0.1);
-  box-shadow: 0 0 0 4px rgba(255, 42, 56, 0.15);
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 .dragging {
@@ -177,8 +177,8 @@
 
 .hasFile {
   border-style: solid;
-  border-color: rgba(56, 189, 248, 0.3);
-  background: rgba(15, 23, 42, 0.8);
+  border-color: #e2e8f0;
+  background: #ffffff;
 }
 
 .hiddenInput {
@@ -189,9 +189,9 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  color: #38bdf8;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #2563eb;
   display: grid;
   place-items: center;
 }
@@ -204,7 +204,7 @@
 .dropText {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .browseBtn {
@@ -214,18 +214,18 @@
   height: 40px;
   padding: 0 22px;
   border-radius: 999px;
-  background: #ff2a38;
+  background: #2563eb;
   color: #ffffff;
   font-size: 0.875rem;
   font-weight: 700;
-  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
   transition: all 0.2s ease;
 }
 
 .browseBtn:hover {
-  background: #e01f2d;
+  background: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: 0 8px 26px rgba(255, 42, 56, 0.5);
+  box-shadow: 0 8px 26px rgba(37, 99, 235, 0.6);
 }
 
 .browseBtn:active {
@@ -250,8 +250,8 @@
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -270,7 +270,7 @@
 .fileName {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -278,21 +278,22 @@
 
 .fileSize {
   font-size: 0.75rem;
-  color: #22c55e;
+  color: #16a34a;
+  font-weight: 600;
   margin-top: 2px;
 }
 
 .removeBtn {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #ff2a38;
+  color: #ef4444;
   padding: 8px 10px;
   border-radius: 8px;
   transition: background 0.15s ease;
 }
 
 .removeBtn:hover {
-  background: rgba(255, 42, 56, 0.15);
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .error {
@@ -305,7 +306,7 @@
 .status {
   margin-top: 12px;
   font-size: 0.82rem;
-  color: #22c55e;
+  color: #16a34a;
   font-weight: 600;
 }
 
@@ -315,7 +316,7 @@
   gap: 8px;
   margin-top: 14px;
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .secureCheck {

@@ -1,20 +1,16 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background:
-    radial-gradient(900px 500px at 85% -5%, rgba(56, 189, 248, 0.15), transparent 65%),
-    radial-gradient(700px 420px at -10% 20%, rgba(37, 99, 235, 0.18), transparent 60%),
-    linear-gradient(180deg, #070a12 0%, #0b0f19 42%, #0f172a 100%);
-  color: #f8fafc;
+  background: #f8fafc;
+  color: #0f172a;
   font-family: var(--font);
 }
 
 .sidebar {
   width: 260px;
   flex-shrink: 0;
-  border-right: 1px solid rgba(56, 189, 248, 0.2);
-  background: rgba(11, 15, 25, 0.95);
-  backdrop-filter: blur(12px);
+  border-right: 1px solid #e2e8f0;
+  background: #ffffff;
   padding: 18px 14px;
   display: flex;
   flex-direction: column;
@@ -40,8 +36,8 @@
   font-weight: 800;
   font-size: 0.8rem;
   color: #fff;
-  background: #ff2a38;
-  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .brand strong {
@@ -49,13 +45,13 @@
   font-family: var(--font-display);
   font-size: 0.95rem;
   letter-spacing: 0.04em;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .brand small {
   display: block;
   font-size: 0.7rem;
-  color: #38bdf8;
+  color: #2563eb;
 }
 
 .nav {
@@ -76,7 +72,7 @@
   border-radius: 12px;
   border: 1px solid transparent;
   background: transparent;
-  color: #cbd5e1;
+  color: #475569;
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
@@ -84,15 +80,15 @@
 }
 
 .navItem:hover {
-  background: rgba(56, 189, 248, 0.12);
-  color: #38bdf8;
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
 }
 
 .navActive {
-  background: rgba(255, 42, 56, 0.15);
-  border-color: rgba(255, 42, 56, 0.35);
-  color: #ff2a38;
-  box-shadow: 0 4px 14px rgba(255, 42, 56, 0.15);
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.3);
+  color: #2563eb;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.1);
 }
 
 .navActive em,
@@ -102,12 +98,12 @@
   font-weight: 800;
   padding: 2px 6px;
   border-radius: 999px;
-  background: #ff2a38;
+  background: #2563eb;
   color: #fff;
 }
 
 .sideFoot {
-  border-top: 1px solid rgba(56, 189, 248, 0.2);
+  border-top: 1px solid #e2e8f0;
   padding-top: 14px;
   display: flex;
   flex-direction: column;
@@ -117,11 +113,11 @@
 .engineCard {
   padding: 12px;
   border-radius: 14px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #0f172a;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -129,7 +125,7 @@
 
 .engineCard small {
   font-weight: 500;
-  color: #cbd5e1;
+  color: #64748b;
 }
 
 .liveDot {
@@ -145,7 +141,7 @@
 .backLink {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #ff2a38;
+  color: #2563eb;
   text-decoration: none;
   padding: 6px 10px;
 }
@@ -175,7 +171,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #38bdf8;
+  color: #2563eb;
 }
 
 .topbar h1 {
@@ -184,7 +180,7 @@
   font-size: clamp(1.6rem, 2.8vw, 2.2rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .topActions {
@@ -197,11 +193,11 @@
 .adminChip {
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .primaryBtn,
@@ -221,27 +217,28 @@
 }
 
 .primaryBtn {
-  background: #ff2a38;
+  background: #2563eb;
   color: #fff;
-  box-shadow: 0 6px 20px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
   transition: all 0.25s ease;
 }
 
 .primaryBtn:hover {
-  background: #e01f2d;
-  box-shadow: 0 8px 26px rgba(255, 42, 56, 0.5);
+  background: #1d4ed8;
+  box-shadow: 0 8px 26px rgba(37, 99, 235, 0.5);
   transform: translateY(-1px);
 }
 
 .ghostBtn {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
 }
 
 .ghostBtn:hover {
-  border-color: #ffffff;
-  background: rgba(30, 41, 59, 0.8);
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #f8fafc;
 }
 
 .content {
@@ -257,21 +254,18 @@
   flex-wrap: wrap;
   padding: 24px 26px;
   border-radius: 22px;
-  background:
-    radial-gradient(400px 200px at 90% 0%, rgba(255, 42, 56, 0.15), transparent 65%),
-    rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(255, 42, 56, 0.35);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
 .bannerPill {
   display: inline-flex;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(255, 42, 56, 0.15);
-  border: 1px solid rgba(255, 42, 56, 0.3);
-  color: #ff2a38;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  color: #2563eb;
   font-size: 0.72rem;
   font-weight: 700;
   margin-bottom: 10px;
@@ -281,7 +275,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.45rem;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .banner p {

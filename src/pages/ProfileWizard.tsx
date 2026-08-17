@@ -138,19 +138,22 @@ export function ProfileWizard() {
   }
 
   async function handleContinue() {
+    const isScheduled = data.interviewNotes?.startsWith('Scheduled:')
     const nextCompleted = Math.max(completedThrough, step)
     await persist(
       step === 5
         ? 'Profile complete — explore your matches!'
         : step === 4
-          ? 'Profile saved. Opening AI interview…'
+          ? isScheduled
+            ? 'Interview scheduled! Moving to matched roles…'
+            : 'Profile saved. Opening AI interview…'
           : `Step ${step} saved. Moving forward…`,
       nextCompleted,
     )
     setCompletedThrough(nextCompleted)
 
-    // After Skills/Performance path: step 4 sends you into the live AI interview.
-    if (step === 4) {
+    // If starting now on step 4, navigate to live AI interview; if scheduled for later, proceed to Step 5 (matched roles)
+    if (step === 4 && !isScheduled) {
       sessionStorage.setItem('hireright.returnToWizard', '1')
       navigate('/interview')
       return

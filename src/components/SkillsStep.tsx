@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   EMPLOYMENT_TYPE_OPTIONS,
   EXPERIENCE_OPTIONS,
+  SKILL_OPTIONS,
   SUGGESTED_SKILLS,
   createEmptyExperience,
   type ProfileFormData,
@@ -30,16 +31,43 @@ function monthLabel(value: string) {
 
 export function SkillsStep({ data, onChange }: SkillsStepProps) {
   const [skillDraft, setSkillDraft] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
+  const trimmedDraft = skillDraft.trim().toLowerCase()
+
+  const matchingSuggestions = trimmedDraft
+    ? SKILL_OPTIONS.filter(
+        (skill) =>
+          skill.toLowerCase().includes(trimmedDraft) &&
+          !data.skills.some((item) => item.toLowerCase() === skill.toLowerCase()),
+      ).slice(0, 8)
+    : []
+
+  const availableSuggestions = (
+    trimmedDraft
+      ? SKILL_OPTIONS.filter(
+          (skill) =>
+            skill.toLowerCase().includes(trimmedDraft) &&
+            !data.skills.some((item) => item.toLowerCase() === skill.toLowerCase()),
+        )
+      : SUGGESTED_SKILLS.filter(
+          (skill) =>
+            !data.skills.some((item) => item.toLowerCase() === skill.toLowerCase()),
+        )
+  ).slice(0, 14)
 
   function addSkill(raw: string) {
     const skill = raw.trim()
     if (!skill) return
     if (data.skills.some((item) => item.toLowerCase() === skill.toLowerCase())) {
       setSkillDraft('')
+      setSelectedIndex(0)
       return
     }
     onChange('skills', [...data.skills, skill])
     setSkillDraft('')
+    setSelectedIndex(0)
   }
 
   function removeSkill(skill: string) {
@@ -50,9 +78,27 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
   }
 
   function onSkillKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') {
+    if (event.key === 'ArrowDown') {
       event.preventDefault()
-      addSkill(skillDraft)
+      if (matchingSuggestions.length > 0) {
+        setSelectedIndex((prev) => (prev + 1) % matchingSuggestions.length)
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      if (matchingSuggestions.length > 0) {
+        setSelectedIndex(
+          (prev) => (prev - 1 + matchingSuggestions.length) % matchingSuggestions.length,
+        )
+      }
+    } else if (event.key === 'Enter') {
+      event.preventDefault()
+      if (matchingSuggestions.length > 0 && matchingSuggestions[selectedIndex]) {
+        addSkill(matchingSuggestions[selectedIndex])
+      } else {
+        addSkill(skillDraft)
+      }
+    } else if (event.key === 'Escape') {
+      setIsFocused(false)
     }
   }
 
@@ -76,22 +122,11 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
   }
 
   function removeExperience(id: string) {
-    if (data.workExperiences.length <= 1) {
-      onChange('workExperiences', [
-        { ...createEmptyExperience(), id: data.workExperiences[0]?.id ?? crypto.randomUUID() },
-      ])
-      return
-    }
     onChange(
       'workExperiences',
       data.workExperiences.filter((item) => item.id !== id),
     )
   }
-
-  const availableSuggestions = SUGGESTED_SKILLS.filter(
-    (skill) =>
-      !data.skills.some((item) => item.toLowerCase() === skill.toLowerCase()),
-  )
 
   return (
     <MotionStack className={styles.stack}>
@@ -104,15 +139,45 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
         <label className={styles.fieldLabel} htmlFor="skill-input">
           Your Skills
         </label>
-        <input
-          id="skill-input"
-          className={styles.textInput}
-          type="text"
-          value={skillDraft}
-          placeholder="Type a skill and press Enter"
-          onChange={(event) => setSkillDraft(event.target.value)}
-          onKeyDown={onSkillKeyDown}
-        />
+        <div className={styles.inputWrapper}>
+          <input
+            id="skill-input"
+            className={styles.textInput}
+            type="text"
+            value={skillDraft}
+            placeholder="Type a skill (e.g. React, Python, Docker, AI)..."
+            onChange={(event) => {
+              setSkillDraft(event.target.value)
+              setSelectedIndex(0)
+              setIsFocused(true)
+            }}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+            onKeyDown={onSkillKeyDown}
+            autoComplete="off"
+          />
+
+          {isFocused && matchingSuggestions.length > 0 && (
+            <div className={styles.dropdownMenu} role="listbox">
+              {matchingSuggestions.map((skill, index) => (
+                <button
+                  key={skill}
+                  type="button"
+                  className={`${styles.dropdownItem} ${
+                    index === selectedIndex ? styles.dropdownItemActive : ''
+                  }`}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    addSkill(skill)
+                  }}
+                >
+                  <span>{skill}</span>
+                  <span className={styles.addBadge}>+ Add</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {data.skills.length > 0 && (
           <div className={styles.tagList}>
@@ -145,7 +210,9 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
 
         {availableSuggestions.length > 0 && (
           <div className={styles.suggestions}>
-            <p className={styles.suggestLabel}>Suggested</p>
+            <p className={styles.suggestLabel}>
+              {trimmedDraft ? 'Matching Suggestions' : 'Suggested'}
+            </p>
             <div className={styles.suggestRow}>
               {availableSuggestions.map((skill) => (
                 <motion.button
@@ -167,48 +234,80 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
       <MotionItem as="section" className={styles.card}>
         <div className={styles.sectionHead}>
           <h3>2. Work Experience</h3>
-          <p>Add your work experience details.</p>
+          <p>Add your work experience details (optional for freshers).</p>
         </div>
 
-        <div className={styles.experienceList}>
-          {data.workExperiences.map((exp, index) => (
-            <motion.article
-              key={exp.id}
-              className={styles.experienceCard}
-              layout
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -3 }}
-            >
-              <div className={styles.expIcon} aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                  <rect
-                    x="3.5"
-                    y="7"
-                    width="17"
-                    height="12.5"
-                    rx="2"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                  />
-                  <path
-                    d="M3.5 12H20.5"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                  />
-                </svg>
-              </div>
+        <div className={styles.fresherToggleBox}>
+          <label className={styles.fresherCheckboxLabel}>
+            <input
+              type="checkbox"
+              checked={data.workExperiences.length === 0}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  onChange('workExperiences', [])
+                } else {
+                  onChange('workExperiences', [createEmptyExperience()])
+                }
+              }}
+            />
+            <span>I am a fresher / I don&apos;t have prior work experience (0 years)</span>
+          </label>
+        </div>
 
-              <div className={styles.expBody}>
-                <div className={styles.expTop}>
-                  <p className={styles.expIndex}>Experience {index + 1}</p>
-                  {data.workExperiences.length > 1 && (
+        {data.workExperiences.length === 0 ? (
+          <div className={styles.fresherEmptyCard}>
+            <div className={styles.fresherBadge}>🌱 Fresher / 0 Years Experience</div>
+            <h4>No prior work experience required</h4>
+            <p>
+              If you are a fresher or student with 0 years of formal work experience, you can leave this section empty and continue directly to the next step!
+            </p>
+            <button
+              type="button"
+              className={styles.addExpBtnOutline}
+              onClick={addExperience}
+            >
+              + Add Work Experience (Optional)
+            </button>
+          </div>
+        ) : (
+          <div className={styles.experienceList}>
+            {data.workExperiences.map((exp, index) => (
+              <motion.article
+                key={exp.id}
+                className={styles.experienceCard}
+                layout
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -3 }}
+              >
+                <div className={styles.expIcon} aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                    <rect
+                      x="3.5"
+                      y="7"
+                      width="17"
+                      height="12.5"
+                      rx="2"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                    />
+                    <path
+                      d="M3.5 12H20.5"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                    />
+                  </svg>
+                </div>
+
+                <div className={styles.expBody}>
+                  <div className={styles.expTop}>
+                    <p className={styles.expIndex}>Experience {index + 1}</p>
                     <button
                       type="button"
                       className={styles.removeExp}
@@ -216,8 +315,7 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
                     >
                       Remove
                     </button>
-                  )}
-                </div>
+                  </div>
 
                 <div className={styles.twoCol}>
                   <div className={styles.field}>
@@ -358,17 +456,20 @@ export function SkillsStep({ data, onChange }: SkillsStepProps) {
                 </div>
               </div>
             </motion.article>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        <MotionButton
-          type="button"
-          className={styles.addExp}
-          onClick={addExperience}
-          lift
-        >
-          <span aria-hidden="true">+</span> Add Another Experience
-        </MotionButton>
+        {data.workExperiences.length > 0 && (
+          <MotionButton
+            type="button"
+            className={styles.addExp}
+            onClick={addExperience}
+            lift
+          >
+            <span aria-hidden="true">+</span> Add Another Experience
+          </MotionButton>
+        )}
       </MotionItem>
 
       <MotionItem as="section" className={styles.card}>

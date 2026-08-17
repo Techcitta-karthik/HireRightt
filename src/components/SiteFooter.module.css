@@ -1,9 +1,9 @@
 .footer {
-  background: #070914;
-  color: #94a3b8;
+  background: #f8fafc;
+  color: #475569;
   padding-top: 36px;
   margin-top: 48px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid #e2e8f0;
   position: relative;
   z-index: 1;
 }
@@ -37,18 +37,18 @@
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  background: #ff2a38;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   font-weight: 800;
   font-size: 0.75rem;
-  box-shadow: 0 4px 12px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .logoText {
-  color: #ffffff;
+  color: #0f172a;
   font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 800;
@@ -59,14 +59,14 @@
   font-size: 0.58em;
   vertical-align: super;
   margin-left: 1px;
-  color: #ff2a38;
+  color: #2563eb;
   font-weight: 800;
 }
 
 .brandDesc {
   font-size: 0.82rem;
   line-height: 1.45;
-  color: #94a3b8;
+  color: #64748b;
   margin: 0;
   max-width: 280px;
 }
@@ -81,8 +81,8 @@
   width: 32px;
   height: 32px;
   border-radius: 6px;
-  background: #1e293b;
-  color: #94a3b8;
+  background: #f1f5f9;
+  color: #475569;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,7 +96,7 @@
 }
 
 .socialLink:hover {
-  background: #ff2a38;
+  background: #2563eb;
   color: #ffffff;
 }
 
@@ -107,7 +107,7 @@
 }
 
 .col h4 {
-  color: #ffffff;
+  color: #0f172a;
   font-size: 0.85rem;
   font-weight: 700;
   margin: 0 0 10px;
@@ -123,25 +123,25 @@
 }
 
 .col a {
-  color: #cbd5e1;
+  color: #475569;
   text-decoration: none;
   font-size: 0.8rem;
   transition: color 0.2s ease;
 }
 
 .col a:hover {
-  color: #ff2a38;
+  color: #2563eb;
 }
 
 .subscribeCol h4 {
-  color: #ffffff;
+  color: #0f172a;
   font-size: 0.85rem;
   font-weight: 700;
   margin: 0 0 6px;
 }
 
 .subscribeCol p {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.8rem;
   line-height: 1.4;
   margin: 0 0 10px;
@@ -156,27 +156,27 @@
   flex: 1;
   height: 36px;
   padding: 0 12px;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
-  color: #ffffff;
+  color: #0f172a;
   font-size: 0.8rem;
   outline: none;
 }
 
 .subInput::placeholder {
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .subInput:focus {
-  border-color: #ff2a38;
+  border-color: #2563eb;
 }
 
 .subBtn {
   width: 36px;
   height: 36px;
   border-radius: 6px;
-  background: #ff2a38;
+  background: #2563eb;
   color: #ffffff;
   border: none;
   font-size: 1rem;
@@ -185,16 +185,16 @@
   align-items: center;
   justify-content: center;
   transition: background 0.2s ease;
-  box-shadow: 0 4px 12px rgba(255, 42, 56, 0.4);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .subBtn:hover {
-  background: #e01f2d;
+  background: #1d4ed8;
 }
 
 .bottomBar {
   padding: 14px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid #e2e8f0;
   text-align: center;
   font-size: 0.78rem;
   color: #64748b;

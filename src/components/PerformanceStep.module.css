@@ -5,11 +5,11 @@
 }
 
 .card {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
   padding: 22px 24px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
   animation: fade-up 0.4s var(--ease) both;
   display: flex;
   flex-direction: column;
@@ -29,14 +29,14 @@
 .sectionHead h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #0f172a;
   letter-spacing: -0.01em;
 }
 
 .sectionHead p {
   margin-top: 4px;
   font-size: 0.84rem;
-  color: var(--gray-500);
+  color: #64748b;
 }
 
 .helper {
@@ -45,7 +45,7 @@
   gap: 6px;
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--gray-400);
+  color: #64748b;
 }
 
 .info {
@@ -79,19 +79,19 @@
 .field label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--gray-700);
+  color: #334155;
 }
 
 .removeLink {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--coral);
+  color: #ef4444;
   padding: 4px 6px;
   border-radius: 6px;
 }
 
 .removeLink:hover {
-  background: rgba(255, 107, 107, 0.1);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .textareaBlock {
@@ -105,10 +105,10 @@
 .textarea,
 .textInput {
   width: 100%;
-  border: 1.5px solid var(--gray-200);
+  border: 1.5px solid #cbd5e1;
   border-radius: var(--radius-sm);
-  background: var(--white);
-  color: var(--gray-800);
+  background: #ffffff;
+  color: #0f172a;
   font-size: 0.875rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -129,14 +129,14 @@
 
 .textarea:hover,
 .textInput:hover {
-  border-color: var(--brand-300);
+  border-color: #2563eb;
 }
 
 .textarea:focus,
 .textInput:focus {
   outline: none;
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px var(--accent-ring);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
 .counter {
@@ -145,7 +145,7 @@
   bottom: 10px;
   font-size: 0.72rem;
   font-weight: 500;
-  color: var(--gray-400);
+  color: #64748b;
   pointer-events: none;
 }
 
@@ -157,18 +157,18 @@
   height: 40px;
   padding: 0 16px;
   border-radius: 10px;
-  border: 1.5px solid var(--orange);
-  background: var(--white);
-  color: var(--brand-700);
+  border: 1.5px solid #2563eb;
+  background: #ffffff;
+  color: #2563eb;
   font-size: 0.86rem;
   font-weight: 700;
   transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .outlineBtn:hover:not(:disabled) {
-  background: var(--brand-50);
+  background: rgba(37, 99, 235, 0.08);
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(251, 146, 60, 0.15);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15);
 }
 
 .outlineBtn:disabled {
@@ -198,7 +198,7 @@
 .metricsHeader span {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--gray-500);
+  color: #64748b;
   letter-spacing: 0.02em;
 }
 
@@ -217,7 +217,7 @@
   width: 40px;
   height: 46px;
   border-radius: 10px;
-  color: var(--gray-400);
+  color: #64748b;
   display: grid;
   place-items: center;
   transition: color 0.15s ease, background 0.15s ease;
@@ -229,15 +229,15 @@
 }
 
 .trashBtn:hover {
-  color: var(--coral);
-  background: rgba(255, 107, 107, 0.1);
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .certCard {
   padding: 14px;
-  border: 1.5px solid var(--gray-200);
+  border: 1.5px solid #e2e8f0;
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, #ffffff, #fffaf5);
+  background: #ffffff;
 }
 
 .certGrid {
@@ -279,7 +279,7 @@
   width: 42px;
   height: 42px;
   border-radius: 10px;
-  color: var(--gray-300);
+  color: #cbd5e1;
   display: grid;
   place-items: center;
   transition: color 0.15s ease, transform 0.15s ease, background 0.15s ease;
@@ -291,20 +291,20 @@
 }
 
 .star:hover {
-  color: var(--orange);
-  background: var(--brand-50);
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
   transform: translateY(-2px);
 }
 
 .starActive {
-  color: var(--orange);
+  color: #f59e0b;
 }
 
 .ratingLabels {
   display: flex;
   justify-content: space-between;
   font-size: 0.78rem;
-  color: var(--gray-500);
+  color: #64748b;
   max-width: 320px;
 }
 
@@ -314,15 +314,15 @@
   gap: 12px;
   padding: 16px 18px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #fff7ed, #ffedd5);
-  border: 1px solid var(--peach);
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1px solid rgba(37, 99, 235, 0.25);
 }
 
 .noteIcon {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #fb923c, #ff6b6b);
+  background: linear-gradient(145deg, #2563eb, #38bdf8);
   color: white;
   display: grid;
   place-items: center;
@@ -336,7 +336,7 @@
 
 .ratingNote p {
   font-size: 0.84rem;
-  color: var(--gray-700);
+  color: #334155;
   line-height: 1.5;
 }
 
@@ -354,9 +354,9 @@
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 14px;
-    border: 1px solid var(--gray-200);
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
-    background: #fffdfa;
+    background: #ffffff;
   }
 
   .metricsRow :global(label) {

@@ -27,6 +27,7 @@ import {
 } from '../lib/interviewAgentClient'
 import { InterviewRecorder } from '../lib/interviewRecorder'
 import {
+  applyToJob,
   firstName,
   getProfile,
   saveInterviewResult,
@@ -65,13 +66,25 @@ export function InterviewPage() {
     [],
   )
 
+  const targetJobRaw = useMemo(() => {
+    const str = sessionStorage.getItem('hireright.targetJob')
+    if (!str) return null
+    try {
+      return JSON.parse(str) as { title: string; company: string; role: string; level: string }
+    } catch {
+      return null
+    }
+  }, [])
+
   const [stage, setStage] = useState<Stage>('setup')
-  const [role, setRole] = useState<string>(() =>
-    mapProfileRoleToInterviewRole(profile?.currentRole ?? ''),
-  )
-  const [level, setLevel] = useState<string>(() =>
-    mapExperienceToLevel(profile?.totalExperience ?? ''),
-  )
+  const [role, setRole] = useState<string>(() => {
+    if (targetJobRaw?.role) return targetJobRaw.role
+    return mapProfileRoleToInterviewRole(profile?.currentRole ?? '')
+  })
+  const [level, setLevel] = useState<string>(() => {
+    if (targetJobRaw?.level) return targetJobRaw.level
+    return mapExperienceToLevel(profile?.totalExperience ?? '')
+  })
   const [questions, setQuestions] = useState<Question[]>([])
   const [current, setCurrent] = useState(0)
   const [draft, setDraft] = useState('')
@@ -643,6 +656,19 @@ export function InterviewPage() {
           }
         }
         saveInterviewResult(scored)
+        if (targetJobRaw && !integrity.banned) {
+          try {
+            applyToJob({
+              title: targetJobRaw.title,
+              company: targetJobRaw.company,
+              location: 'Remote',
+              match: scored.overall,
+            })
+          } catch {
+            // ignore if already applied
+          }
+          sessionStorage.removeItem('hireright.targetJob')
+        }
         setResult(scored)
         setStage('results')
       })()
@@ -840,6 +866,23 @@ export function InterviewPage() {
               </div>
 
               <div className={styles.lobbySide}>
+                {targetJobRaw && (
+                  <div className={styles.autoConfigBanner}>
+                    <div className={styles.autoConfigLeft}>
+                      <span className={styles.autoConfigIcon}>🎯</span>
+                      <div>
+                        <strong>Auto-Selected for Job Application</strong>
+                        <p>
+                          Targeting: <strong>{targetJobRaw.title}</strong> at <strong>{targetJobRaw.company}</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <span className={styles.autoConfigPill}>
+                      {role} · {level}
+                    </span>
+                  </div>
+                )}
+
                 <div className={styles.avaCard}>
                   <div className={styles.avaPortrait} aria-hidden="true">
                     <div className={styles.avaFace}>
@@ -1046,6 +1089,14 @@ export function InterviewPage() {
                   <span className={styles.ccTag}>Ava asks</span>
                   <p>{question.text}</p>
                   {!aiSpeaking && <small>{question.hint}</small>}
+                </div>
+
+                {/* Candidate Live Speech Captions Overlay */}
+                <div className={styles.webcamCaptionsOverlay}>
+                  <span className={styles.ccLiveTag}>● LIVE CAPTION</span>
+                  <p className={styles.ccLiveText}>
+                    {draft.trim() ? `"${draft}"` : listening ? 'Listening... Speak your answer out loud.' : 'Waiting for Ava to finish question...'}
+                  </p>
                 </div>
 
                 <div className={styles.youLabel}>

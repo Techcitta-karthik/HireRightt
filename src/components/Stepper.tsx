@@ -24,9 +24,7 @@ export function Stepper({ current, onStepClick, completedThrough }: StepperProps
           const isActive = step.id === current
           const isDone = step.id < current || step.id <= completedThrough
           const isClickable = step.id <= Math.max(current, completedThrough + 1)
-          const nextDone =
-            index < STEPS.length - 1 &&
-            (STEPS[index + 1].id <= current || STEPS[index + 1].id <= completedThrough)
+          const isConnectorActive = step.id < current || step.id <= completedThrough
 
           return (
             <Fragment key={step.id}>
@@ -83,7 +81,7 @@ export function Stepper({ current, onStepClick, completedThrough }: StepperProps
                   aria-hidden="true"
                 >
                   <div
-                    className={`${styles.connector} ${isDone || nextDone || isActive ? styles.connectorActive : ''}`}
+                    className={`${styles.connector} ${isConnectorActive ? styles.connectorActive : ''}`}
                   />
                 </li>
               )}
