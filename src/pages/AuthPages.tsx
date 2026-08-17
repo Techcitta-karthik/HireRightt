@@ -5,8 +5,8 @@ import { SiteNav } from '../components/SiteNav'
 import { MotionButton } from '../motion/MotionButton'
 import { easeOut, fadeUp } from '../motion/variants'
 import {
+  findUserByEmail,
   getAccountPrefs,
-  getInterviewResult,
   getProfile,
   getUser,
   isLoggedIn,
@@ -17,21 +17,34 @@ import {
   updateUserEmail,
   updateUserPassword,
 } from '../lib/store'
-import { apiHealth, apiLogin, apiSignup } from '../lib/api'
+import { apiHealth, apiLogin, apiLogout, apiSignup } from '../lib/api'
 import styles from './AuthPages.module.css'
 
 export function SignupPage() {
   const navigate = useNavigate()
+  const [role, setRole] = useState<'jobseeker' | 'employer'>('jobseeker')
   const [name, setName] = useState('')
+  const [companyName, setCompanyName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  function fillDemo() {
+  function fillCandidateDemo() {
+    setRole('jobseeker')
     setName('Arjun Sharma')
     setEmail('demo@hireright.com')
+    setPassword('password123')
+    setConfirm('password123')
+    setError('')
+  }
+
+  function fillEmployerDemo() {
+    setRole('employer')
+    setName('Sarah Jenkins')
+    setCompanyName('TechCitta Solutions')
+    setEmail('employer@hireright.com')
     setPassword('password123')
     setConfirm('password123')
     setError('')
@@ -41,6 +54,10 @@ export function SignupPage() {
     event.preventDefault()
     if (!name.trim() || !email.trim() || !password.trim()) {
       setError('Fill in all fields to create your account.')
+      return
+    }
+    if (role === 'employer' && !companyName.trim()) {
+      setError('Enter your company or organization name.')
       return
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
@@ -60,17 +77,30 @@ export function SignupPage() {
 
     try {
       if (await apiHealth()) {
-        await apiSignup(name.trim(), email.trim().toLowerCase(), password)
+        try {
+          await apiSignup(name.trim(), email.trim().toLowerCase(), password, {
+            role,
+            companyName: role === 'employer' ? companyName.trim() : undefined,
+          })
+        } catch {
+          // API 409 / offline after health check must not block local demo accounts
+        }
       }
       saveUser(
         {
           name: name.trim(),
           email: email.trim().toLowerCase(),
           password,
+          role,
+          companyName: role === 'employer' ? companyName.trim() : undefined,
         },
         true,
       )
-      navigate('/onboarding')
+      if (role === 'employer') {
+        navigate('/employer/dashboard')
+      } else {
+        navigate('/onboarding')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create account.')
     } finally {
@@ -88,13 +118,37 @@ export function SignupPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: easeOut }}
         >
-          <span className={styles.kicker}>BUILD PROFILE → AI INTERVIEW</span>
+          <span className={styles.kicker}>
+            {role === 'employer'
+              ? 'EMPLOYER PORTAL → CREATE JOBS'
+              : 'BUILD PROFILE → AI INTERVIEW'}
+          </span>
           <h1>
             Create your <em>HIRERIGHT<sup>TT</sup></em> account
           </h1>
           <p>
-            Sign up, fill About You & Skills, take Ava&apos;s AI interview, then get scored and unlock matches.
+            {role === 'employer'
+              ? 'Create private job openings, generate unique application links, and evaluate candidates with AI interviews.'
+              : "Sign up, fill About You & Skills, take Ava's AI interview, then get scored and unlock matches."}
           </p>
+
+          {/* Role Tab Switcher */}
+          <div className={styles.roleSelector}>
+            <button
+              type="button"
+              className={`${styles.roleTab} ${role === 'jobseeker' ? styles.roleTabActive : ''}`}
+              onClick={() => setRole('jobseeker')}
+            >
+              👤 Job Seeker
+            </button>
+            <button
+              type="button"
+              className={`${styles.roleTab} ${role === 'employer' ? styles.roleTabActive : ''}`}
+              onClick={() => setRole('employer')}
+            >
+              🏢 Employer / Recruiter
+            </button>
+          </div>
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <label>
@@ -102,13 +156,26 @@ export function SignupPage() {
               <input
                 type="text"
                 value={name}
-                placeholder="Arjun Sharma"
+                placeholder={role === 'employer' ? 'Sarah Jenkins' : 'Arjun Sharma'}
                 onChange={(event) => setName(event.target.value)}
                 autoComplete="name"
               />
             </label>
+
+            {role === 'employer' && (
+              <label>
+                Company / Organization Name
+                <input
+                  type="text"
+                  value={companyName}
+                  placeholder="TechCitta Solutions"
+                  onChange={(event) => setCompanyName(event.target.value)}
+                />
+              </label>
+            )}
+
             <label>
-              Email
+              Work email
               <input
                 type="email"
                 value={email}
@@ -123,9 +190,8 @@ export function SignupPage() {
                 <input
                   type="password"
                   value={password}
-                  placeholder="6+ characters"
+                  placeholder="••••••••"
                   onChange={(event) => setPassword(event.target.value)}
-                  autoComplete="new-password"
                 />
               </label>
               <label>
@@ -133,22 +199,38 @@ export function SignupPage() {
                 <input
                   type="password"
                   value={confirm}
-                  placeholder="Repeat password"
+                  placeholder="••••••••"
                   onChange={(event) => setConfirm(event.target.value)}
-                  autoComplete="new-password"
                 />
               </label>
             </div>
             {error && <p className={styles.error} role="alert">{error}</p>}
             <MotionButton type="submit" className={styles.submit} disabled={loading} lift>
-              {loading ? 'Creating Account...' : 'Create Account →'}
+              {loading
+                ? 'Creating Account...'
+                : role === 'employer'
+                  ? 'Create Employer Account →'
+                  : 'Create Job Seeker Account →'}
             </MotionButton>
-            <button type="button" className={styles.demoBtn} onClick={fillDemo}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }}>
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </svg>
-              Quick Fill Demo Details
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className={styles.demoBtn}
+                onClick={fillCandidateDemo}
+                style={{ flex: 1 }}
+              >
+                👤 Candidate Demo
+              </button>
+
+              <button
+                type="button"
+                className={styles.demoBtn}
+                onClick={fillEmployerDemo}
+                style={{ flex: 1 }}
+              >
+                🏢 Employer Demo
+              </button>
+            </div>
           </form>
 
           <p className={styles.footer}>
@@ -168,8 +250,14 @@ export function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  function fillDemo() {
+  function fillCandidateDemo() {
     setEmail('demo@hireright.com')
+    setPassword('password123')
+    setError('')
+  }
+
+  function fillEmployerDemo() {
+    setEmail('employer@hireright.com')
     setPassword('password123')
     setError('')
   }
@@ -191,11 +279,21 @@ export function LoginPage() {
         if (await apiHealth()) {
           const apiRes = await apiLogin(targetEmail, password)
           if (apiRes) {
+            const existing = findUserByEmail(targetEmail)
+            const apiRole =
+              apiRes.role === 'employer' || apiRes.role === 'jobseeker'
+                ? apiRes.role
+                : undefined
             authenticatedUser = saveUser(
               {
-                name: apiRes.name || targetEmail.split('@')[0],
+                name: apiRes.name || existing?.name || targetEmail.split('@')[0],
                 email: targetEmail,
                 password,
+                role:
+                  apiRole ??
+                  existing?.role ??
+                  (targetEmail.includes('employer') ? 'employer' : 'jobseeker'),
+                companyName: apiRes.companyName || existing?.companyName,
               },
               true,
             )
@@ -209,30 +307,27 @@ export function LoginPage() {
         authenticatedUser = login(targetEmail, password)
       }
 
-      // If user isn't found locally either, auto-create a user session so login works seamlessly
       if (!authenticatedUser) {
-        authenticatedUser = saveUser(
-          {
-            name: targetEmail.split('@')[0],
-            email: targetEmail,
-            password,
-          },
-          true,
+        setError(
+          findUserByEmail(targetEmail)
+            ? 'Email or password is incorrect.'
+            : 'No account found for that email. Create one first.',
         )
+        return
       }
 
-      const from = (location.state as { from?: string } | null)?.from
-      if (from) {
-        navigate(from)
+      const from = (location.state as { from?: string })?.from
+      if (from && from !== '/login' && from !== '/signup') {
+        navigate(from, { replace: true })
+        return
+      }
+      if (authenticatedUser?.role === 'employer') {
+        navigate('/employer/dashboard')
         return
       }
       const profile = getProfile()
       if (!profile || (profile.completedSteps ?? 0) < 3) {
         navigate('/onboarding')
-        return
-      }
-      if (!getInterviewResult()) {
-        navigate('/interview')
         return
       }
       navigate('/dashboard')
@@ -253,11 +348,11 @@ export function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: easeOut }}
         >
-          <span className={styles.kicker}>WELCOME BACK · AI INTERVIEW</span>
+          <span className={styles.kicker}>WELCOME BACK · HIRERIGHT</span>
           <h1>
             Login to <em>HIRERIGHT<sup>TT</sup></em>
           </h1>
-          <p>Sign in to your interview studio, talent score, and unlocked matches.</p>
+          <p>Sign in to access your interview studio, ATS portal, or candidate dashboard.</p>
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <label>
@@ -280,16 +375,31 @@ export function LoginPage() {
                 autoComplete="current-password"
               />
             </label>
+
             {error && <p className={styles.error} role="alert">{error}</p>}
+
             <MotionButton type="submit" className={styles.submit} disabled={loading} lift>
-              {loading ? 'Signing in...' : 'Login'}
+              {loading ? 'Signing in...' : 'Sign In →'}
             </MotionButton>
-            <button type="button" className={styles.demoBtn} onClick={fillDemo}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }}>
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </svg>
-              Quick Fill Demo Login
-            </button>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className={styles.demoBtn}
+                onClick={fillCandidateDemo}
+                style={{ flex: 1 }}
+              >
+                👤 Candidate Demo
+              </button>
+              <button
+                type="button"
+                className={styles.demoBtn}
+                onClick={fillEmployerDemo}
+                style={{ flex: 1 }}
+              >
+                🏢 Employer Demo
+              </button>
+            </div>
           </form>
 
           <p className={styles.footer}>
@@ -574,6 +684,7 @@ export function LogoutPage() {
   }, [])
 
   function confirmSignOut() {
+    void apiLogout()
     logout()
     setSignedOut(true)
   }

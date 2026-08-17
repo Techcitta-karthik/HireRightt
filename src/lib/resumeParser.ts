@@ -242,7 +242,7 @@ function pickAchievements(text: string): string[] {
 }
 
 export function parseResumeText(raw: string): ResumeExtract {
-  const text = raw.replace(/\u0000/g, ' ')
+  const text = raw.split('\0').join(' ')
   const lines = cleanLines(text)
   const joined = lines.join('\n')
 

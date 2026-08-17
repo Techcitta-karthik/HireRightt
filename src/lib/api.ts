@@ -1,5 +1,5 @@
 /** Thin client for the optional Node API. Falls back silently when offline. */
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 const TOKEN_KEY = 'hireright.apiToken'
 
@@ -35,10 +35,21 @@ export async function apiHealth() {
   }
 }
 
-export async function apiSignup(name: string, email: string, password: string) {
+export async function apiSignup(
+  name: string,
+  email: string,
+  password: string,
+  extras?: { role?: 'jobseeker' | 'employer'; companyName?: string },
+) {
   const data = await request('/api/signup', {
     method: 'POST',
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({
+      name,
+      email,
+      password,
+      role: extras?.role,
+      companyName: extras?.companyName,
+    }),
   })
   setApiToken(data.token)
   return data.user

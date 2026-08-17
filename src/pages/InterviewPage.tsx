@@ -28,9 +28,11 @@ import {
 import { InterviewRecorder } from '../lib/interviewRecorder'
 import {
   applyToJob,
+  attachInterviewToApplicant,
   firstName,
   getProfile,
   saveInterviewResult,
+  type IntegrityLogEvent,
   type InterviewResult,
 } from '../lib/store'
 import { easeOut } from '../motion/variants'
@@ -70,7 +72,14 @@ export function InterviewPage() {
     const str = sessionStorage.getItem('hireright.targetJob')
     if (!str) return null
     try {
-      return JSON.parse(str) as { title: string; company: string; role: string; level: string }
+      return JSON.parse(str) as {
+        title: string
+        company: string
+        role: string
+        level: string
+        applicantId?: string
+        jd?: string
+      }
     } catch {
       return null
     }
@@ -110,21 +119,23 @@ export function InterviewPage() {
   } | null>(null)
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787'
-    fetch(`${apiUrl}/api/llm-status`)
+    fetch('/api/llm-status')
       .then((r) => r.json())
       .then((data) => setLlmStatus(data))
       .catch(() =>
         setLlmStatus({
-          active: true,
-          model: 'openrouter/free',
-          provider: 'OpenRouter AI',
-          message: '✓ OpenRouter API Key Active & Working',
+          active: false,
+          provider: 'Local Ava agent',
+          message: 'API offline — interview still runs on-device.',
         }),
       )
   }, [])
   const [customJd, setCustomJd] = useState(
-    targetJobRaw?.title ? `Target Job: ${targetJobRaw.title} at ${targetJobRaw.company}` : '',
+    targetJobRaw?.jd
+      ? targetJobRaw.jd
+      : targetJobRaw?.title
+        ? `Target Job: ${targetJobRaw.title} at ${targetJobRaw.company}`
+        : '',
   )
   const [faceStatus, setFaceStatus] = useState<FaceTrackStatus>({
     faceCount: 0,
@@ -189,6 +200,44 @@ export function InterviewPage() {
     stageRef.current = stage
   }, [stage])
 
+  const lastLogTimeRef = useRef<{ [key: string]: number }>({})
+
+  const addIntegrityLog = useCallback(
+    (
+      eventType: IntegrityLogEvent['eventType'],
+      severity: IntegrityLogEvent['severity'],
+      message: string,
+    ) => {
+      const now = Date.now()
+      const lastTime = lastLogTimeRef.current[eventType] || 0
+      if (now - lastTime < 3000 && eventType !== 'INTERVIEW_BANNED') return
+      lastLogTimeRef.current[eventType] = now
+
+      const date = new Date()
+      const formattedTime = date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
+
+      const logEvent: IntegrityLogEvent = {
+        id: `log-${now.toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        timestamp: date.toISOString(),
+        formattedTime,
+        eventType,
+        severity,
+        message,
+        questionIndex: stageRef.current === 'interview' ? currentRef.current + 1 : undefined,
+      }
+
+      if (!integrityRef.current.logs) {
+        integrityRef.current.logs = []
+      }
+      integrityRef.current.logs.push(logEvent)
+    },
+    [],
+  )
+
   // Continuous face tracking in lobby + full interview room
   useEffect(() => {
     if (skipCamera || (!streamReady && stage === 'setup')) return
@@ -213,10 +262,20 @@ export function InterviewPage() {
         if (status.issue === 'looking_away') {
           integrityRef.current.sideLookWarnings =
             (integrityRef.current.sideLookWarnings || 0) + 1
+          addIntegrityLog(
+            'SIDE_GAZE_LOOKING_AWAY',
+            'warn',
+            `👀 Candidate looking away from screen (Yaw: ${(status.yaw * 57.3).toFixed(1)}°)`,
+          )
         }
         if (status.issue === 'too_far') {
           integrityRef.current.tooFarWarnings =
             (integrityRef.current.tooFarWarnings || 0) + 1
+          addIntegrityLog(
+            'EXCESSIVE_MOVEMENT',
+            'warn',
+            `📏 Excessive distance/movement from camera (Face ratio: ${status.faceAreaRatio.toFixed(3)})`,
+          )
         }
 
         if (status.issue === 'multi_person' || status.severity === 'ban') {
@@ -225,12 +284,23 @@ export function InterviewPage() {
           multiBanRef.current += 1
           void pingInterviewIntegrity(sessionIdRef.current, status.faceCount)
 
+          addIntegrityLog(
+            'MULTIPLE_FACES_DETECTED',
+            'ban',
+            `🚨 MULTIPLE PEOPLE DETECTED: ${status.faceCount} faces in camera frame simultaneously!`,
+          )
+
           // ~2 seconds of multi-person (interval 350ms × 6) → ban live interview
           if (stageRef.current === 'interview' && multiBanRef.current >= 6) {
             const reason =
               'Interview banned: more than one person was detected on camera. Only the candidate may be in frame.'
             integrityRef.current.banned = true
             integrityRef.current.banReason = reason
+            addIntegrityLog(
+              'INTERVIEW_BANNED',
+              'ban',
+              `🚫 INTERVIEW BANNED & TERMINATED: Integrity violation (Multiple people detected)`,
+            )
             setInterviewBanned(true)
             setBanMessage(reason)
             stopAllSpeech()
@@ -251,6 +321,11 @@ export function InterviewPage() {
         ) {
           integrityRef.current.faceViolations += 1
           void pingInterviewIntegrity(sessionIdRef.current, 0)
+          addIntegrityLog(
+            'NO_FACE_SEEN',
+            'block',
+            `⚠️ NO FACE DETECTED: Candidate face moved out of camera frame`,
+          )
         }
       })()
     }, 350)
@@ -498,21 +573,19 @@ export function InterviewPage() {
 
   async function startInterview() {
     if (!streamReady && !skipCamera) return
-    if (skipCamera) {
-      setDeviceError('Camera is required for proctored interviews. Enable camera & stay alone in frame.')
-      return
-    }
-    if (faceStatus.issue === 'multi_person' || faceStatus.severity === 'ban') {
-      setDeviceError('More than one person detected — clear the frame to only you before joining.')
-      return
-    }
-    if (faceStatus.severity === 'block' || faceStatus.faceCount !== 1) {
-      setDeviceError('Face check: sit where Ava can see your face (move closer if you are far).')
-      return
-    }
-    if (faceStatus.issue === 'looking_away' && !faceStatus.lookingForward) {
-      setDeviceError('Face the camera straight-on before joining.')
-      return
+    if (!skipCamera) {
+      if (faceStatus.issue === 'multi_person' || faceStatus.severity === 'ban') {
+        setDeviceError('More than one person detected — clear the frame to only you before joining.')
+        return
+      }
+      if (faceStatus.severity === 'block' || faceStatus.faceCount !== 1) {
+        setDeviceError('Face check: sit where Ava can see your face (move closer if you are far).')
+        return
+      }
+      if (faceStatus.issue === 'looking_away' && !faceStatus.lookingForward) {
+        setDeviceError('Face the camera straight-on before joining.')
+        return
+      }
     }
     setStarting(true)
     finishingRef.current = false
@@ -627,21 +700,19 @@ export function InterviewPage() {
         try {
           const clip = await recorderRef.current.stop()
           if (clip) {
-            const saved = await recorderRef.current.saveToIndexedDb({
+            await recorderRef.current.saveToIndexedDb({
               blob: clip.blob,
               durationMs: clip.durationMs,
               role,
               level,
               candidateName: firstName(),
             })
-            const fileName = `hireright-interview-${saved.id}.webm`
-            recorderRef.current.download(clip.blob, fileName)
             if (recordingBlobUrlRef.current) {
               URL.revokeObjectURL(recordingBlobUrlRef.current)
             }
             recordingBlobUrlRef.current = URL.createObjectURL(clip.blob)
             setRecordingUrl(recordingBlobUrlRef.current)
-            recordingNoteLocal = `Recording saved (${Math.round(clip.blob.size / 1024)} KB) · ${fileName}`
+            recordingNoteLocal = `✓ Video recording saved securely to local storage (${Math.round(clip.blob.size / 1024)} KB)`
           } else {
             recordingNoteLocal = 'Recording not captured — answers were still scored locally.'
           }
@@ -680,6 +751,9 @@ export function InterviewPage() {
           }
         }
         saveInterviewResult(scored)
+        if (targetJobRaw?.applicantId) {
+          attachInterviewToApplicant(targetJobRaw.applicantId, scored)
+        }
         if (targetJobRaw && !integrity.banned) {
           try {
             applyToJob({
@@ -689,7 +763,7 @@ export function InterviewPage() {
               match: scored.overall,
             })
           } catch {
-            // ignore if already applied
+            // ignore if already applied or score too low
           }
           sessionStorage.removeItem('hireright.targetJob')
         }
@@ -746,12 +820,9 @@ export function InterviewPage() {
   const faceWarnOnly =
     !skipCamera && faceStatus.severity === 'warn' && !faceBlocks
   const canStart =
-    streamReady &&
-    !skipCamera &&
     checklist.every(Boolean) &&
     !starting &&
-    !faceBlocks &&
-    faceStatus.faceCount === 1
+    (skipCamera || (streamReady && !faceBlocks && faceStatus.faceCount === 1))
   const canSubmit =
     Boolean(draft.trim()) && !aiSpeaking && !faceBlocks && !interviewBanned
 
@@ -869,6 +940,18 @@ export function InterviewPage() {
                   >
                     {mediaBusy ? 'Connecting…' : streamReady ? 'Recheck devices' : 'Allow camera & mic'}
                   </button>
+                  {!streamReady && (
+                    <button
+                      type="button"
+                      className={styles.secondaryBtn}
+                      onClick={() => {
+                        setSkipCamera(true)
+                        setDeviceError('')
+                      }}
+                    >
+                      Continue without camera
+                    </button>
+                  )}
                 </div>
                 <p className={styles.joinHint}>
                   Camera is required. Face tracking runs for the full interview — one person, facing forward.
@@ -1433,11 +1516,39 @@ export function InterviewPage() {
                   </p>
                 )}
                 {recordingNote && <p className={styles.scoreMeta}>{recordingNote}</p>}
+
+                {result.integrity?.logs && result.integrity.logs.length > 0 && (
+                  <div style={{ marginTop: '16px', textAlign: 'left', width: '100%' }}>
+                    <p style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>
+                      🛡️ Real-Time Proctoring Activity Logs ({result.integrity.logs.length})
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '160px', overflowY: 'auto' }}>
+                      {result.integrity.logs.map((log) => (
+                        <div
+                          key={log.id}
+                          style={{
+                            background: log.severity === 'ban' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(37, 99, 235, 0.06)',
+                            border: `1px solid ${log.severity === 'ban' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(37, 99, 235, 0.15)'}`,
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            fontSize: '0.78rem',
+                            color: log.severity === 'ban' ? '#dc2626' : '#1e293b',
+                          }}
+                        >
+                          <span style={{ fontWeight: 700 }}>[{log.formattedTime}]</span> {log.message}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {recordingUrl && (
                   <video
                     className={styles.recordingPreview}
                     src={recordingUrl}
                     controls
+                    controlsList="nodownload"
+                    disablePictureInPicture
                     playsInline
                   />
                 )}
@@ -1445,7 +1556,7 @@ export function InterviewPage() {
 
               <div className={styles.categoryCard}>
                 <h3>Score breakdown</h3>
-                {result.categories.map((cat, i) => (
+                {result.categories?.map((cat, i) => (
                   <div key={cat.label} className={styles.catRow}>
                     <span>{cat.label}</span>
                     <div className={styles.catTrack}>
@@ -1466,7 +1577,7 @@ export function InterviewPage() {
               <div className={styles.insightCard}>
                 <h3>Strengths</h3>
                 <ul>
-                  {result.strengths.map((s) => (
+                  {result.strengths?.map((s) => (
                     <li key={s}>{s}</li>
                   ))}
                 </ul>
@@ -1474,7 +1585,7 @@ export function InterviewPage() {
               <div className={styles.insightCard}>
                 <h3>Improve next</h3>
                 <ul>
-                  {result.improvements.map((s) => (
+                  {result.improvements?.map((s) => (
                     <li key={s}>{s}</li>
                   ))}
                 </ul>
@@ -1483,7 +1594,7 @@ export function InterviewPage() {
 
             <div className={styles.answerReview}>
               <h3>Question feedback</h3>
-              {result.answers.map((a, i) => (
+              {result.answers?.map((a, i) => (
                 <details key={i} className={styles.answerItem}>
                   <summary>
                     <span>

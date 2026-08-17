@@ -219,74 +219,30 @@ export function generateLocalQuestions(ctx, role, level) {
  * @returns {Promise<Question[] | null>}
  */
 /**
- * Generic multi-provider LLM API caller (Gemini, OpenRouter, OpenAI).
+ * Dedicated OpenRouter LLM API caller.
  * Logs exact token usage / burn count for every API request.
  */
 export async function callLlmApi({ system, user }) {
-  const geminiKey = process.env.GEMINI_API_KEY
-  const openrouterKey = process.env.OPENROUTER_API_KEY
-  const openaiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY
-
-  // 1. Google Gemini API Key
-  if (geminiKey) {
-    try {
-      const geminiModel = process.env.GEMINI_MODEL || 'gemini-flash-latest'
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `${system}\n\nUser Input Data:\n${user}` }] }],
-          generationConfig: {
-            temperature: 0.3,
-            responseMimeType: 'application/json',
-          },
-        }),
-      })
-      if (!res.ok) {
-        console.warn('[LLM-Gemini] Error status:', res.status, await res.text())
-        return null
-      }
-      const data = await res.json()
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-      const usage = data.usageMetadata || {}
-      const tokenUsage = {
-        promptTokens: usage.promptTokenCount || 0,
-        completionTokens: usage.candidatesTokenCount || 0,
-        totalTokens: usage.totalTokenCount || 0,
-      }
-      console.log(
-        `🔥 [LLM Token Burn] Provider: Google Gemini (${geminiModel}) | Prompt: ${tokenUsage.promptTokens} | Completion: ${tokenUsage.completionTokens} | Total Tokens Burned: ${tokenUsage.totalTokens}`,
-      )
-      return { text, tokenUsage, provider: 'Google Gemini AI', model: geminiModel }
-    } catch (err) {
-      console.warn('[LLM-Gemini] Network error:', err.message)
-    }
-  }
-
-  // 2. OpenRouter or OpenAI Key
-  const apiKey = openrouterKey || openaiKey
+  const apiKey =
+    process.env.OPENROUTER_API_KEY ||
+    process.env.OPENAI_API_KEY ||
+    process.env.LLM_API_KEY
   if (!apiKey) return null
 
-  const isOpenRouter =
-    apiKey.startsWith('sk-or-') ||
-    process.env.OPENAI_BASE_URL?.includes('openrouter')
-  const base = (
-    process.env.OPENAI_BASE_URL ||
-    (isOpenRouter ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1')
-  ).replace(/\/$/, '')
+  const base = (process.env.OPENAI_BASE_URL || 'https://openrouter.ai/api/v1').replace(
+    /\/$/,
+    '',
+  )
   const model =
+    process.env.OPENROUTER_MODEL ||
     process.env.OPENAI_MODEL ||
-    process.env.LLM_MODEL ||
-    (isOpenRouter ? 'openrouter/free' : 'gpt-4o-mini')
+    'openrouter/free'
 
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
-  }
-  if (isOpenRouter) {
-    headers['HTTP-Referer'] = 'http://localhost:5173'
-    headers['X-Title'] = 'HIRERIGHTTT'
+    'HTTP-Referer': 'http://localhost:5173',
+    'X-Title': 'HIRERIGHTTT',
   }
 
   try {
@@ -315,11 +271,11 @@ export async function callLlmApi({ system, user }) {
       totalTokens: usage.total_tokens || 0,
     }
     console.log(
-      `🔥 [LLM Token Burn] Provider: ${isOpenRouter ? 'OpenRouter AI' : 'OpenAI'} (${model}) | Prompt: ${tokenUsage.promptTokens} | Completion: ${tokenUsage.completionTokens} | Total Tokens Burned: ${tokenUsage.totalTokens}`,
+      `🔥 [OpenRouter Token Burn] Model: ${model} | Prompt: ${tokenUsage.promptTokens} | Completion: ${tokenUsage.completionTokens} | Total Tokens Burned: ${tokenUsage.totalTokens}`,
     )
-    return { text, tokenUsage, provider: isOpenRouter ? 'OpenRouter AI' : 'OpenAI', model }
+    return { text, tokenUsage, provider: 'OpenRouter AI', model }
   } catch (err) {
-    console.warn('[LLM-Call] Error:', err.message)
+    console.warn('[LLM-OpenRouter] Error:', err.message)
     return null
   }
 }
@@ -643,7 +599,7 @@ export async function scoreInterviewSession(input) {
     categories,
     strengths: unique(strengths).slice(0, 6),
     improvements: unique(improvements).slice(0, 6),
-    answers: analyses.map(({ resumeSkillsHit, ...rest }) => rest),
+    answers: analyses.map(({ resumeSkillsHit: _r, ...rest }) => rest),
     integrity: {
       faceViolations: integrity.faceViolations || 0,
       singlePersonOk: integrity.singlePersonOk !== false,

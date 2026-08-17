@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { easeOut } from '../motion/variants'
-import { firstName, isLoggedIn } from '../lib/store'
+import { firstName, getUser, isLoggedIn, unreadNotificationCount } from '../lib/store'
 import styles from './SiteNav.module.css'
 
 const NAV = [
@@ -23,11 +23,14 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
   const [open, setOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [name, setName] = useState('there')
+  const [unread, setUnread] = useState(0)
+  const user = getUser()
 
   useEffect(() => {
     function syncAuth() {
       setLoggedIn(isLoggedIn())
       setName(firstName())
+      setUnread(unreadNotificationCount())
     }
     syncAuth()
     window.addEventListener('hireright-auth', syncAuth)
@@ -77,9 +80,28 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
       <div className={styles.navActions}>
         {loggedIn ? (
           <>
-            <Link to="/dashboard" className={styles.textBtn}>
-              Hi, {name}
-            </Link>
+            {user?.role === 'employer' ? (
+              <>
+                <Link to="/employer/dashboard" className={styles.textBtn} style={{ color: '#2563eb', fontWeight: 700 }}>
+                  Employer ATS
+                </Link>
+                <Link to="/admin" className={styles.textBtn}>
+                  Pipeline
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/dashboard" className={styles.textBtn}>
+                  Hi, {name}
+                </Link>
+                <Link to="/jobs" className={styles.textBtn}>
+                  Jobs
+                </Link>
+                <Link to="/applications" className={styles.textBtn}>
+                  Applications{unread > 0 ? ` (${unread})` : ''}
+                </Link>
+              </>
+            )}
             <Link to="/settings" className={styles.textBtn}>
               Settings
             </Link>
@@ -164,19 +186,25 @@ export function SiteNav({ variant = 'light' }: SiteNavProps) {
             {loggedIn && (
               <>
                 <NavLink
-                  to="/dashboard"
+                  to={user?.role === 'employer' ? '/employer/dashboard' : '/dashboard'}
                   onClick={() => setOpen(false)}
                   className={styles.mobileLink}
                 >
                   Dashboard
                 </NavLink>
-                <NavLink
-                  to="/profile"
-                  onClick={() => setOpen(false)}
-                  className={styles.mobileLink}
-                >
-                  Profile
-                </NavLink>
+                {user?.role !== 'employer' && (
+                  <>
+                    <NavLink to="/jobs" onClick={() => setOpen(false)} className={styles.mobileLink}>
+                      Jobs
+                    </NavLink>
+                    <NavLink to="/applications" onClick={() => setOpen(false)} className={styles.mobileLink}>
+                      Applications
+                    </NavLink>
+                    <NavLink to="/profile" onClick={() => setOpen(false)} className={styles.mobileLink}>
+                      Profile
+                    </NavLink>
+                  </>
+                )}
                 <NavLink
                   to="/settings"
                   onClick={() => setOpen(false)}

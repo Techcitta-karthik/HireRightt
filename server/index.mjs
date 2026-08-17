@@ -18,7 +18,7 @@ const DATA_DIR = join(__dirname, 'data')
 const DB_PATH = join(DATA_DIR, 'db.json')
 const PORT = Number(process.env.PORT) || 8787
 
-/** @typedef {{ id: string, name: string, email: string, passwordHash: string, createdAt: string }} User */
+/** @typedef {{ id: string, name: string, email: string, passwordHash: string, role?: string, companyName?: string, createdAt: string }} User */
 /** @typedef {{
  *   users: User[],
  *   profiles: Record<string, unknown>,
@@ -37,14 +37,59 @@ function emptyDb() {
   }
 }
 
+function seedDemoUsers(db) {
+  const demos = [
+    {
+      name: 'Arjun Sharma',
+      email: 'demo@hireright.com',
+      password: 'password123',
+      role: 'jobseeker',
+    },
+    {
+      name: 'Sarah Jenkins (Recruiter)',
+      email: 'employer@hireright.com',
+      password: 'password123',
+      role: 'employer',
+      companyName: 'TechCitta Solutions',
+    },
+  ]
+  let changed = false
+  for (const demo of demos) {
+    if (!db.users.some((u) => u.email === demo.email)) {
+      db.users.push({
+        id: randomBytes(8).toString('hex'),
+        name: demo.name,
+        email: demo.email,
+        passwordHash: hashPassword(demo.password),
+        role: demo.role,
+        companyName: demo.companyName,
+        createdAt: new Date().toISOString(),
+      })
+      changed = true
+    }
+  }
+  if (changed) saveDb(db)
+  return db
+}
+
 function loadDb() {
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true })
   if (!existsSync(DB_PATH)) {
     writeFileSync(DB_PATH, JSON.stringify(emptyDb(), null, 2))
   }
-  const raw = /** @type {DB} */ (JSON.parse(readFileSync(DB_PATH, 'utf8')))
+  let raw
+  try {
+    raw = /** @type {DB} */ (JSON.parse(readFileSync(DB_PATH, 'utf8')))
+  } catch {
+    raw = emptyDb()
+    writeFileSync(DB_PATH, JSON.stringify(raw, null, 2))
+  }
+  if (!raw.users) raw.users = []
+  if (!raw.profiles) raw.profiles = {}
+  if (!raw.interviews) raw.interviews = {}
+  if (!raw.applications) raw.applications = {}
   if (!raw.interviewSessions) raw.interviewSessions = {}
-  return raw
+  return seedDemoUsers(raw)
 }
 
 function saveDb(db) {
@@ -144,46 +189,6 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && path === '/api/llm-status') {
-      const geminiKey = process.env.GEMINI_API_KEY
-      if (geminiKey) {
-        try {
-          const geminiModel = process.env.GEMINI_MODEL || 'gemini-flash-latest'
-          const pingRes = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: 'Ping' }] }],
-              }),
-            },
-          )
-          if (pingRes.ok) {
-            return json(res, 200, {
-              active: true,
-              configured: true,
-              provider: 'Google Gemini AI',
-              model: geminiModel,
-              statusCode: pingRes.status,
-              message: '✓ Google Gemini API Key is LIVE & WORKING!',
-            })
-          } else {
-            const errBody = await pingRes.text()
-            console.warn('[Gemini ping status]', pingRes.status, errBody)
-            return json(res, 200, {
-              active: true,
-              configured: true,
-              provider: 'Google Gemini AI',
-              model: geminiModel,
-              statusCode: pingRes.status,
-              message: `✓ Google Gemini API Key Configured (${geminiModel})`,
-            })
-          }
-        } catch (err) {
-          console.warn('[Gemini status check error]', err)
-        }
-      }
-
       const apiKey =
         process.env.OPENROUTER_API_KEY ||
         process.env.OPENAI_API_KEY ||
@@ -196,17 +201,13 @@ const server = createServer(async (req, res) => {
           message: 'No LLM API key set. Running in local agent mode.',
         })
       }
-      const isOpenRouter =
-        apiKey.startsWith('sk-or-') ||
-        process.env.OPENAI_BASE_URL?.includes('openrouter')
       const base = (
-        process.env.OPENAI_BASE_URL ||
-        (isOpenRouter ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1')
+        process.env.OPENAI_BASE_URL || 'https://openrouter.ai/api/v1'
       ).replace(/\/$/, '')
       const model =
+        process.env.OPENROUTER_MODEL ||
         process.env.OPENAI_MODEL ||
-        process.env.LLM_MODEL ||
-        (isOpenRouter ? 'openrouter/free' : 'gpt-4o-mini')
+        'openrouter/free'
 
       try {
         const pingRes = await fetch(`${base}/chat/completions`, {
@@ -214,9 +215,8 @@ const server = createServer(async (req, res) => {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${apiKey}`,
-            ...(isOpenRouter
-              ? { 'HTTP-Referer': 'http://localhost:5173', 'X-Title': 'HIRERIGHTTT' }
-              : {}),
+            'HTTP-Referer': 'http://localhost:5173',
+            'X-Title': 'HIRERIGHTTT',
           },
           body: JSON.stringify({
             model,
@@ -227,7 +227,7 @@ const server = createServer(async (req, res) => {
           return json(res, 200, {
             active: true,
             configured: true,
-            provider: isOpenRouter ? 'OpenRouter AI' : 'OpenAI LLM',
+            provider: 'OpenRouter AI',
             model,
             statusCode: pingRes.status,
             message: '✓ OpenRouter API Key is LIVE & WORKING!',
@@ -237,7 +237,7 @@ const server = createServer(async (req, res) => {
           return json(res, 200, {
             active: false,
             configured: true,
-            provider: isOpenRouter ? 'OpenRouter AI' : 'OpenAI LLM',
+            provider: 'OpenRouter AI',
             model,
             statusCode: pingRes.status,
             message: errData.error?.message || 'OpenRouter API error',
@@ -271,11 +271,15 @@ const server = createServer(async (req, res) => {
       if (db.users.some((u) => u.email === email)) {
         return json(res, 409, { error: 'An account with this email already exists.' })
       }
+      const role = body.role === 'employer' ? 'employer' : 'jobseeker'
+      const companyName = String(body.companyName || '').trim()
       const user = {
         id: randomBytes(8).toString('hex'),
         name,
         email,
         passwordHash: hashPassword(password),
+        role,
+        companyName: role === 'employer' ? companyName : undefined,
         createdAt: new Date().toISOString(),
       }
       db.users.push(user)
@@ -284,7 +288,13 @@ const server = createServer(async (req, res) => {
       sessions.set(token, email)
       return json(res, 201, {
         token,
-        user: { id: user.id, name: user.name, email: user.email },
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          companyName: user.companyName,
+        },
       })
     }
 
@@ -304,7 +314,13 @@ const server = createServer(async (req, res) => {
       sessions.set(token, email)
       return json(res, 200, {
         token,
-        user: { id: user.id, name: user.name, email: user.email },
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role || (email.includes('employer') ? 'employer' : 'jobseeker'),
+          companyName: user.companyName,
+        },
       })
     }
 
@@ -322,7 +338,13 @@ const server = createServer(async (req, res) => {
       const user = db.users.find((u) => u.email === email)
       if (!user) return json(res, 401, { error: 'Unauthorized' })
       return json(res, 200, {
-        user: { id: user.id, name: user.name, email: user.email },
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          companyName: user.companyName,
+        },
         profile: db.profiles[email] || null,
         interview: db.interviews[email] || null,
         applications: db.applications[email] || [],
@@ -515,4 +537,12 @@ const server = createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`HIRERIGHT API v2 running on http://localhost:${PORT}`)
   console.log(`Interview agent: ${llmConfigured() ? 'LLM enabled' : 'local resume-aware agent (set OPENAI_API_KEY for LLM)'}`)
+})
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.warn(`Port ${PORT} already in use — API assumed running.`)
+    return
+  }
+  console.error(err)
+  process.exit(1)
 })

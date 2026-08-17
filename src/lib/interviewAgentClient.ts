@@ -3,7 +3,7 @@
  * Questions and scoring come from the resume-aware local agent.
  */
 import type { Question } from './interviewEngine'
-import type { InterviewResult, SavedProfile } from './store'
+import type { IntegrityLogEvent, InterviewResult, SavedProfile } from './store'
 import {
   buildResumeInterviewQuestions,
   runLocalInterviewScore,
@@ -27,6 +27,7 @@ export type IntegritySnapshot = {
   banReason?: string
   sideLookWarnings?: number
   tooFarWarnings?: number
+  logs?: IntegrityLogEvent[]
 }
 
 /** @deprecated use buildResumeInterviewQuestions — kept for imports */

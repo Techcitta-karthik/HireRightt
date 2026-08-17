@@ -20,6 +20,23 @@
       "email": "test.py@hireright.local",
       "passwordHash": "1f98d146f802f972$b2f8106440f3c308534807950875ed87de0bd6817e2abf8f39798a41884e2d2b",
       "createdAt": "2026-08-07T04:20:41.856Z"
+    },
+    {
+      "id": "e166358738a44a3d",
+      "name": "Arjun Sharma",
+      "email": "demo@hireright.com",
+      "passwordHash": "b081b6319de62643$d68bd0417349b4c387409d8bb0b93b47ce9da1a1b0c645ad79dc094921ac4553",
+      "role": "jobseeker",
+      "createdAt": "2026-08-17T12:11:07.023Z"
+    },
+    {
+      "id": "a8863e9c470eb874",
+      "name": "Sarah Jenkins (Recruiter)",
+      "email": "employer@hireright.com",
+      "passwordHash": "2e97a07495624083$1f82218b0cc8f6dbc8e48fafdff21f5aea7641a4967e2e3970cf0df80296c1a2",
+      "role": "employer",
+      "companyName": "TechCitta Solutions",
+      "createdAt": "2026-08-17T12:11:07.024Z"
     }
   ],
   "profiles": {

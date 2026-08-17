@@ -39,7 +39,7 @@ const COLUMNS = [
     links: [
       { label: 'About Us', to: '/about' },
       { label: 'Careers', to: '/about' },
-      { label: 'Contact Us', to: '/about' },
+      { label: 'Contact Us', to: '/contact' },
       { label: 'Privacy Policy', to: '/about' },
       { label: 'Terms of Service', to: '/about' },
     ],

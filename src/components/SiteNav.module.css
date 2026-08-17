@@ -90,6 +90,28 @@
   color: #e2e8f0;
 }
 
+.dark .textBtn {
+  color: #e2e8f0;
+}
+
+.dark .textBtn:hover,
+.dark .navLink:hover,
+.dark .active {
+  color: #38bdf8;
+}
+
+.dark .signOutBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.dark .menuBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
 .navLink:hover,
 .active {
   color: #2563eb;

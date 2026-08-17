@@ -1,10 +1,14 @@
 import type { ProfileFormData } from '../data/wizard'
 
+export type UserRole = 'jobseeker' | 'employer'
+
 export type User = {
   id: string
   name: string
   email: string
   password: string
+  role?: UserRole
+  companyName?: string
   createdAt: string
 }
 
@@ -26,6 +30,21 @@ export type AnswerAnalysis = {
   feedback: string
 }
 
+export type IntegrityLogEvent = {
+  id: string
+  timestamp: string
+  formattedTime: string
+  eventType:
+    | 'NO_FACE_SEEN'
+    | 'MULTIPLE_FACES_DETECTED'
+    | 'SIDE_GAZE_LOOKING_AWAY'
+    | 'EXCESSIVE_MOVEMENT'
+    | 'INTERVIEW_BANNED'
+  severity: 'warn' | 'block' | 'ban'
+  message: string
+  questionIndex?: number
+}
+
 export type InterviewResult = {
   role: string
   level: string
@@ -45,6 +64,7 @@ export type InterviewResult = {
     banReason?: string
     sideLookWarnings?: number
     tooFarWarnings?: number
+    logs?: IntegrityLogEvent[]
   }
 }
 
@@ -58,11 +78,43 @@ export type Application = {
   appliedAt: string
 }
 
+export type EmployerJob = {
+  id: string
+  title: string
+  company: string
+  roleTrack: string
+  experienceLevel: string
+  location: string
+  jobDescription: string
+  requiredSkills: string[]
+  createdByEmail: string
+  createdAt: string
+  shareableCode: string
+}
+
+export type EmployerApplicant = {
+  id: string
+  jobId: string
+  jobTitle: string
+  company: string
+  candidateName: string
+  candidateEmail: string
+  candidatePhone: string
+  experienceYears: string
+  resumeName: string | null
+  resumeText?: string
+  interviewResult?: InterviewResult
+  appliedAt: string
+  status: 'New' | 'Shortlisted' | 'In Review' | 'Rejected'
+}
+
 const USERS_KEY = 'hireright.users'
 const SESSION_KEY = 'hireright.session'
 const PROFILE_KEY = 'hireright.profile'
 const RESULT_KEY = 'hireright.interviewResult'
 const APPS_KEY = 'hireright.applications'
+const EMPLOYER_JOBS_KEY = 'hireright.employerJobs'
+const EMPLOYER_APPLICANTS_KEY = 'hireright.employerApplicants'
 
 function uid() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
@@ -73,6 +125,17 @@ const DEFAULT_DEMO_USER: User = {
   name: 'Arjun Sharma',
   email: 'demo@hireright.com',
   password: 'password123',
+  role: 'jobseeker',
+  createdAt: new Date().toISOString(),
+}
+
+const DEFAULT_EMPLOYER_USER: User = {
+  id: 'demo-employer-1',
+  name: 'Sarah Jenkins (Recruiter)',
+  email: 'employer@hireright.com',
+  password: 'password123',
+  role: 'employer',
+  companyName: 'TechCitta Solutions',
   createdAt: new Date().toISOString(),
 }
 
@@ -89,17 +152,35 @@ function readUsers(): User[] {
         localStorage.removeItem('hireright.user')
         return [user]
       }
-      writeUsers([DEFAULT_DEMO_USER])
-      return [DEFAULT_DEMO_USER]
+      writeUsers([DEFAULT_DEMO_USER, DEFAULT_EMPLOYER_USER])
+      return [DEFAULT_DEMO_USER, DEFAULT_EMPLOYER_USER]
     }
     const users = JSON.parse(raw) as User[]
     if (users.length === 0) {
-      writeUsers([DEFAULT_DEMO_USER])
-      return [DEFAULT_DEMO_USER]
+      writeUsers([DEFAULT_DEMO_USER, DEFAULT_EMPLOYER_USER])
+      return [DEFAULT_DEMO_USER, DEFAULT_EMPLOYER_USER]
     }
-    return users
+    let next: User[] = users.map((u) => ({
+      ...u,
+      role:
+        u.role ??
+        (u.email.includes('employer') ? ('employer' as const) : ('jobseeker' as const)),
+      companyName:
+        u.companyName ??
+        (u.email === DEFAULT_EMPLOYER_USER.email ? DEFAULT_EMPLOYER_USER.companyName : undefined),
+    }))
+    const missingDemo = !next.some((u) => u.email === DEFAULT_DEMO_USER.email)
+    const missingEmployer = !next.some((u) => u.email === DEFAULT_EMPLOYER_USER.email)
+    if (missingDemo) next.push(DEFAULT_DEMO_USER)
+    if (missingEmployer) next.push(DEFAULT_EMPLOYER_USER)
+    const changed =
+      missingDemo ||
+      missingEmployer ||
+      next.some((u, i) => u.role !== users[i]?.role || u.companyName !== users[i]?.companyName)
+    if (changed) writeUsers(next)
+    return next
   } catch {
-    return [DEFAULT_DEMO_USER]
+    return [DEFAULT_DEMO_USER, DEFAULT_EMPLOYER_USER]
   }
 }
 
@@ -123,6 +204,8 @@ export function saveUser(
       ...users[existingIdx],
       name: input.name.trim() || users[existingIdx].name,
       password: input.password || users[existingIdx].password,
+      role: input.role ?? users[existingIdx].role,
+      companyName: input.companyName ?? users[existingIdx].companyName,
     }
     writeUsers(users)
     localStorage.setItem(SESSION_KEY, email)
@@ -135,6 +218,8 @@ export function saveUser(
     name: input.name.trim(),
     email,
     password: input.password,
+    role: input.role ?? 'jobseeker',
+    companyName: input.companyName,
     createdAt: input.createdAt ?? new Date().toISOString(),
   }
   users.push(user)
@@ -142,6 +227,10 @@ export function saveUser(
   localStorage.setItem(SESSION_KEY, user.email)
   window.dispatchEvent(new Event('hireright-auth'))
   return user
+}
+
+export function findUserByEmail(email: string): User | undefined {
+  return readUsers().find((u) => u.email === email.trim().toLowerCase())
 }
 
 export function getUser(): User | null {
@@ -309,6 +398,35 @@ export function saveProfile(data: ProfileFormData, completedSteps = 0): SavedPro
   return saved
 }
 
+function normalizeProfile(p: SavedProfile): SavedProfile {
+  return {
+    ...p,
+    whoAreYou: p.whoAreYou ?? '',
+    whatDrivesYou: p.whatDrivesYou ?? '',
+    keyStrengths: p.keyStrengths ?? '',
+    currentRole: p.currentRole ?? '',
+    totalExperience: p.totalExperience ?? '',
+    currentLocation: p.currentLocation ?? '',
+    noticePeriod: p.noticePeriod ?? '',
+    skills: Array.isArray(p.skills) ? p.skills : [],
+    experienceSummary: p.experienceSummary ?? '',
+    workExperiences: Array.isArray(p.workExperiences) ? p.workExperiences : [],
+    achievements: Array.isArray(p.achievements) ? p.achievements : [''],
+    metrics: Array.isArray(p.metrics) ? p.metrics : [],
+    awards: Array.isArray(p.awards) ? p.awards : [],
+    certifications: Array.isArray(p.certifications) ? p.certifications : [],
+    preferredRoles: Array.isArray(p.preferredRoles) ? p.preferredRoles : [],
+    preferredLocations: Array.isArray(p.preferredLocations) ? p.preferredLocations : [],
+    selfRating: typeof p.selfRating === 'number' ? p.selfRating : 0,
+    workMode: p.workMode ?? '',
+    salaryExpectation: p.salaryExpectation ?? '',
+    interviewNotes: p.interviewNotes ?? '',
+    resumeName: p.resumeName ?? null,
+    resumeText: p.resumeText ?? '',
+    completedSteps: p.completedSteps ?? 0,
+  }
+}
+
 export function getProfile(): SavedProfile | null {
   const user = getUser()
   const raw =
@@ -316,7 +434,7 @@ export function getProfile(): SavedProfile | null {
     localStorage.getItem(PROFILE_KEY)
   if (!raw) return null
   try {
-    return JSON.parse(raw) as SavedProfile
+    return normalizeProfile(JSON.parse(raw) as SavedProfile)
   } catch {
     return null
   }
@@ -376,18 +494,31 @@ export function getRankedJobs(): RankedJob[] {
   const roleHint = (
     interview?.role ||
     profile?.currentRole ||
-    profile?.preferredRoles[0] ||
+    profile?.preferredRoles?.[0] ||
     ''
   ).toLowerCase()
 
-  return JOB_MATCHES.map((job) => {
+  const employerPosted = getEmployerJobs().map((job) => ({
+    title: job.title,
+    company: job.company,
+    location: job.location,
+    match: 82,
+  }))
+
+  const catalog = [...employerPosted, ...JOB_MATCHES].filter(
+    (job, index, list) =>
+      list.findIndex((j) => j.title === job.title && j.company === job.company) === index,
+  )
+
+  return catalog
+    .map((job) => {
     let match = job.match
     if (unlocked) {
       match = Math.min(99, job.match + boost)
       if (roleHint && job.title.toLowerCase().includes(roleHint.split(' ')[0] ?? '')) {
         match = Math.min(99, match + 3)
       }
-      if (profile?.skills.some((s) => job.title.toLowerCase().includes(s.toLowerCase().slice(0, 4)))) {
+      if (profile?.skills?.some((s) => job.title.toLowerCase().includes(s.toLowerCase().slice(0, 4)))) {
         match = Math.min(99, match + 2)
       }
     } else {
@@ -447,7 +578,7 @@ export function applyToJob(job: {
   }
   const apps = getApplications()
   if (apps.some((a) => a.title === job.title && a.company === job.company)) {
-    return apps.find((a) => a.title === job.title)!
+    return apps.find((a) => a.title === job.title && a.company === job.company)!
   }
   const app: Application = {
     id: uid(),
@@ -457,7 +588,55 @@ export function applyToJob(job: {
   }
   apps.unshift(app)
   localStorage.setItem(appsKey(), JSON.stringify(apps))
+
+  const user = getUser()
+  const employerJobs = getEmployerJobs()
+  const match =
+    employerJobs.find(
+      (j) =>
+        j.title.toLowerCase() === job.title.toLowerCase() &&
+        j.company.toLowerCase() === job.company.toLowerCase(),
+    ) || employerJobs.find((j) => j.company.toLowerCase() === job.company.toLowerCase())
+
+  if (user && match) {
+    const already = getEmployerApplicants().some(
+      (a) => a.jobId === match.id && a.candidateEmail === user.email,
+    )
+    if (!already) {
+      saveEmployerApplicant({
+        jobId: match.id,
+        jobTitle: match.title,
+        company: match.company,
+        candidateName: user.name,
+        candidateEmail: user.email,
+        candidatePhone: '',
+        experienceYears: getProfile()?.totalExperience || '',
+        resumeName: getProfile()?.resumeName ?? null,
+        resumeText: getProfile()?.resumeText,
+        interviewResult: getInterviewResult() ?? undefined,
+      })
+    }
+  }
+
+  addNotification({
+    title: `Applied to ${job.title}`,
+    body: `${job.company} received your application and AI score.`,
+    href: '/applications',
+  })
   return app
+}
+
+export function withdrawApplication(id: string) {
+  const apps = getApplications().filter((a) => a.id !== id)
+  localStorage.setItem(appsKey(), JSON.stringify(apps))
+}
+
+export function updateApplicationStatus(
+  id: string,
+  status: Application['status'],
+) {
+  const apps = getApplications().map((a) => (a.id === id ? { ...a, status } : a))
+  localStorage.setItem(appsKey(), JSON.stringify(apps))
 }
 
 export function applicationStats() {
@@ -508,3 +687,224 @@ export const JOB_MATCHES = [
     match: 86,
   },
 ]
+
+/* ---------- EMPLOYER ATS STORE ---------- */
+
+const DEFAULT_DEMO_JOB: EmployerJob = {
+  id: 'job-demo-1',
+  title: 'Senior Frontend Developer',
+  company: 'TechCitta Solutions',
+  roleTrack: 'Frontend Developer',
+  experienceLevel: '6+ years',
+  location: 'Hyderabad / Remote',
+  jobDescription:
+    'Looking for a Senior Frontend Developer with 5+ years experience building modern web applications with React, TypeScript, state management, and performance optimization.',
+  requiredSkills: ['React', 'TypeScript', 'Redux', 'CSS Modules', 'GraphQL'],
+  createdByEmail: 'employer@hireright.com',
+  createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+  shareableCode: 'techcitta-sr-frontend',
+}
+
+const DEFAULT_DEMO_APPLICANT: EmployerApplicant = {
+  id: 'app-demo-1',
+  jobId: 'job-demo-1',
+  jobTitle: 'Senior Frontend Developer',
+  company: 'TechCitta Solutions',
+  candidateName: 'Vikram Mehta',
+  candidateEmail: 'vikram.m@example.com',
+  candidatePhone: '+91 98765 43210',
+  experienceYears: '6 years',
+  resumeName: 'Vikram_Mehta_Resume.pdf',
+  resumeText:
+    'Senior Frontend Developer with 6 years experience specializing in React, TypeScript, Redux, Performance, and Micro-frontends.',
+  interviewResult: {
+    role: 'Frontend Developer',
+    level: '6+ years',
+    date: new Date(Date.now() - 86400000 * 1).toISOString(),
+    overall: 92,
+    categories: [
+      { label: 'Communication', score: 94 },
+      { label: 'Technical', score: 92 },
+      { label: 'Problem Solving', score: 90 },
+      { label: 'Experience', score: 92 },
+    ],
+    strengths: [
+      'Exceptional React architecture knowledge',
+      'Clear, concise STAR method explanations',
+    ],
+    improvements: ['Could elaborate more on automated E2E testing'],
+    answers: [
+      {
+        question: 'Tell me about yourself',
+        answer: 'I have 6 years building high scale React apps...',
+        score: 95,
+        wordCount: 85,
+        keywordsHit: ['react', 'typescript'],
+        feedback: 'Strong intro.',
+      },
+    ],
+    resumeFitScore: 94,
+    agent: 'openrouter+hireright-agent',
+    integrity: { faceViolations: 0, singlePersonOk: true, maxFacesSeen: 1 },
+  },
+  appliedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+  status: 'Shortlisted',
+}
+
+export function getEmployerJobs(email?: string): EmployerJob[] {
+  try {
+    const raw = localStorage.getItem(EMPLOYER_JOBS_KEY)
+    if (!raw) {
+      localStorage.setItem(EMPLOYER_JOBS_KEY, JSON.stringify([DEFAULT_DEMO_JOB]))
+      return [DEFAULT_DEMO_JOB]
+    }
+    const jobs = JSON.parse(raw) as EmployerJob[]
+    if (email) return jobs.filter((j) => j.createdByEmail === email)
+    return jobs
+  } catch {
+    return [DEFAULT_DEMO_JOB]
+  }
+}
+
+export function getEmployerJobByCode(code: string): EmployerJob | null {
+  const jobs = getEmployerJobs()
+  return jobs.find((j) => j.shareableCode === code || j.id === code) ?? null
+}
+
+export function saveEmployerJob(
+  input: Omit<EmployerJob, 'id' | 'createdAt' | 'shareableCode'>,
+): EmployerJob {
+  const jobs = getEmployerJobs()
+  const user = getUser()
+  const code = `${input.company.toLowerCase().replace(/[^a-z0-9]/g, '')}-${input.title.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Math.random().toString(36).slice(2, 6)}`
+  const job: EmployerJob = {
+    ...input,
+    id: uid(),
+    createdByEmail: input.createdByEmail || user?.email || 'employer@hireright.com',
+    createdAt: new Date().toISOString(),
+    shareableCode: code,
+  }
+  jobs.unshift(job)
+  localStorage.setItem(EMPLOYER_JOBS_KEY, JSON.stringify(jobs))
+  return job
+}
+
+export function deleteEmployerJob(id: string) {
+  const jobs = getEmployerJobs().filter((j) => j.id !== id)
+  localStorage.setItem(EMPLOYER_JOBS_KEY, JSON.stringify(jobs))
+}
+
+export function getEmployerApplicants(jobId?: string): EmployerApplicant[] {
+  try {
+    const raw = localStorage.getItem(EMPLOYER_APPLICANTS_KEY)
+    if (!raw) {
+      localStorage.setItem(
+        EMPLOYER_APPLICANTS_KEY,
+        JSON.stringify([DEFAULT_DEMO_APPLICANT]),
+      )
+      return [DEFAULT_DEMO_APPLICANT]
+    }
+    const applicants = JSON.parse(raw) as EmployerApplicant[]
+    if (jobId) return applicants.filter((a) => a.jobId === jobId)
+    return applicants
+  } catch {
+    return [DEFAULT_DEMO_APPLICANT]
+  }
+}
+
+export function saveEmployerApplicant(
+  input: Omit<EmployerApplicant, 'id' | 'appliedAt' | 'status'>,
+): EmployerApplicant {
+  const applicants = getEmployerApplicants()
+  const applicant: EmployerApplicant = {
+    ...input,
+    id: uid(),
+    appliedAt: new Date().toISOString(),
+    status: 'New',
+  }
+  applicants.unshift(applicant)
+  localStorage.setItem(EMPLOYER_APPLICANTS_KEY, JSON.stringify(applicants))
+  return applicant
+}
+
+export function updateEmployerApplicantStatus(
+  id: string,
+  status: EmployerApplicant['status'],
+) {
+  const applicants = getEmployerApplicants()
+  const idx = applicants.findIndex((a) => a.id === id)
+  if (idx >= 0) {
+    applicants[idx].status = status
+    localStorage.setItem(EMPLOYER_APPLICANTS_KEY, JSON.stringify(applicants))
+    addNotification(
+      {
+        title: `Application ${status.toLowerCase()}`,
+        body: `${applicants[idx].company} marked you as ${status} for ${applicants[idx].jobTitle}.`,
+        href: '/applications',
+      },
+      applicants[idx].candidateEmail,
+    )
+  }
+}
+
+export function attachInterviewToApplicant(applicantId: string, result: InterviewResult) {
+  const applicants = getEmployerApplicants()
+  const idx = applicants.findIndex((a) => a.id === applicantId)
+  if (idx < 0) return
+  applicants[idx] = {
+    ...applicants[idx],
+    interviewResult: result,
+    status: result.overall >= 70 ? 'Shortlisted' : 'In Review',
+  }
+  localStorage.setItem(EMPLOYER_APPLICANTS_KEY, JSON.stringify(applicants))
+}
+
+export type AppNotification = {
+  id: string
+  title: string
+  body: string
+  href?: string
+  read: boolean
+  createdAt: string
+}
+
+const NOTIF_KEY = 'hireright.notifications'
+
+function notifKey(email?: string) {
+  const userEmail = email ?? getUser()?.email
+  return userEmail ? `${NOTIF_KEY}.${userEmail}` : NOTIF_KEY
+}
+
+export function getNotifications(email?: string): AppNotification[] {
+  try {
+    const raw = localStorage.getItem(notifKey(email))
+    return raw ? (JSON.parse(raw) as AppNotification[]) : []
+  } catch {
+    return []
+  }
+}
+
+export function addNotification(
+  input: Pick<AppNotification, 'title' | 'body' | 'href'>,
+  email?: string,
+) {
+  const list = getNotifications(email)
+  list.unshift({
+    id: uid(),
+    ...input,
+    read: false,
+    createdAt: new Date().toISOString(),
+  })
+  localStorage.setItem(notifKey(email), JSON.stringify(list.slice(0, 40)))
+  window.dispatchEvent(new Event('hireright-auth'))
+}
+
+export function markNotificationsRead() {
+  const list = getNotifications().map((n) => ({ ...n, read: true }))
+  localStorage.setItem(notifKey(), JSON.stringify(list))
+  window.dispatchEvent(new Event('hireright-auth'))
+}
+
+export function unreadNotificationCount() {
+  return getNotifications().filter((n) => !n.read).length
+}

@@ -32,19 +32,21 @@ export function MarketingPage({
 }: MarketingPageProps) {
   return (
     <div className={styles.page}>
-      <div className={styles.shell}>
-        <SiteNav />
-        <motion.main
-          className={styles.main}
-          variants={staggerContainer}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.section className={styles.hero} variants={fadeUp}>
-            <span className={styles.kicker}>{kicker}</span>
-            <h1>{title}</h1>
-            <p>{subtitle}</p>
-            <div className={styles.actions}>
+      <div className={styles.topHeroBlock}>
+        <div className={styles.shell}>
+          <SiteNav variant="dark" />
+          <motion.section
+            className={styles.hero}
+            variants={staggerContainer}
+            initial="hidden"
+            animate="show"
+          >
+            <motion.span className={styles.kicker} variants={fadeUp}>
+              {kicker}
+            </motion.span>
+            <motion.h1 variants={fadeUp}>{title}</motion.h1>
+            <motion.p variants={fadeUp}>{subtitle}</motion.p>
+            <motion.div className={styles.actions} variants={fadeUp}>
               <Link to={primaryCta.to} className={styles.primary}>
                 {primaryCta.label}
               </Link>
@@ -58,18 +60,31 @@ export function MarketingPage({
                   {secondaryCta.label}
                 </Link>
               )}
-            </div>
+            </motion.div>
           </motion.section>
+        </div>
+      </div>
 
+      <div className={styles.shell}>
+        <main className={styles.main}>
           {sections.length > 0 && (
-            <motion.section className={styles.grid} variants={staggerContainer}>
-              {sections.map((section) => (
+            <motion.section
+              className={styles.grid}
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.15 }}
+            >
+              {sections.map((section, index) => (
                 <motion.article
                   key={section.title}
                   className={styles.card}
                   variants={fadeUp}
                   whileHover={{ y: -4 }}
                 >
+                  <span className={styles.stepNum}>
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
                   <h2>{section.title}</h2>
                   <p>{section.body}</p>
                 </motion.article>
@@ -78,7 +93,27 @@ export function MarketingPage({
           )}
 
           {children}
-        </motion.main>
+
+          <motion.section
+            className={styles.ctaBanner}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div>
+              <h2>Ready to hire — or get hired — the right way?</h2>
+              <p>Create a free account and run the full loop: profile, AI interview, matches, ATS.</p>
+            </div>
+            <div className={styles.ctaActions}>
+              <Link to="/signup" className={styles.primary}>
+                Get Started Free
+              </Link>
+              <Link to="/how-it-works" className={styles.secondary}>
+                How It Works
+              </Link>
+            </div>
+          </motion.section>
+        </main>
       </div>
 
       <SiteFooter />

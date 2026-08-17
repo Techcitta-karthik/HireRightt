@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { VideoProctorTimeline } from '../components/VideoProctorTimeline'
 import {
   ADMIN_JOBS,
   MONTHLY_TRENDS,
@@ -56,7 +57,7 @@ export function AdminDashboard() {
         !q ||
         c.name.toLowerCase().includes(q) ||
         c.email.toLowerCase().includes(q) ||
-        c.skills.some((s) => s.toLowerCase().includes(q)) ||
+        c.skills?.some((s) => s.toLowerCase().includes(q)) ||
         c.currentTitle.toLowerCase().includes(q)
       const stageOk = stageFilter === 'All' || c.stage === stageFilter
       return hit && stageOk
@@ -402,7 +403,7 @@ export function AdminDashboard() {
                     const missing =
                       job?.requiredSkills.filter(
                         (s) =>
-                          !c.skills.some(
+                          !c.skills?.some(
                             (cs) => cs.toLowerCase() === s.toLowerCase(),
                           ),
                       ) ?? []
@@ -618,6 +619,32 @@ export function AdminDashboard() {
                   ))}
                 </select>
               </label>
+
+              {/* Real-time Video Timeline & Misbehavior Red Markers */}
+              <div style={{ marginTop: '20px' }}>
+                <VideoProctorTimeline
+                  logs={[
+                    {
+                      id: 'admin-log-1',
+                      timestamp: new Date().toISOString(),
+                      formattedTime: '02:14 PM',
+                      eventType: 'SIDE_GAZE_LOOKING_AWAY',
+                      severity: 'warn',
+                      message: '👀 Candidate looking away off-screen (Side Gaze: 34°)',
+                      questionIndex: 1,
+                    },
+                    {
+                      id: 'admin-log-2',
+                      timestamp: new Date().toISOString(),
+                      formattedTime: '02:16 PM',
+                      eventType: 'MULTIPLE_FACES_DETECTED',
+                      severity: 'ban',
+                      message: '🚨 MULTIPLE FACES DETECTED: 2 people seen in camera frame',
+                      questionIndex: 3,
+                    },
+                  ]}
+                />
+              </div>
             </motion.aside>
           </motion.div>
         )}

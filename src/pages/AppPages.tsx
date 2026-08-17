@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { SiteNav } from '../components/SiteNav'
 import { fadeUp, staggerContainer } from '../motion/variants'
@@ -14,21 +14,28 @@ import {
   calcProfileStrength,
   canApplyToJobs,
   firstName,
+  getApplications,
   getInterviewResult,
   getProfile,
   getRankedJobs,
   getUser,
   hasInterviewScore,
+  markNotificationsRead,
+  withdrawApplication,
 } from '../lib/store'
 import styles from './AppPages.module.css'
 
 export function DashboardPage() {
+  const user = getUser()
+  if (user?.role === 'employer') {
+    return <Navigate to="/employer/dashboard" replace />
+  }
   const interview = getInterviewResult()
   const profile = getProfile()
   const name = firstName()
   const strength = calcProfileStrength(profile)
   const stats = applicationStats()
-  const ranked = useMemo(() => getRankedJobs().slice(0, 3), [interview])
+  const ranked = getRankedJobs().slice(0, 3)
 
   return (
     <div className={styles.page}>
@@ -200,7 +207,7 @@ export function DashboardPage() {
               <div className={styles.quick}>
                 <Link to="/interview">AI interview studio</Link>
                 <Link to="/jobs">Ranked job matches</Link>
-                <Link to="/admin">Admin ATS dashboard</Link>
+                <Link to="/applications">My applications</Link>
                 <Link to="/profile">Talent scorecard</Link>
                 <Link to="/onboarding">Profile details</Link>
               </div>
@@ -218,7 +225,7 @@ export function JobsPage() {
   const interview = getInterviewResult()
   const unlocked = hasInterviewScore()
   const canApply = canApplyToJobs()
-  const ranked = useMemo(() => getRankedJobs(), [interview])
+  const ranked = getRankedJobs()
 
   function handleApply(job: (typeof ranked)[number]) {
     try {
@@ -289,7 +296,7 @@ export function JobsPage() {
           <div className={styles.jobList}>
             {ranked.map((job) => (
               <motion.article
-                key={job.title}
+                key={`${job.company}-${job.title}`}
                 className={`${styles.jobCard} ${job.locked ? styles.jobLocked : ''}`}
                 variants={fadeUp}
                 whileHover={{ y: -3 }}
@@ -374,7 +381,7 @@ export function ProfilePage() {
                 <div className={styles.stats}>
                   {[
                     [String(interview.overall), 'Overall'],
-                    ...interview.categories.map(
+                    ...(interview.categories ?? []).map(
                       (c) => [String(c.score), c.label] as [string, string],
                     ),
                   ].map(([value, label]) => (
@@ -388,7 +395,7 @@ export function ProfilePage() {
                   <div>
                     <h3>Strengths</h3>
                     <ul>
-                      {interview.strengths.map((s) => (
+                      {(interview.strengths ?? []).map((s) => (
                         <li key={s}>{s}</li>
                       ))}
                     </ul>
@@ -396,7 +403,7 @@ export function ProfilePage() {
                   <div>
                     <h3>Improve next</h3>
                     <ul>
-                      {interview.improvements.map((s) => (
+                      {(interview.improvements ?? []).map((s) => (
                         <li key={s}>{s}</li>
                       ))}
                     </ul>
@@ -415,9 +422,9 @@ export function ProfilePage() {
             <div className={styles.stats}>
               {[
                 [`${strength}%`, 'Readiness'],
-                [String(profile?.skills.length ?? 0), 'Skills'],
+                [String(profile?.skills?.length ?? 0), 'Skills'],
                 [
-                  String(profile?.achievements.filter(Boolean).length ?? 0),
+                  String(profile?.achievements?.filter(Boolean).length ?? 0),
                   'Achievements',
                 ],
                 [interview ? 'Certified' : 'Pending', 'Interview'],
@@ -449,9 +456,93 @@ export function ProfilePage() {
             <div className={styles.quick}>
               <Link to="/dashboard">Dashboard</Link>
               <Link to="/jobs">Matches</Link>
+              <Link to="/applications">Applications</Link>
               <Link to="/interview">Interview studio</Link>
             </div>
           </motion.section>
+        </motion.main>
+      </div>
+    </div>
+  )
+}
+
+export function ApplicationsPage() {
+  const [apps, setApps] = useState(() => getApplications())
+  const interview = getInterviewResult()
+
+  useEffect(() => {
+    markNotificationsRead()
+  }, [])
+
+  function handleWithdraw(id: string) {
+    withdrawApplication(id)
+    setApps(getApplications())
+  }
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.shell}>
+        <SiteNav />
+        <motion.main
+          className={styles.main}
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.header className={styles.head} variants={fadeUp}>
+            <div>
+              <h1>My applications</h1>
+              <p>
+                Track every role you applied to. Status updates from employers
+                show up here automatically.
+              </p>
+            </div>
+            <Link to="/jobs" className={styles.primary}>
+              Find more roles
+            </Link>
+          </motion.header>
+
+          {apps.length === 0 ? (
+            <motion.aside className={styles.unlockBanner} variants={fadeUp}>
+              <div>
+                <strong>No applications yet</strong>
+                <p>
+                  {interview
+                    ? 'Browse ranked matches and apply with your AI score.'
+                    : 'Complete your AI interview first, then apply to unlocked roles.'}
+                </p>
+              </div>
+              <Link to={interview ? '/jobs' : '/interview'} className={styles.primary}>
+                {interview ? 'Browse jobs →' : 'Take interview →'}
+              </Link>
+            </motion.aside>
+          ) : (
+            <div className={styles.jobList}>
+              {apps.map((app) => (
+                <motion.article key={app.id} className={styles.jobCard} variants={fadeUp}>
+                  <div>
+                    <h2>{app.title}</h2>
+                    <p>
+                      {app.company} · {app.location}
+                    </p>
+                    <span className={styles.lockTag}>
+                      {app.status} · {new Date(app.appliedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className={styles.jobRight}>
+                    <b>{app.match}% Match</b>
+                    <button
+                      type="button"
+                      className={styles.secondary}
+                      onClick={() => handleWithdraw(app.id)}
+                    >
+                      Withdraw
+                    </button>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          )}
         </motion.main>
       </div>
     </div>
